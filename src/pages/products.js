@@ -1,337 +1,230 @@
 // src/pages/products.js
+import Layout from '@/components/layout/Layout';
+import Button from '@/components/ui/Button';
+import Card from '@/components/ui/Card';
+import Motion from '@/components/ui/Motion';
+import SEO from '@/components/SEO';
+
 export default function Products() {
-    // Define a common link style to use throughout the navigation
-    const navLinkStyle = { color: '#4b5563' };
-    
-    // Common card style
-    const productCardStyle = {
-      backgroundColor: 'white',
-      padding: '1.5rem',
-      borderRadius: '0.5rem',
-      boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)',
-      display: 'flex',
-      flexDirection: 'column',
-      height: '100%'
-    };
-    
-    return (
-      <div style={{ 
-        width: '100%', 
-        display: 'flex', 
-        flexDirection: 'column', 
-        alignItems: 'center' 
-      }}>
-        <div style={{ 
-          maxWidth: '1000px', 
-          width: '100%', 
-          padding: '2rem', 
-          boxSizing: 'border-box' 
-        }}>
-          <header style={{ 
-            marginBottom: '2rem', 
-            textAlign: 'center' 
-          }}>
-            <h1 style={{ fontSize: '1.875rem', fontWeight: 'bold', color: '#1e3a8a' }}>
-              Zenith Capital Advisors
+  // Structured data for rich search results
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ItemList",
+    "itemListElement": [
+      {
+        "@type": "Product",
+        "position": 1,
+        "name": "Multi-Family Acquisition Model",
+        "description": "Comprehensive underwriting for apartment complexes with unit-level analysis, renovation scenarios, and financing options.",
+        "offers": {
+          "@type": "Offer",
+          "price": "299",
+          "priceCurrency": "USD"
+        }
+      },
+      {
+        "@type": "Product",
+        "position": 2,
+        "name": "Office Property Acquisition Model",
+        "description": "Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for office investments.",
+        "offers": {
+          "@type": "Offer",
+          "price": "349",
+          "priceCurrency": "USD"
+        }
+      }
+    ]
+  };
+
+  return (
+    <Layout>
+      <SEO
+        title="Financial Models"
+        description="Explore our pre-built financial models for public and private equity investments."
+        structuredData={structuredData}
+      />
+      
+      {/* Hero Section */}
+      <section className="bg-navy-700 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
+          <Motion animation="fade" direction="down" duration={800}>
+            <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
+              Financial Models
             </h1>
-            <nav style={{ 
-              marginTop: '1rem', 
-              display: 'flex', 
-              justifyContent: 'center', 
-              gap: '1.5rem' 
-            }}>
-              <a href="/" style={navLinkStyle}>Home</a>
-              <a href="/about" style={navLinkStyle}>About</a>
-              <a href="/products" style={{...navLinkStyle, fontWeight: 'bold'}}>Products</a>
-              <a href="/services" style={navLinkStyle}>Services</a>
-              <a href="/contact" style={navLinkStyle}>Contact</a>
-            </nav>
-          </header>
+          </Motion>
           
-          <main>
-            {/* Hero Section */}
-            <section style={{ 
-              padding: '3rem 1rem', 
-              backgroundColor: '#1a3a5f', 
-              marginBottom: '2rem', 
-              borderRadius: '0.5rem', 
-              textAlign: 'center' 
-            }}>
-              <h2 style={{ 
-                fontSize: '2.25rem', 
-                fontWeight: 'bold', 
-                marginBottom: '1rem',
-                color: 'white' // Explicitly set to white
-              }}>
-                Financial Models
-              </h2>
-              <p style={{ fontSize: '1.25rem', marginBottom: '2rem', color: 'white' }}>
-                Pre-built Excel solutions to streamline your investment analysis
-              </p>
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                gap: '1rem', 
-                flexWrap: 'wrap' 
-              }}>
-                <a href="/contact" style={{ 
-                  backgroundColor: '#ffd700', 
-                  color: '#1a3a5f',
-                  padding: '0.75rem 1.5rem', 
-                  borderRadius: '0.375rem', 
-                  fontWeight: '500',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  Request a Custom Model
-                </a>
-              </div>
-            </section>
-            
-            {/* Filter Section */}
-            <section style={{
-              marginBottom: '2rem',
-              padding: '1.5rem',
-              backgroundColor: 'white',
-              borderRadius: '0.5rem',
-              boxShadow: '0 1px 3px 0 rgba(0, 0, 0, 0.1)'
-            }}>
-              <div style={{
-                display: 'flex',
-                flexWrap: 'wrap',
-                alignItems: 'center',
-                gap: '1rem'
-              }}>
-                <span style={{ fontWeight: '500', color: '#4b5563' }}>Filter by:</span>
-                <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap' }}>
-                  <button style={{
-                    padding: '0.5rem 0.75rem',
-                    backgroundColor: '#1a3a5f',
-                    color: 'white',
-                    borderRadius: '9999px',
-                    border: 'none',
-                    fontSize: '0.875rem',
-                    cursor: 'pointer'
-                  }}>
+          <Motion animation="fade" direction="up" delay={200} duration={800}>
+            <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
+              Pre-built Excel solutions to streamline your investment analysis
+            </p>
+          </Motion>
+          
+          <Motion animation="fade" direction="up" delay={400}>
+            <Button href="/contact" variant="accent" size="lg">
+              Request a Custom Model
+            </Button>
+          </Motion>
+        </div>
+      </section>
+      
+      {/* Filter Section */}
+      <section className="py-6">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Motion animation="fade" direction="up">
+            <Card className="p-4">
+              <div className="flex flex-wrap items-center gap-4">
+                <span className="font-medium text-navy-700 dark:text-white">Filter by:</span>
+                <div className="flex flex-wrap gap-2">
+                  <button className="px-4 py-2 bg-navy-700 text-white rounded-full text-sm font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500">
                     All Models
                   </button>
-                  <button style={{
-                    padding: '0.5rem 0.75rem',
-                    backgroundColor: '#f3f4f6',
-                    color: '#4b5563',
-                    borderRadius: '9999px',
-                    border: 'none',
-                    fontSize: '0.875rem',
-                    cursor: 'pointer'
-                  }}>
+                  <button className="px-4 py-2 bg-gray-100 dark:bg-navy-800 text-navy-700 dark:text-gray-300 rounded-full text-sm font-medium hover:bg-gray-200 dark:hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500">
                     Private Equity
                   </button>
-                  <button style={{
-                    padding: '0.5rem 0.75rem',
-                    backgroundColor: '#f3f4f6',
-                    color: '#4b5563',
-                    borderRadius: '9999px',
-                    border: 'none',
-                    fontSize: '0.875rem',
-                    cursor: 'pointer'
-                  }}>
+                  <button className="px-4 py-2 bg-gray-100 dark:bg-navy-800 text-navy-700 dark:text-gray-300 rounded-full text-sm font-medium hover:bg-gray-200 dark:hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500">
                     Public Equity
                   </button>
                 </div>
               </div>
-            </section>
-            
-            {/* Private Equity Models */}
-            <section style={{ marginBottom: '3rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#1a3a5f' }}>
-                Private Equity Models
-              </h2>
-              
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                gap: '1.5rem',
-                marginBottom: '2rem'
-              }}>
-                {/* Product 1 */}
-                <div style={productCardStyle}>
-                  <div style={{
-                    height: '150px',
-                    backgroundColor: '#f3f4f6',
-                    borderRadius: '0.25rem',
-                    marginBottom: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#9ca3af'
-                  }}>
-                    [Excel Preview]
-                  </div>
-                  <div style={{ padding: '0.25rem 0.5rem', backgroundColor: '#e6f0ff', color: '#1a3a5f', borderRadius: '9999px', display: 'inline-block', fontSize: '0.75rem', marginBottom: '0.5rem' }}>
-                    Private Equity
-                  </div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1a3a5f' }}>
-                    Multi-Family Acquisition Model
-                  </h3>
-                  <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem', flexGrow: 1 }}>
-                    Comprehensive underwriting for apartment complexes with unit-level analysis, renovation scenarios, and financing options.
-                  </p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 'bold', color: '#1a3a5f' }}>$299</span>
-                    <a href="#" style={{ color: '#3b82f6', fontWeight: '500', fontSize: '0.875rem' }}>View Details</a>
-                  </div>
-                </div>
-                
-                {/* Product 2 */}
-                <div style={productCardStyle}>
-                  <div style={{
-                    height: '150px',
-                    backgroundColor: '#f3f4f6',
-                    borderRadius: '0.25rem',
-                    marginBottom: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#9ca3af'
-                  }}>
-                    [Excel Preview]
-                  </div>
-                  <div style={{ padding: '0.25rem 0.5rem', backgroundColor: '#e6f0ff', color: '#1a3a5f', borderRadius: '9999px', display: 'inline-block', fontSize: '0.75rem', marginBottom: '0.5rem' }}>
-                    Private Equity
-                  </div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1a3a5f' }}>
-                    Office Property Acquisition Model
-                  </h3>
-                  <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem', flexGrow: 1 }}>
-                    Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for office investments.
-                  </p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 'bold', color: '#1a3a5f' }}>$349</span>
-                    <a href="#" style={{ color: '#3b82f6', fontWeight: '500', fontSize: '0.875rem' }}>View Details</a>
-                  </div>
-                </div>
-              </div>
-            </section>
-            
-            {/* Public Equity Models */}
-            <section style={{ marginBottom: '3rem' }}>
-              <h2 style={{ fontSize: '1.5rem', fontWeight: 'bold', marginBottom: '1.5rem', color: '#1a3a5f' }}>
-                Public Equity Models
-              </h2>
-              
-              <div style={{
-                display: 'grid',
-                gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))',
-                gap: '1.5rem',
-                marginBottom: '2rem'
-              }}>
-                {/* Product 3 */}
-                <div style={productCardStyle}>
-                  <div style={{
-                    height: '150px',
-                    backgroundColor: '#f3f4f6',
-                    borderRadius: '0.25rem',
-                    marginBottom: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#9ca3af'
-                  }}>
-                    [Excel Preview]
-                  </div>
-                  <div style={{ padding: '0.25rem 0.5rem', backgroundColor: '#e1f0ff', color: '#1e40af', borderRadius: '9999px', display: 'inline-block', fontSize: '0.75rem', marginBottom: '0.5rem' }}>
-                    Public Equity
-                  </div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1a3a5f' }}>
-                    DCF Valuation Suite
-                  </h3>
-                  <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem', flexGrow: 1 }}>
-                    Comprehensive discounted cash flow analysis for public companies with integrated financial statement projections.
-                  </p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 'bold', color: '#1a3a5f' }}>$249</span>
-                    <a href="#" style={{ color: '#3b82f6', fontWeight: '500', fontSize: '0.875rem' }}>View Details</a>
-                  </div>
-                </div>
-                
-                {/* Product 4 */}
-                <div style={productCardStyle}>
-                  <div style={{
-                    height: '150px',
-                    backgroundColor: '#f3f4f6',
-                    borderRadius: '0.25rem',
-                    marginBottom: '1rem',
-                    display: 'flex',
-                    alignItems: 'center',
-                    justifyContent: 'center',
-                    color: '#9ca3af'
-                  }}>
-                    [Excel Preview]
-                  </div>
-                  <div style={{ padding: '0.25rem 0.5rem', backgroundColor: '#e1f0ff', color: '#1e40af', borderRadius: '9999px', display: 'inline-block', fontSize: '0.75rem', marginBottom: '0.5rem' }}>
-                    Public Equity
-                  </div>
-                  <h3 style={{ fontSize: '1.125rem', fontWeight: 'bold', marginBottom: '0.5rem', color: '#1a3a5f' }}>
-                    Portfolio Attribution Model
-                  </h3>
-                  <p style={{ color: '#6b7280', fontSize: '0.875rem', marginBottom: '1rem', flexGrow: 1 }}>
-                    Analyze performance drivers and attribution factors across investment positions.
-                  </p>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-                    <span style={{ fontWeight: 'bold', color: '#1a3a5f' }}>$279</span>
-                    <a href="#" style={{ color: '#3b82f6', fontWeight: '500', fontSize: '0.875rem' }}>View Details</a>
-                  </div>
-                </div>
-              </div>
-            </section>
-            
-            {/* CTA Section */}
-            <section style={{ 
-              padding: '3rem 1rem', 
-              backgroundColor: '#1a3a5f', 
-              marginBottom: '2rem', 
-              borderRadius: '0.5rem', 
-              textAlign: 'center' 
-            }}>
-              <h2 style={{ fontSize: '2rem', fontWeight: 'bold', marginBottom: '1rem', color: 'white' }}>
-                Need Something More Tailored?
-              </h2>
-              <p style={{ fontSize: '1.125rem', marginBottom: '2rem', color: 'white' }}>
-                Our custom financial modeling services can create bespoke solutions for your specific investment needs.
-              </p>
-              <div style={{ 
-                display: 'flex', 
-                justifyContent: 'center', 
-                gap: '1rem', 
-                flexWrap: 'wrap' 
-              }}>
-                <a href="/services" style={{ 
-                  backgroundColor: '#ffd700', 
-                  color: '#1a3a5f',
-                  padding: '0.75rem 1.5rem', 
-                  borderRadius: '0.375rem', 
-                  fontWeight: '500',
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  justifyContent: 'center'
-                }}>
-                  Learn About Custom Services
-                </a>
-              </div>
-            </section>
-          </main>
-          
-          <footer style={{ 
-            paddingTop: '2rem', 
-            borderTop: '1px solid #e5e7eb', 
-            marginTop: '3rem', 
-            color: '#6b7280', 
-            textAlign: 'center' 
-          }}>
-            <p>&copy; {new Date().getFullYear()} Zenith Capital Advisors</p>
-          </footer>
+            </Card>
+          </Motion>
         </div>
-      </div>
-    );
-  }
+      </section>
+      
+      {/* Private Equity Models */}
+      <section className="py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Motion animation="fade" direction="up">
+            <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-6">
+              Private Equity Models
+            </h2>
+          </Motion>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {/* Product 1 */}
+            <Motion animation="fade" direction="up" delay={200}>
+              <Card>
+                <div className="h-40 bg-gray-100 dark:bg-navy-700 rounded mb-4 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                  [Excel Preview]
+                </div>
+                <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium mb-2">
+                  Private Equity
+                </span>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Multi-Family Acquisition Model
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-grow">
+                  Comprehensive underwriting for apartment complexes with unit-level analysis, renovation scenarios, and financing options.
+                </p>
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-navy-700 dark:text-white">$299</span>
+                  <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">View Details</a>
+                </div>
+              </Card>
+            </Motion>
+            
+            {/* Product 2 */}
+            <Motion animation="fade" direction="up" delay={300}>
+              <Card>
+                <div className="h-40 bg-gray-100 dark:bg-navy-700 rounded mb-4 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                  [Excel Preview]
+                </div>
+                <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium mb-2">
+                  Private Equity
+                </span>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Office Property Acquisition Model
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-grow">
+                  Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for office investments.
+                </p>
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-navy-700 dark:text-white">$349</span>
+                  <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">View Details</a>
+                </div>
+              </Card>
+            </Motion>
+          </div>
+        </div>
+      </section>
+      
+      {/* Public Equity Models */}
+      <section className="py-12 bg-gray-50 dark:bg-navy-900/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Motion animation="fade" direction="up">
+            <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-6">
+              Public Equity Models
+            </h2>
+          </Motion>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-12">
+            {/* Product 3 */}
+            <Motion animation="fade" direction="up" delay={200}>
+              <Card>
+                <div className="h-40 bg-gray-100 dark:bg-navy-700 rounded mb-4 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                  [Excel Preview]
+                </div>
+                <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium mb-2">
+                  Public Equity
+                </span>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  DCF Valuation Suite
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-grow">
+                  Comprehensive discounted cash flow analysis for public companies with integrated financial statement projections.
+                </p>
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-navy-700 dark:text-white">$249</span>
+                  <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">View Details</a>
+                </div>
+              </Card>
+            </Motion>
+            
+            {/* Product 4 */}
+            <Motion animation="fade" direction="up" delay={300}>
+              <Card>
+                <div className="h-40 bg-gray-100 dark:bg-navy-700 rounded mb-4 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                  [Excel Preview]
+                </div>
+                <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium mb-2">
+                  Public Equity
+                </span>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Portfolio Attribution Model
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 flex-grow">
+                  Analyze performance drivers and attribution factors across investment positions.
+                </p>
+                <div className="flex justify-between items-center">
+                  <span className="font-bold text-navy-700 dark:text-white">$279</span>
+                  <a href="#" className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">View Details</a>
+                </div>
+              </Card>
+            </Motion>
+          </div>
+        </div>
+      </section>
+      
+      {/* CTA Section */}
+      <section className="bg-navy-900 text-white py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+          <Motion animation="fade" direction="up">
+            <h2 className="text-3xl font-bold mb-4">Need Something More Tailored?</h2>
+          </Motion>
+          
+          <Motion animation="fade" direction="up" delay={200}>
+            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+              Our custom financial modeling services can create bespoke solutions for your specific investment needs.
+            </p>
+          </Motion>
+          
+          <Motion animation="fade" direction="up" delay={400}>
+            <Button href="/services" variant="accent" size="lg">
+              Learn About Custom Services
+            </Button>
+          </Motion>
+        </div>
+      </section>
+    </Layout>
+  );
+}

@@ -1,4 +1,3 @@
-// src/components/ui/Hero.js
 import Button from './Button';
 
 export default function Hero({
@@ -16,9 +15,9 @@ export default function Hero({
   // Background styles
   const backgroundStyles = backgroundImage
     ? { backgroundImage: `url(${backgroundImage})`, backgroundSize: 'cover', backgroundPosition: 'center' }
-    : { backgroundColor: '#1a3a5f' };
+    : {}; // We'll use a class instead for solid color
   
-  // Overlay styles
+  // Overlay class
   const overlayClass = overlay ? 'relative bg-gradient-to-r from-navy-900/80 to-navy-900/60' : '';
   
   // Height styles
@@ -33,7 +32,7 @@ export default function Hero({
   
   return (
     <div 
-      className={`${heightClass} flex flex-col justify-center ${overlayClass}`} 
+      className={`${heightClass} flex flex-col justify-center ${overlayClass} bg-navy-700`} 
       style={backgroundStyles}
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 w-full">

@@ -1,4 +1,3 @@
-// src/components/ui/Card.js
 export default function Card({ 
   children, 
   className = '', 

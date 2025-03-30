@@ -1,4 +1,3 @@
-// src/components/ui/Button.js
 import Link from 'next/link';
 
 export default function Button({ 
@@ -11,9 +10,9 @@ export default function Button({
   fullWidth = false,
   type = 'button'
 }) {
-  // Variant styles
+  // Variant styles with consistent colors
   const variants = {
-    primary: 'bg-navy-700 hover:bg-navy-900 text-white',
+    primary: 'bg-navy-700 hover:bg-navy-800 text-white',
     secondary: 'bg-white border border-navy-700 text-navy-700 hover:bg-gray-50',
     accent: 'bg-gold-500 hover:bg-gold-600 text-navy-900',
     ghost: 'bg-transparent hover:bg-gray-50 text-navy-700'
@@ -27,7 +26,7 @@ export default function Button({
   };
   
   // Base styles
-  const baseStyles = 'inline-flex items-center justify-center rounded font-medium focus:outline-none transition duration-150 ease-in-out';
+  const baseStyles = 'inline-flex items-center justify-center rounded font-medium focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500 transition duration-150 ease-in-out';
   
   // Combined styles
   const buttonStyles = `${baseStyles} ${variants[variant]} ${sizes[size]} ${fullWidth ? 'w-full' : ''} ${className}`;
