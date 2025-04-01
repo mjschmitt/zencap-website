@@ -1,8 +1,9 @@
-// src/components/layout/Layout.js
+// src/components/layout/Layout.js - With transition improvements
 import Head from 'next/head';
 import Header from './Header';
 import Footer from './Footer';
 import ScrollToTop from '../ui/ScrollToTop';
+import PerformanceMonitor from '../PerformanceMonitor';
 
 export default function Layout({ 
   children, 
@@ -40,6 +41,7 @@ export default function Layout({
       <Footer />
       
       <ScrollToTop />
+      <PerformanceMonitor />
     </div>
   );
 }

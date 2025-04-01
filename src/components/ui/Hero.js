@@ -1,3 +1,4 @@
+// src/components/ui/Hero.js
 import Button from './Button';
 
 export default function Hero({

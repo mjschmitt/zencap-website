@@ -1,3 +1,4 @@
+// src/pages/contact.js
 import { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
@@ -5,8 +6,19 @@ import Card from '@/components/ui/Card';
 import Motion from '@/components/ui/Motion';
 import Accordion from '@/components/ui/Accordion';
 import ContactForm from '@/components/ui/ContactForm';
+import SEO from '@/components/SEO';
 
 export default function Contact() {
+  const [openIndex, setOpenIndex] = useState(null);
+
+  const toggleItem = (index) => {
+    if (openIndex === index) {
+      setOpenIndex(null);
+    } else {
+      setOpenIndex(index);
+    }
+  };
+
   const faqItems = [
     {
       title: "What is the typical turnaround time for custom services?",
@@ -31,21 +43,47 @@ export default function Contact() {
     // Here you would typically send the data to your backend
   };
 
+  // Structured data for rich search results
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "ContactPage",
+    "name": "Contact Zenith Capital Advisors",
+    "description": "Get in touch with our team to discuss your financial modeling and investment advisory needs.",
+    "mainEntity": {
+      "@type": "Organization",
+      "name": "Zenith Capital Advisors",
+      "telephone": "+1-555-123-4567",
+      "email": "info@zencap.co",
+      "address": {
+        "@type": "PostalAddress",
+        "streetAddress": "123 Finance Street",
+        "addressLocality": "New York",
+        "addressRegion": "NY",
+        "postalCode": "10001",
+        "addressCountry": "US"
+      }
+    }
+  };
+
   return (
-    <Layout
-      title="Contact Us | Zenith Capital Advisors"
-      description="Get in touch with our team to discuss your financial modeling and investment advisory needs."
-    >
+    <Layout>
+      <SEO
+        title="Contact Us"
+        description="Get in touch with our team to discuss your financial modeling and investment advisory needs."
+        structuredData={structuredData}
+      />
+      
       {/* Page Header */}
-      <section className="bg-navy-50 py-12">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Motion animation="fade" direction="up">
-            <h1 className="text-3xl md:text-4xl font-bold text-navy-700 mb-4">
+      <section className="bg-navy-700 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
+          <Motion animation="fade" direction="down" duration={800}>
+            <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
               Contact Us
             </h1>
           </Motion>
-          <Motion animation="fade" direction="up" delay={200}>
-            <p className="text-xl text-navy-600 max-w-3xl mx-auto">
+          
+          <Motion animation="fade" direction="up" delay={200} duration={800}>
+            <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
               Let's discuss how we can help elevate your investment process
             </p>
           </Motion>
@@ -75,7 +113,7 @@ export default function Contact() {
                 
                 <div className="space-y-4">
                   <div className="flex items-start">
-                    <svg className="h-6 w-6 text-gold-500 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="h-6 w-6 text-teal-500 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <div>
@@ -87,7 +125,7 @@ export default function Contact() {
                   </div>
                   
                   <div className="flex items-start">
-                    <svg className="h-6 w-6 text-gold-500 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="h-6 w-6 text-teal-500 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
                     <div>
@@ -99,7 +137,7 @@ export default function Contact() {
                   </div>
                   
                   <div className="flex items-start">
-                    <svg className="h-6 w-6 text-gold-500 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                    <svg className="h-6 w-6 text-teal-500 mt-1 mr-3 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
@@ -147,17 +185,51 @@ export default function Contact() {
         </div>
       </section>
       
-      {/* FAQ Section */}
-      <section className="py-16 bg-gray-50">
+      {/* FAQ Section - Custom implementation instead of using Accordion component */}
+      <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
-            <h2 className="text-2xl font-bold text-navy-700 mb-8 text-center">
+            <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-8 text-center">
               Frequently Asked Questions
             </h2>
           </Motion>
           
           <Motion animation="fade" direction="up" delay={200} className="max-w-4xl mx-auto">
-            <Accordion items={faqItems} />
+            <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md p-6">
+              {faqItems.map((item, index) => (
+                <div key={index} className="border-b border-gray-200 dark:border-navy-700 last:border-b-0 py-4">
+                  <button
+                    onClick={() => toggleItem(index)}
+                    className="flex justify-between items-center w-full text-left font-medium text-navy-700 dark:text-white focus:outline-none bg-transparent"
+                  >
+                    <span>{item.title}</span>
+                    <svg
+                      className={`w-5 h-5 ml-2 text-teal-500 transform transition-transform duration-200 ${
+                        openIndex === index ? 'rotate-180' : ''
+                      }`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                      xmlns="http://www.w3.org/2000/svg"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                      />
+                    </svg>
+                  </button>
+                  <div
+                    className={`overflow-hidden transition-all duration-300 ${
+                      openIndex === index ? 'max-h-96 opacity-100 mt-2' : 'max-h-0 opacity-0'
+                    }`}
+                  >
+                    <div className="text-gray-600 dark:text-gray-300 text-sm">{item.content}</div>
+                  </div>
+                </div>
+              ))}
+            </div>
           </Motion>
         </div>
       </section>

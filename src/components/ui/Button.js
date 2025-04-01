@@ -14,7 +14,7 @@ export default function Button({
   const variants = {
     primary: 'bg-navy-700 hover:bg-navy-800 text-white',
     secondary: 'bg-white border border-navy-700 text-navy-700 hover:bg-gray-50',
-    accent: 'bg-gold-500 hover:bg-gold-600 text-navy-900',
+    accent: 'bg-teal-500 hover:bg-teal-600 text-white',
     ghost: 'bg-transparent hover:bg-gray-50 text-navy-700'
   };
   

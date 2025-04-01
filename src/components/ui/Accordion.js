@@ -13,16 +13,16 @@ export default function Accordion({ items }) {
   };
 
   return (
-    <div className="divide-y divide-gray-200">
+    <div className="divide-y divide-gray-200 dark:divide-gray-700">
       {items.map((item, index) => (
         <div key={index} className="py-4">
           <button
             onClick={() => toggleItem(index)}
-            className="flex justify-between items-center w-full text-left font-medium text-navy-700 focus:outline-none"
+            className="flex justify-between items-center w-full text-left font-medium text-navy-700 dark:text-white focus:outline-none bg-transparent"
           >
             <span>{item.title}</span>
             <svg
-              className={`w-5 h-5 ml-2 transform transition-transform duration-200 ${
+              className={`w-5 h-5 ml-2 text-teal-500 transform transition-transform duration-200 ${
                 openIndex === index ? 'rotate-180' : ''
               }`}
               fill="none"
@@ -43,7 +43,7 @@ export default function Accordion({ items }) {
               openIndex === index ? 'max-h-96 opacity-100' : 'max-h-0 opacity-0'
             }`}
           >
-            <div className="text-gray-600 text-sm py-2">{item.content}</div>
+            <div className="text-gray-600 dark:text-gray-300 text-sm py-2">{item.content}</div>
           </div>
         </div>
       ))}

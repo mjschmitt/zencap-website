@@ -1,3 +1,4 @@
+// src/components/layout/Footer.js
 import Link from 'next/link';
 
 export default function Footer() {
@@ -9,7 +10,7 @@ export default function Footer() {
           <div className="col-span-1 md:col-span-1">
             <div className="flex items-center mb-4">
               <div className="h-8 w-8 mr-2 bg-white rounded-full flex items-center justify-center">
-                <div className="h-4 w-4 bg-gold-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
+                <div className="h-4 w-4 bg-teal-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
               </div>
               <span className="text-white font-serif text-2xl font-bold">Zenith</span>
             </div>
@@ -97,7 +98,7 @@ export default function Footer() {
               </li>
               <li>
                 <Link href="/contact">
-                  <div className="mt-4 inline-block bg-gold-500 text-navy-900 px-4 py-2 text-sm font-medium rounded hover:bg-gold-600 cursor-pointer">
+                  <div className="mt-4 inline-block bg-teal-500 text-white px-4 py-2 text-sm font-medium rounded hover:bg-teal-600 cursor-pointer">
                     Contact Us
                   </div>
                 </Link>

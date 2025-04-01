@@ -6,15 +6,25 @@ export default function DarkModeToggle() {
 
   // Initialize dark mode based on user preference or system preference
   useEffect(() => {
-    const isDarkMode = localStorage.getItem('darkMode') === 'true' || 
-      (window.matchMedia && window.matchMedia('(prefers-color-scheme: dark)').matches);
+    // Check if there's a stored preference
+    const savedMode = localStorage.getItem('darkMode');
     
-    setDarkMode(isDarkMode);
-    
-    if (isDarkMode) {
-      document.documentElement.classList.add('dark');
+    // Only use system preference if there's no stored preference
+    if (savedMode === null) {
+      // Default to light mode instead of checking system preference
+      setDarkMode(false);
+    } else {
+      // Otherwise use the stored preference
+      setDarkMode(savedMode === 'true');
     }
-  }, []);
+    
+    // Apply the dark mode class if needed
+    if (darkMode) {
+      document.documentElement.classList.add('dark');
+    } else {
+      document.documentElement.classList.remove('dark');
+    }
+  }, [darkMode]);
 
   // Toggle dark mode
   const toggleDarkMode = () => {
@@ -33,10 +43,14 @@ export default function DarkModeToggle() {
   return (
     <button
       onClick={toggleDarkMode}
-      className="p-2 rounded-md text-gray-500 hover:text-navy-700 dark:text-gray-400 dark:hover:text-white focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-navy-500"
+      className={`p-2 rounded-md focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500 transition duration-200 ${
+        darkMode 
+          ? 'bg-white text-navy-800 hover:bg-gray-100'
+          : 'bg-navy-700 text-white hover:bg-navy-800'
+      }`}
       aria-label={darkMode ? 'Switch to light mode' : 'Switch to dark mode'}
     >
-      {/* Sun icon */}
+      {/* Sun icon - light mode */}
       <svg
         className={`h-5 w-5 ${darkMode ? 'hidden' : 'block'}`}
         fill="none"
@@ -52,7 +66,7 @@ export default function DarkModeToggle() {
         />
       </svg>
       
-      {/* Moon icon */}
+      {/* Moon icon - dark mode */}
       <svg
         className={`h-5 w-5 ${darkMode ? 'block' : 'hidden'}`}
         fill="none"

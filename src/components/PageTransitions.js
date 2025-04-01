@@ -1,35 +1,26 @@
-// src/components/PageTransition.js
+// src/components/PageTransitions.js - Updated with variants
 import { motion } from 'framer-motion';
+import { pageVariants, transitionPresets } from '@/utils/motionVariants';
 
-const pageVariants = {
-  initial: {
-    opacity: 0,
-    y: 20
-  },
-  in: {
-    opacity: 1,
-    y: 0
-  },
-  out: {
-    opacity: 0,
-    y: -20
-  }
-};
+export default function PageTransition({ 
+  children, 
+  variant = 'default',
+  transitionPreset = 'default',
+  customVariants = null,
+  customTransition = null
+}) {
+  // Use custom variants/transition if provided, otherwise use preset
+  const variants = customVariants || pageVariants[variant];
+  const transition = customTransition || transitionPresets[transitionPreset];
 
-const pageTransition = {
-  type: 'tween',
-  ease: 'anticipate',
-  duration: 0.4
-};
-
-export default function PageTransition({ children }) {
   return (
     <motion.div
       initial="initial"
       animate="in"
       exit="out"
-      variants={pageVariants}
-      transition={pageTransition}
+      variants={variants}
+      transition={transition}
+      className="w-full"
     >
       {children}
     </motion.div>

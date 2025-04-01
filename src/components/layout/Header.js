@@ -48,7 +48,7 @@ export default function Header() {
             <Link href="/">
               <div className="flex items-center cursor-pointer">
                 <div className="h-8 w-8 mr-2 bg-navy-700 rounded-full flex items-center justify-center">
-                  <div className="h-4 w-4 bg-gold-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
+                  <div className="h-4 w-4 bg-teal-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
                 </div>
                 <span className="text-navy-700 dark:text-white font-serif text-2xl font-bold">Zenith</span>
                 <span className="text-navy-600 dark:text-gray-300 font-sans text-lg ml-1">Capital Advisors</span>
@@ -111,7 +111,7 @@ export default function Header() {
             <div className="flex items-center justify-between mb-8">
               <div className="flex items-center">
                 <div className="h-8 w-8 mr-2 bg-navy-700 rounded-full flex items-center justify-center">
-                  <div className="h-4 w-4 bg-gold-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
+                  <div className="h-4 w-4 bg-teal-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
                 </div>
                 <span className="text-navy-700 dark:text-white font-serif text-xl font-bold">Zenith</span>
               </div>
@@ -185,6 +185,13 @@ export default function Header() {
                 </div>
               </div>
               
+              {/* Insights Link - New addition */}
+              <Link href="/insights">
+                <div className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/insights') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}>
+                  Insights
+                </div>
+              </Link>
+              
               <Link href="/contact">
                 <div className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname === '/contact' ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}>
                   Contact
@@ -194,7 +201,7 @@ export default function Header() {
             
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-navy-700">
               <Link href="/contact">
-                <div className="block w-full px-4 py-3 text-center rounded-md shadow bg-gold-500 text-navy-900 font-medium hover:bg-gold-600 transition duration-150 ease-in-out">
+                <div className="block w-full px-4 py-3 text-center rounded-md shadow bg-teal-500 text-white font-medium hover:bg-teal-600 transition duration-150 ease-in-out">
                   Get In Touch
                 </div>
               </Link>
