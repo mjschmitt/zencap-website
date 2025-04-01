@@ -192,7 +192,7 @@ export default function Insights() {
                 className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
                   activeCategory === category.id
                     ? 'bg-teal-500 text-white'
-                    : 'bg-gray-100 dark:bg-navy-800 text-navy-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-navy-700'
+                    : 'bg-gray-100 dark:bg-navy-700 text-navy-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-navy-600'
                 }`}
               >
                 {category.name}
@@ -216,7 +216,7 @@ export default function Insights() {
               {featuredInsights.map((insight) => (
                 <Motion key={insight.id} animation="fade" direction="up" delay={200} className="h-full">
                   <Link href={`/insights/${insight.slug}`}>
-                    <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
                       <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
                         [{ insight.imagePlaceholder }]
                       </div>
@@ -236,7 +236,7 @@ export default function Insights() {
                           {insight.excerpt}
                         </p>
                         <div className="flex items-center">
-                          <div className="h-10 w-10 bg-gray-200 dark:bg-navy-700 rounded-full flex items-center justify-center mr-3">
+                          <div className="h-10 w-10 bg-gray-200 dark:bg-navy-600 rounded-full flex items-center justify-center mr-3">
                             <span className="text-navy-700 dark:text-white font-semibold">
                               {insight.author.name.charAt(0)}
                             </span>
@@ -274,7 +274,7 @@ export default function Insights() {
               regularInsights.map((insight) => (
                 <Motion key={insight.id} animation="fade" direction="up" delay={200} className="h-full">
                   <Link href={`/insights/${insight.slug}`}>
-                    <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                    <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
                       <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
                         [{ insight.imagePlaceholder }]
                       </div>
@@ -295,7 +295,7 @@ export default function Insights() {
                         </p>
                         <div className="flex items-center justify-between mt-auto">
                           <div className="flex items-center">
-                            <div className="h-8 w-8 bg-gray-200 dark:bg-navy-700 rounded-full flex items-center justify-center mr-2">
+                            <div className="h-8 w-8 bg-gray-200 dark:bg-navy-600 rounded-full flex items-center justify-center mr-2">
                               <span className="text-navy-700 dark:text-white font-semibold text-xs">
                                 {insight.author.name.charAt(0)}
                               </span>

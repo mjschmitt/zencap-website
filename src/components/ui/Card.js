@@ -7,12 +7,12 @@ export default function Card({
   rounded = true
 }) {
   // Base styles
-  const baseStyles = 'bg-white';
+  const baseStyles = 'bg-white dark:bg-navy-800';
   
   // Optional styles
   const paddingStyles = padding ? 'p-6' : '';
-  const shadowStyles = shadow ? 'shadow-md' : '';
-  const borderStyles = border ? 'border border-gray-200' : '';
+  const shadowStyles = shadow ? 'shadow-md dark:shadow-navy-900/30' : '';
+  const borderStyles = border ? 'border border-gray-200 dark:border-navy-700' : '';
   const roundedStyles = rounded ? 'rounded-lg' : '';
   
   // Combined styles
