@@ -34,10 +34,8 @@ export default function Button({
   // Return as link or button
   if (href) {
     return (
-      <Link href={href}>
-        <div className={buttonStyles}>
-          {children}
-        </div>
+      <Link href={href} className={buttonStyles}>
+        {children}
       </Link>
     );
   }

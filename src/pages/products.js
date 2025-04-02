@@ -134,7 +134,7 @@ export default function Products() {
               .filter(product => product.category === 'Private Equity')
               .map((product, index) => (
                 <Motion key={product.id} animation="fade" direction="up" delay={200 + (index * 100)} className="h-full">
-                  <Link href={`/products/${product.slug}`}>
+                  <Link href={`/products/${product.slug}`} className="block h-full">
                     <Card className="h-full bg-white dark:bg-navy-800 hover:shadow-lg transition-shadow duration-300">
                       <div className="h-40 bg-gray-100 dark:bg-navy-700 rounded mb-4 flex items-center justify-center text-gray-400 dark:text-gray-500">
                         [{product.imagePlaceholder}]

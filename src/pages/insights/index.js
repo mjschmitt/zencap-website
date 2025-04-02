@@ -215,7 +215,7 @@ export default function Insights() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {featuredInsights.map((insight) => (
                 <Motion key={insight.id} animation="fade" direction="up" delay={200} className="h-full">
-                  <Link href={`/insights/${insight.slug}`}>
+                  <Link href={`/insights/${insight.slug}`} className="block h-full">
                     <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
                       <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
                         [{ insight.imagePlaceholder }]
@@ -273,7 +273,7 @@ export default function Insights() {
             {regularInsights.length > 0 ? (
               regularInsights.map((insight) => (
                 <Motion key={insight.id} animation="fade" direction="up" delay={200} className="h-full">
-                  <Link href={`/insights/${insight.slug}`}>
+                  <Link href={`/insights/${insight.slug}`} className="block h-full">
                     <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
                       <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
                         [{ insight.imagePlaceholder }]

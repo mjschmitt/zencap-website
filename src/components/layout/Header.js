@@ -45,14 +45,12 @@ export default function Header() {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/">
-              <div className="flex items-center cursor-pointer">
-                <div className="h-8 w-8 mr-2 bg-navy-700 rounded-full flex items-center justify-center">
-                  <div className="h-4 w-4 bg-teal-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
-                </div>
-                <span className="text-navy-700 dark:text-white font-serif text-2xl font-bold">Zenith</span>
-                <span className="text-navy-600 dark:text-gray-300 font-sans text-lg ml-1">Capital Advisors</span>
+            <Link href="/" className="flex items-center cursor-pointer">
+              <div className="h-8 w-8 mr-2 bg-navy-700 rounded-full flex items-center justify-center">
+                <div className="h-4 w-4 bg-teal-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
               </div>
+              <span className="text-navy-700 dark:text-white font-serif text-2xl font-bold">Zenith</span>
+              <span className="text-navy-600 dark:text-gray-300 font-sans text-lg ml-1">Capital Advisors</span>
             </Link>
           </div>
           
@@ -127,83 +125,95 @@ export default function Header() {
             </div>
             
             <nav className="flex-1 mt-4 space-y-2">
-              <Link href="/">
-                <div className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname === '/' ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}>
-                  Home
-                </div>
+              <Link 
+                href="/" 
+                className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname === '/' ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
+              >
+                Home
               </Link>
-              <Link href="/about">
-                <div className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname === '/about' ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}>
-                  About
-                </div>
+              <Link 
+                href="/about" 
+                className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname === '/about' ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
+              >
+                About
               </Link>
               
               {/* Products Section */}
               <div className="space-y-1">
-                <Link href="/products">
-                  <div className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/products') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}>
-                    Products
-                  </div>
+                <Link 
+                  href="/products" 
+                  className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/products') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
+                >
+                  Products
                 </Link>
                 <div className="pl-8 space-y-1">
-                  <Link href="/products/private-equity">
-                    <div className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/products/private-equity' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}>
-                      Private Equity Models
-                    </div>
+                  <Link 
+                    href="/products/private-equity" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/products/private-equity' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                  >
+                    Private Equity Models
                   </Link>
-                  <Link href="/products/public-equity">
-                    <div className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/products/public-equity' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}>
-                      Public Equity Models
-                    </div>
+                  <Link 
+                    href="/products/public-equity" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/products/public-equity' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                  >
+                    Public Equity Models
                   </Link>
                 </div>
               </div>
               
               {/* Services Section */}
               <div className="space-y-1">
-                <Link href="/services">
-                  <div className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/services') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}>
-                    Services
-                  </div>
+                <Link 
+                  href="/services" 
+                  className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/services') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
+                >
+                  Services
                 </Link>
                 <div className="pl-8 space-y-1">
-                  <Link href="/services/financial-modeling">
-                    <div className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/services/financial-modeling' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}>
-                      Financial Modeling
-                    </div>
+                  <Link 
+                    href="/services/financial-modeling" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/services/financial-modeling' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                  >
+                    Financial Modeling
                   </Link>
-                  <Link href="/services/infrastructure">
-                    <div className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/services/infrastructure' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}>
-                      Investment Infrastructure
-                    </div>
+                  <Link 
+                    href="/services/infrastructure" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/services/infrastructure' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                  >
+                    Investment Infrastructure
                   </Link>
-                  <Link href="/services/research">
-                    <div className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/services/research' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}>
-                      Industry Research
-                    </div>
+                  <Link 
+                    href="/services/research" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/services/research' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                  >
+                    Industry Research
                   </Link>
                 </div>
               </div>
               
               {/* Insights Link - New addition */}
-              <Link href="/insights">
-                <div className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/insights') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}>
-                  Insights
-                </div>
+              <Link 
+                href="/insights" 
+                className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/insights') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
+              >
+                Insights
               </Link>
               
-              <Link href="/contact">
-                <div className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname === '/contact' ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}>
-                  Contact
-                </div>
+              <Link 
+                href="/contact" 
+                className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname === '/contact' ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
+              >
+                Contact
               </Link>
             </nav>
             
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-navy-700">
-              <Link href="/contact">
-                <div className="block w-full px-4 py-3 text-center rounded-md shadow bg-teal-500 text-white font-medium hover:bg-teal-600 transition duration-150 ease-in-out">
-                  Get In Touch
-                </div>
+              <Link 
+                href="/contact" 
+                className="block w-full px-4 py-3 text-center rounded-md shadow bg-teal-500 text-white font-medium hover:bg-teal-600 transition duration-150 ease-in-out"
+              >
+                Get In Touch
               </Link>
             </div>
           </div>

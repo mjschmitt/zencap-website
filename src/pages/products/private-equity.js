@@ -4,36 +4,60 @@ import Button from '@/components/ui/Button';
 import Motion from '@/components/ui/Motion';
 import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
+import Link from 'next/link';
+
+// Sample product data - in a real app, this would be imported from a data file
+const PRIVATE_EQUITY_PRODUCTS = [
+  {
+    id: 'multi-family-acquisition-model',
+    slug: 'multi-family-acquisition-model',
+    title: 'Multi-Family Acquisition Model',
+    excerpt: 'Comprehensive underwriting for apartment complexes with unit-level analysis, renovation scenarios, and financing options.',
+    category: 'Private Equity',
+    price: 299,
+    imagePlaceholder: 'Multi-Family Model Preview',
+    features: [
+      'Unit-by-unit rental analysis',
+      'Value-add renovation scenarios',
+      'Detailed financing options with sensitivity analysis',
+      'Investor waterfall and return calculations',
+      'Dynamic charts and reporting'
+    ]
+  },
+  {
+    id: 'office-property-acquisition-model',
+    slug: 'office-property-acquisition-model',
+    title: 'Office Property Acquisition Model',
+    excerpt: 'Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for office investments.',
+    category: 'Private Equity',
+    price: 349,
+    imagePlaceholder: 'Office Property Model Preview',
+    features: [
+      'Tenant-by-tenant lease analysis',
+      'Renewal probability scenarios',
+      'TI/LC and capital expenditure modeling',
+      'Detailed debt and equity structures',
+      'Sensitivity analysis dashboard'
+    ]
+  }
+];
 
 export default function PrivateEquity() {
   // Structured data for rich search results
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "itemListElement": [
-      {
-        "@type": "Product",
-        "position": 1,
-        "name": "Multi-Family Acquisition Model",
-        "description": "Comprehensive underwriting for apartment complexes with unit-level analysis, renovation scenarios, and financing options.",
-        "offers": {
-          "@type": "Offer",
-          "price": "299",
-          "priceCurrency": "USD"
-        }
-      },
-      {
-        "@type": "Product",
-        "position": 2,
-        "name": "Office Property Acquisition Model",
-        "description": "Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for office investments.",
-        "offers": {
-          "@type": "Offer",
-          "price": "349",
-          "priceCurrency": "USD"
-        }
+    "itemListElement": PRIVATE_EQUITY_PRODUCTS.map((product, index) => ({
+      "@type": "Product",
+      "position": index + 1,
+      "name": product.title,
+      "description": product.excerpt,
+      "offers": {
+        "@type": "Offer",
+        "price": product.price.toString(),
+        "priceCurrency": "USD"
       }
-    ]
+    }))
   };
 
   return (
@@ -76,81 +100,43 @@ export default function PrivateEquity() {
           </Motion>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            {/* Product 1 */}
-            <Motion animation="fade" direction="up" delay={200}>
-              <Card className="flex flex-col h-full">
-                <div className="h-48 bg-gray-100 dark:bg-navy-700 rounded-t-lg flex items-center justify-center text-gray-400 dark:text-gray-500">
-                  [Multi-Family Model Preview]
-                </div>
-                <div className="p-6 flex-grow">
-                  <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium mb-2">
-                    Private Equity
-                  </span>
-                  <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                    Multi-Family Acquisition Model
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Comprehensive underwriting for apartment complexes with unit-level analysis, renovation scenarios, and financing options.
-                  </p>
-                  
-                  <div className="mb-4">
-                    <h4 className="font-semibold text-navy-700 dark:text-white mb-2">Key Features:</h4>
-                    <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 space-y-1">
-                      <li>Unit-by-unit rental analysis</li>
-                      <li>Value-add renovation scenarios</li>
-                      <li>Detailed financing options with sensitivity analysis</li>
-                      <li>Investor waterfall and return calculations</li>
-                      <li>Dynamic charts and reporting</li>
-                    </ul>
+            {/* Map through product data */}
+            {PRIVATE_EQUITY_PRODUCTS.map((product, index) => (
+              <Motion key={product.id} animation="fade" direction="up" delay={200 + (index * 100)}>
+                <Card className="flex flex-col h-full">
+                  <div className="h-48 bg-gray-100 dark:bg-navy-700 rounded-t-lg flex items-center justify-center text-gray-400 dark:text-gray-500">
+                    [{product.imagePlaceholder}]
                   </div>
-                  
-                  <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <span className="font-bold text-navy-700 dark:text-white text-lg">$299</span>
-                    <Button href="#" variant="primary" size="sm">
-                      View Details
-                    </Button>
+                  <div className="p-6 flex-grow">
+                    <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium mb-2">
+                      {product.category}
+                    </span>
+                    <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
+                      {product.title}
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      {product.excerpt}
+                    </p>
+                    
+                    <div className="mb-4">
+                      <h4 className="font-semibold text-navy-700 dark:text-white mb-2">Key Features:</h4>
+                      <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 space-y-1">
+                        {product.features.map((feature, i) => (
+                          <li key={i}>{feature}</li>
+                        ))}
+                      </ul>
+                    </div>
+                    
+                    <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
+                      <span className="font-bold text-navy-700 dark:text-white text-lg">${product.price}</span>
+                      <Button href={`/products/${product.slug}`} variant="primary" size="sm">
+                        View Details
+                      </Button>
+                    </div>
                   </div>
-                </div>
-              </Card>
-            </Motion>
-            
-            {/* Product 2 */}
-            <Motion animation="fade" direction="up" delay={300}>
-              <Card className="flex flex-col h-full">
-                <div className="h-48 bg-gray-100 dark:bg-navy-700 rounded-t-lg flex items-center justify-center text-gray-400 dark:text-gray-500">
-                  [Office Property Model Preview]
-                </div>
-                <div className="p-6 flex-grow">
-                  <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium mb-2">
-                    Private Equity
-                  </span>
-                  <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                    Office Property Acquisition Model
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for office investments.
-                  </p>
-                  
-                  <div className="mb-4">
-                    <h4 className="font-semibold text-navy-700 dark:text-white mb-2">Key Features:</h4>
-                    <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 space-y-1">
-                      <li>Tenant-by-tenant lease analysis</li>
-                      <li>Renewal probability scenarios</li>
-                      <li>TI/LC and capital expenditure modeling</li>
-                      <li>Detailed debt and equity structures</li>
-                      <li>Sensitivity analysis dashboard</li>
-                    </ul>
-                  </div>
-                  
-                  <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                    <span className="font-bold text-navy-700 dark:text-white text-lg">$349</span>
-                    <Button href="#" variant="primary" size="sm">
-                      View Details
-                    </Button>
-                  </div>
-                </div>
-              </Card>
-            </Motion>
+                </Card>
+              </Motion>
+            ))}
           </div>
         </div>
       </section>

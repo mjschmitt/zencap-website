@@ -31,24 +31,18 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/products/private-equity">
-                  <div className="text-gray-300 hover:text-white text-sm cursor-pointer">
-                    Private Equity Models
-                  </div>
+                <Link href="/products/private-equity" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                  Private Equity Models
                 </Link>
               </li>
               <li>
-                <Link href="/products/public-equity">
-                  <div className="text-gray-300 hover:text-white text-sm cursor-pointer">
-                    Public Equity Models
-                  </div>
+                <Link href="/products/public-equity" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                  Public Equity Models
                 </Link>
               </li>
               <li>
-                <Link href="/products">
-                  <div className="text-gray-300 hover:text-white text-sm cursor-pointer">
-                    Model Documentation
-                  </div>
+                <Link href="/products" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                  Model Documentation
                 </Link>
               </li>
             </ul>
@@ -60,24 +54,18 @@ export default function Footer() {
             </h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/services/financial-modeling">
-                  <div className="text-gray-300 hover:text-white text-sm cursor-pointer">
-                    Financial Modeling
-                  </div>
+                <Link href="/services/financial-modeling" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                  Financial Modeling
                 </Link>
               </li>
               <li>
-                <Link href="/services/infrastructure">
-                  <div className="text-gray-300 hover:text-white text-sm cursor-pointer">
-                    Investment Infrastructure
-                  </div>
+                <Link href="/services/infrastructure" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                  Investment Infrastructure
                 </Link>
               </li>
               <li>
-                <Link href="/services/research">
-                  <div className="text-gray-300 hover:text-white text-sm cursor-pointer">
-                    Industry Research
-                  </div>
+                <Link href="/services/research" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                  Industry Research
                 </Link>
               </li>
             </ul>
@@ -97,10 +85,8 @@ export default function Footer() {
                 <a href="tel:+15551234567" className="hover:text-white">+1 (555) 123-4567</a>
               </li>
               <li>
-                <Link href="/contact">
-                  <div className="mt-4 inline-block bg-teal-500 text-white px-4 py-2 text-sm font-medium rounded hover:bg-teal-600 cursor-pointer">
-                    Contact Us
-                  </div>
+                <Link href="/contact" className="mt-4 inline-block bg-teal-500 text-white px-4 py-2 text-sm font-medium rounded hover:bg-teal-600 cursor-pointer">
+                  Contact Us
                 </Link>
               </li>
             </ul>
