@@ -24,53 +24,55 @@ export default function Footer() {
             </div>
           </div>
           
-          {/* Quick Links */}
+          {/* Models Links */}
           <div className="col-span-1">
             <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">
-              Products
+              Models
             </h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/products/private-equity" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/models/private-equity" className="text-gray-300 hover:text-white text-sm cursor-pointer">
                   Private Equity Models
                 </Link>
               </li>
               <li>
-                <Link href="/products/public-equity" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/models/public-equity" className="text-gray-300 hover:text-white text-sm cursor-pointer">
                   Public Equity Models
                 </Link>
               </li>
               <li>
-                <Link href="/products" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/models" className="text-gray-300 hover:text-white text-sm cursor-pointer">
                   Model Documentation
                 </Link>
               </li>
             </ul>
           </div>
           
+          {/* Solutions Links */}
           <div className="col-span-1">
             <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">
-              Services
+              Solutions
             </h3>
             <ul className="space-y-2">
               <li>
-                <Link href="/services/financial-modeling" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/solutions/financial-modeling" className="text-gray-300 hover:text-white text-sm cursor-pointer">
                   Financial Modeling
                 </Link>
               </li>
               <li>
-                <Link href="/services/infrastructure" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/solutions/infrastructure" className="text-gray-300 hover:text-white text-sm cursor-pointer">
                   Investment Infrastructure
                 </Link>
               </li>
               <li>
-                <Link href="/services/research" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/solutions/research" className="text-gray-300 hover:text-white text-sm cursor-pointer">
                   Industry Research
                 </Link>
               </li>
             </ul>
           </div>
           
+          {/* Contact Section */}
           <div className="col-span-1">
             <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">
               Contact
