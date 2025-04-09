@@ -138,54 +138,54 @@ export default function Header() {
                 About
               </Link>
               
-              {/* Products Section */}
+              {/* Models Section */}
               <div className="space-y-1">
                 <Link 
-                  href="/products" 
-                  className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/products') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
+                  href="/models" 
+                  className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/models') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
                 >
-                  Products
+                  Models
                 </Link>
                 <div className="pl-8 space-y-1">
                   <Link 
-                    href="/products/private-equity" 
-                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/products/private-equity' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                    href="/models/private-equity" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/models/private-equity' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
                   >
                     Private Equity Models
                   </Link>
                   <Link 
-                    href="/products/public-equity" 
-                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/products/public-equity' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                    href="/models/public-equity" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/models/public-equity' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
                   >
                     Public Equity Models
                   </Link>
                 </div>
               </div>
               
-              {/* Services Section */}
+              {/* Solutions Section */}
               <div className="space-y-1">
                 <Link 
-                  href="/services" 
-                  className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/services') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
+                  href="/solutions" 
+                  className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/solutions') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
                 >
-                  Services
+                  Solutions
                 </Link>
                 <div className="pl-8 space-y-1">
                   <Link 
-                    href="/services/financial-modeling" 
-                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/services/financial-modeling' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                    href="/solutions/financial-modeling" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/solutions/financial-modeling' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
                   >
                     Financial Modeling
                   </Link>
                   <Link 
-                    href="/services/infrastructure" 
-                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/services/infrastructure' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                    href="/solutions/infrastructure" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/solutions/infrastructure' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
                   >
                     Investment Infrastructure
                   </Link>
                   <Link 
-                    href="/services/research" 
-                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/services/research' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                    href="/solutions/research" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/solutions/research' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
                   >
                     Industry Research
                   </Link>

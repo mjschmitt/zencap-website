@@ -6,8 +6,8 @@ import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
 import Link from 'next/link';
 
-// Sample product data - in a real app, this would be imported from a data file
-const PRIVATE_EQUITY_PRODUCTS = [
+// Sample model data - in a real app, this would be imported from a data file
+const PRIVATE_EQUITY_MODELS = [
   {
     id: 'multi-family-acquisition-model',
     slug: 'multi-family-acquisition-model',
@@ -47,14 +47,14 @@ export default function PrivateEquity() {
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "ItemList",
-    "itemListElement": PRIVATE_EQUITY_PRODUCTS.map((product, index) => ({
+    "itemListElement": PRIVATE_EQUITY_MODELS.map((model, index) => ({
       "@type": "Product",
       "position": index + 1,
-      "name": product.title,
-      "description": product.excerpt,
+      "name": model.title,
+      "description": model.excerpt,
       "offers": {
         "@type": "Offer",
-        "price": product.price.toString(),
+        "price": model.price.toString(),
         "priceCurrency": "USD"
       }
     }))
@@ -85,7 +85,7 @@ export default function PrivateEquity() {
         </div>
       </section>
       
-      {/* Products Section */}
+      {/* Models Section */}
       <section className="py-12">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
@@ -100,36 +100,36 @@ export default function PrivateEquity() {
           </Motion>
           
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
-            {/* Map through product data */}
-            {PRIVATE_EQUITY_PRODUCTS.map((product, index) => (
-              <Motion key={product.id} animation="fade" direction="up" delay={200 + (index * 100)}>
-                <Link href={`/models/${product.slug}`} className="block h-full">
+            {/* Map through model data */}
+            {PRIVATE_EQUITY_MODELS.map((model, index) => (
+              <Motion key={model.id} animation="fade" direction="up" delay={200 + (index * 100)}>
+                <Link href={`/models/${model.slug}`} className="block h-full">
                   <Card className="flex flex-col h-full">
                     <div className="h-48 bg-gray-100 dark:bg-navy-700 rounded-t-lg flex items-center justify-center text-gray-400 dark:text-gray-500">
-                      [{product.imagePlaceholder}]
+                      [{model.imagePlaceholder}]
                     </div>
                     <div className="p-6 flex-grow">
                       <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium mb-2">
-                        {product.category}
+                        {model.category}
                       </span>
                       <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                        {product.title}
+                        {model.title}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-300 mb-4">
-                        {product.excerpt}
+                        {model.excerpt}
                       </p>
                       
                       <div className="mb-4">
                         <h4 className="font-semibold text-navy-700 dark:text-white mb-2">Key Features:</h4>
                         <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 space-y-1">
-                          {product.features.map((feature, i) => (
+                          {model.features.map((feature, i) => (
                             <li key={i}>{feature}</li>
                           ))}
                         </ul>
                       </div>
                       
                       <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <span className="font-bold text-navy-700 dark:text-white text-lg">${product.price}</span>
+                        <span className="font-bold text-navy-700 dark:text-white text-lg">${model.price}</span>
                         <div className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">
                           View Details
                         </div>

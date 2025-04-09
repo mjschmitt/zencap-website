@@ -1,4 +1,4 @@
-// src/pages/products/[slug].js
+// src/pages/models/[slug].js
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
@@ -7,8 +7,8 @@ import Motion from '@/components/ui/Motion';
 import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
 
-// Sample products data - in a real application, this would be fetched from an API or CMS
-const PRODUCTS = [
+// Sample models data - in a real application, this would be fetched from an API or CMS
+const MODELS = [
   {
     id: 'multi-family-acquisition-model',
     slug: 'multi-family-acquisition-model',
@@ -251,22 +251,22 @@ const PRODUCTS = [
   }
 ];
 
-// Function to find related products (same category but different product)
-const getRelatedProducts = (product) => {
-  return PRODUCTS.filter(p => 
-    p.category === product.category && p.id !== product.id
+// Function to find related models (same category but different model)
+const getRelatedModels = (model) => {
+  return MODELS.filter(p => 
+    p.category === model.category && p.id !== model.id
   ).slice(0, 3);
 };
 
-export default function ProductDetail() {
+export default function ModelDetail() {
   const router = useRouter();
   const { slug } = router.query;
   
-  // Find the product based on the slug
-  const product = PRODUCTS.find(item => item.slug === slug);
+  // Find the model based on the slug
+  const model = MODELS.find(item => item.slug === slug);
   
-  // If the page is still loading or product not found
-  if (router.isFallback || !product) {
+  // If the page is still loading or model not found
+  if (router.isFallback || !model) {
     return (
       <Layout>
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center">
@@ -286,19 +286,19 @@ export default function ProductDetail() {
     );
   }
   
-  // Get related products
-  const relatedProducts = getRelatedProducts(product);
+  // Get related models
+  const relatedModels = getRelatedModels(model);
   
   // Structured data for rich search results
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
-    "name": product.title,
-    "description": product.excerpt,
-    "category": product.category,
+    "name": model.title,
+    "description": model.excerpt,
+    "category": model.category,
     "offers": {
       "@type": "Offer",
-      "price": product.price,
+      "price": model.price,
       "priceCurrency": "USD"
     }
   };
@@ -306,12 +306,12 @@ export default function ProductDetail() {
   return (
     <Layout>
       <SEO
-        title={product.title}
-        description={product.excerpt}
+        title={model.title}
+        description={model.excerpt}
         structuredData={structuredData}
       />
       
-      {/* Product Header */}
+      {/* Model Header */}
       <section className="bg-navy-700 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
@@ -319,20 +319,20 @@ export default function ProductDetail() {
               <div>
                 <div className="flex items-center space-x-2 mb-4">
                   <span className="inline-block px-3 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-sm font-medium">
-                    {product.category}
+                    {model.category}
                   </span>
                 </div>
                 
                 <h1 className="text-3xl md:text-4xl font-bold font-serif tracking-tight mb-6 text-white">
-                  {product.title}
+                  {model.title}
                 </h1>
                 
                 <p className="text-xl text-gray-200 mb-8">
-                  {product.excerpt}
+                  {model.excerpt}
                 </p>
                 
                 <div className="flex items-baseline mb-8">
-                  <span className="text-3xl font-bold text-white">${product.price}</span>
+                  <span className="text-3xl font-bold text-white">${model.price}</span>
                   <span className="ml-2 text-lg text-gray-300">USD</span>
                 </div>
                 
@@ -349,7 +349,7 @@ export default function ProductDetail() {
             
             <Motion animation="fade" direction="left">
               <div className="aspect-w-4 aspect-h-3 bg-gray-200 dark:bg-navy-600 rounded-lg flex items-center justify-center text-gray-400 dark:text-gray-500">
-                [{product.imagePlaceholder}]
+                [{model.imagePlaceholder}]
               </div>
             </Motion>
           </div>
@@ -366,7 +366,7 @@ export default function ProductDetail() {
           </Motion>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {product.features.map((feature, index) => (
+            {model.features.map((feature, index) => (
               <Motion key={index} animation="fade" direction="up" delay={index * 100} className="h-full">
                 <Card className="h-full bg-white dark:bg-navy-800 p-6">
                   <div className="flex items-start">
@@ -386,13 +386,13 @@ export default function ProductDetail() {
         </div>
       </section>
       
-      {/* Product Description */}
+      {/* Model Description */}
       <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
             <Card className="bg-white dark:bg-navy-800 p-8">
               <div className="prose prose-lg max-w-none dark:prose-invert prose-headings:font-serif prose-headings:text-navy-700 dark:prose-headings:text-white prose-a:text-teal-600 dark:prose-a:text-teal-400 prose-img:rounded-lg">
-                <div dangerouslySetInnerHTML={{ __html: product.description }} />
+                <div dangerouslySetInnerHTML={{ __html: model.description }} />
               </div>
             </Card>
           </Motion>
@@ -409,7 +409,7 @@ export default function ProductDetail() {
           </Motion>
           
           <div className="space-y-6">
-            {product.faq.map((item, index) => (
+            {model.faq.map((item, index) => (
               <Motion key={index} animation="fade" direction="up" delay={index * 100}>
                 <Card className="bg-white dark:bg-navy-800 p-6">
                   <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-3">
@@ -425,20 +425,20 @@ export default function ProductDetail() {
         </div>
       </section>
       
-      {/* Related Products */}
-      {relatedProducts.length > 0 && (
+      {/* Related Models */}
+      {relatedModels.length > 0 && (
         <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <Motion animation="fade" direction="up">
               <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-8 text-center">
-                Related Products
+                Related Models
               </h2>
             </Motion>
             
             <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-              {relatedProducts.map((related) => (
+              {relatedModels.map((related) => (
                 <Motion key={related.id} animation="fade" direction="up" delay={200} className="h-full">
-                  <Link href={`/products/${related.slug}`}>
+                  <Link href={`/models/${related.slug}`}>
                     <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
                       <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
                         [{related.imagePlaceholder}]
@@ -475,10 +475,10 @@ export default function ProductDetail() {
                 Ready to elevate your investment analysis?
               </h2>
               <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Purchase {product.title} today and start making better investment decisions.
+                Purchase {model.title} today and start making better investment decisions.
               </p>
               <Button href="#" variant="accent" size="lg">
-                Purchase for ${product.price}
+                Purchase for ${model.price}
               </Button>
               <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
                 30-day satisfaction guarantee. Full support included.
@@ -488,16 +488,16 @@ export default function ProductDetail() {
         </div>
       </section>
       
-      {/* Back to Products Button */}
+      {/* Back to Models Button */}
       <section className="pb-16">
         <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Motion animation="fade" direction="up">
-            <Link href="/products">
+            <Link href="/models">
               <Button variant="ghost" size="lg">
                 <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                 </svg>
-                Back to All Products
+                Back to All Models
               </Button>
             </Link>
           </Motion>
@@ -510,8 +510,8 @@ export default function ProductDetail() {
 // This function gets called at build time
 export async function getStaticPaths() {
   // In a real app, this would fetch data from an API or CMS
-  const paths = PRODUCTS.map((product) => ({
-    params: { slug: product.slug },
+  const paths = MODELS.map((model) => ({
+    params: { slug: model.slug },
   }));
 
   return { paths, fallback: true };
@@ -520,11 +520,11 @@ export async function getStaticPaths() {
 // This function gets called at build time
 export async function getStaticProps({ params }) {
   // In a real app, this would fetch data from an API or CMS
-  const product = PRODUCTS.find((item) => item.slug === params.slug) || null;
+  const model = MODELS.find((item) => item.slug === params.slug) || null;
 
   return {
     props: {
-      product,
+      model,
     },
     // Re-generate the page at most once per hour
     revalidate: 3600,
