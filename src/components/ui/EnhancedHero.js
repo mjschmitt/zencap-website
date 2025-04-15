@@ -18,7 +18,7 @@ const heroTextOptions = [
   }
 ];
 
-export default function EnhancedHero({ backgroundImage }) {
+export default function EnhancedHero() {
   const [currentTextIndex, setCurrentTextIndex] = useState(0);
   const [isVisible, setIsVisible] = useState(true);
 
@@ -40,24 +40,17 @@ export default function EnhancedHero({ backgroundImage }) {
     };
   }, []);
 
-  // Floating elements animation variants
-  const floatingElements = [
-    { id: 1, icon: "📊", delay: 0, initialX: "-20vw", initialY: "5vh" },
-    { id: 2, icon: "📈", delay: 1.2, initialX: "30vw", initialY: "20vh" },
-    { id: 3, icon: "💹", delay: 0.5, initialX: "25vw", initialY: "70vh" },
-    { id: 4, icon: "📉", delay: 1.7, initialX: "-15vw", initialY: "65vh" },
-    { id: 5, icon: "📱", delay: 2.3, initialX: "35vw", initialY: "40vh" },
-  ];
-
   return (
-    <section 
-      className="relative bg-navy-800 text-white overflow-hidden min-h-screen flex items-center"
-      style={backgroundImage ? { 
-        backgroundImage: `linear-gradient(to right, rgba(26, 58, 95, 0.95), rgba(26, 58, 95, 0.8)), url(${backgroundImage})`,
-        backgroundSize: 'cover',
-        backgroundPosition: 'center'
-      } : {}}
-    >
+    <section className="relative overflow-hidden min-h-screen flex items-center">
+      {/* Background image with CSS background approach */}
+      <div 
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
+        style={{ backgroundImage: 'url(/images/hero-background.jpg)' }}
+      >
+        {/* Gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60 z-10"></div>
+      </div>
+      
       {/* Background pattern */}
       <div className="absolute inset-0 z-0 opacity-5">
         <div className="absolute top-0 left-0 w-full h-full">
@@ -70,33 +63,6 @@ export default function EnhancedHero({ backgroundImage }) {
           ))}
         </div>
       </div>
-      
-      {/* Animated floating elements */}
-      {floatingElements.map(element => (
-        <motion.div
-          key={element.id}
-          className="absolute text-6xl text-white opacity-5 z-10 select-none pointer-events-none"
-          initial={{ 
-            x: element.initialX,
-            y: element.initialY,
-            scale: 0.8
-          }}
-          animate={{ 
-            y: `calc(${element.initialY} - 30px)`,
-            scale: 1.2,
-            opacity: 0.08
-          }}
-          transition={{
-            repeat: Infinity,
-            repeatType: "reverse",
-            duration: 3 + (element.id % 2),
-            delay: element.delay,
-            ease: "easeInOut"
-          }}
-        >
-          {element.icon}
-        </motion.div>
-      ))}
       
       {/* Main content container */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center relative z-20">
