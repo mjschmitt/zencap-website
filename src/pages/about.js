@@ -48,7 +48,7 @@ export default function About() {
                 Our Mission
               </h2>
               <p className="text-xl text-navy-700 dark:text-white font-serif italic mb-6">
-                "To empower investment professionals with analytical tools and frameworks that transform data into actionable insights, enabling better decisions and superior returns."
+                "To equip investment professionals with powerful analytical tools that transform complex data into actionable insights, driving better decisions and superior returns."
               </p>
               <div className="h-1 w-24 bg-teal-500 mx-auto"></div>
             </div>
@@ -206,19 +206,20 @@ export default function About() {
         </div>
       </section>
       
-      {/* Founder Section - Replacing Team Section with taller image */}
+      {/* Leadership Section - Replacing Founder Section with taller image */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
             <h2 className="text-3xl font-bold text-navy-700 dark:text-white mb-12 text-center">
-              Our Founder
+              Our Leadership
             </h2>
           </Motion>
           
-          <div className="max-w-3xl mx-auto">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Maximilian Schmitt Profile */}
             <Motion animation="fade" direction="up" delay={200}>
               <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden">
-                <div className="relative h-[500px]">
+                <div className="relative h-[400px]">
                   <Image 
                     src="/images/about/max-profile.jpg" 
                     alt="Maximilian Schmitt"
@@ -233,7 +234,7 @@ export default function About() {
                   </h3>
                   <p className="text-teal-500 font-medium mb-4">Founder & CEO</p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    With experience spanning private equity and public markets, Max brings a unique perspective to financial modeling. Prior to founding Zenith Capital Advisors, Max held senior research positions at Evercore ISI and Macquarie Capital. Before transitioning to public markets, Max began his career in private equity as a a commercial real estate acquisitions analyst.
+                    With experience spanning private equity and public markets, Max brings a unique perspective to financial modeling. Prior to founding Zenith Capital Advisors, Max held senior research positions at Evercore ISI and Macquarie Capital. Before transitioning to public markets, Max began his career in private equity as a commercial real estate acquisitions analyst.
                   </p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
                     Max holds a bachelor's degree in finance, a master's in real estate, and a master's in entrepreneurship from the University of Florida. His background in both private and public markets informs Zenith's distinctive approach to financial modeling and investment advisory.
@@ -253,6 +254,9 @@ export default function About() {
                 </div>
               </div>
             </Motion>
+            
+            {/* Add more leadership profiles here in the future */}
+            {/* The grid layout will automatically adjust as new profiles are added */}
           </div>
         </div>
       </section>
