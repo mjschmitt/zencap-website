@@ -56,7 +56,7 @@ export default function About() {
         </div>
       </section>
       
-      {/* Our Story Section - Enhanced with taller image container */}
+      {/* Our Story Section - Enhanced with taller image container and more content */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md p-8 mb-12">
@@ -74,10 +74,10 @@ export default function About() {
                       Zenith Capital Advisors was founded in 2023 by Maximilian Schmitt, drawing on his extensive experience across both private and public equity markets. After witnessing firsthand the limitations of existing financial models – either overly simplistic or unnecessarily complex – Max recognized the need for analytical tools that balanced mathematical rigor with practical usability.
                     </p>
                     <p className="mb-4">
-                      Having held senior research positions at premier Wall Street firms such as Evercore ISI and Macquarie Capital, and underwritten over $1 billion of private assets while working in private equity, Max understood the challenges investment professionals face when translating financial theory into practical investment decisions.
+                      Our approach combines rigorous quantitative methods with practical investment experience. We believe that the most effective models are those that provide transparency into key drivers and assumptions, allowing investment professionals to exercise their judgment with better information.
                     </p>
                     <p className="mb-4">
-                      This insight led to the development of Zenith's core philosophy: financial models should serve as decision-making tools, not black boxes. Every formula, every assumption, and every output should provide clear insights that enhance judgment rather than replace it.
+                      What sets Zenith apart is our commitment to creating tools that aren't just technically sound but are genuinely useful in real-world investment settings. Our models strip away unnecessary detail while preserving the sophisticated analysis needed for informed decision-making. We focus on making the important variables clear and actionable, rather than hiding them behind layers of complexity.
                     </p>
                     <p>
                       Today, Zenith serves clients ranging from boutique real estate investment firms to global asset managers, providing both standardized models that save countless development hours and bespoke solutions tailored to specific investment strategies.
@@ -206,7 +206,7 @@ export default function About() {
         </div>
       </section>
       
-      {/* Leadership Section - Replacing Founder Section with taller image */}
+      {/* Leadership Section - with three profiles of equal size */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
@@ -218,28 +218,28 @@ export default function About() {
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
             {/* Maximilian Schmitt Profile */}
             <Motion animation="fade" direction="up" delay={200}>
-              <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden">
+              <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden h-full flex flex-col">
                 <div className="relative h-[400px]">
                   <Image 
-                    src="/images/about/max-profile.jpg" 
+                    src="/images/about/founder.jpg" 
                     alt="Maximilian Schmitt"
                     fill
                     className="object-cover object-top"
-                    sizes="(max-width: 768px) 100vw, 50vw"
+                    sizes="(max-width: 768px) 100vw, 33vw"
                   />
                 </div>
-                <div className="p-8">
+                <div className="p-8 flex-grow flex flex-col">
                   <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-1">
                     Maximilian Schmitt
                   </h3>
                   <p className="text-teal-500 font-medium mb-4">Founder & CEO</p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    With experience spanning private equity and public markets, Max brings a unique perspective to financial modeling. Prior to founding Zenith Capital Advisors, Max held senior research positions at Evercore ISI and Macquarie Capital. Before transitioning to public markets, Max began his career in private equity as a commercial real estate acquisitions analyst.
+                    Max has over 10 years of experience in public and private equity investing, bringing a comprehensive perspective to financial modeling. His career spans senior research roles at Evercore ISI and Macquarie Capital, where he developed innovative analytical frameworks for equity valuation and investment decision-making. Prior to Wall Street, Max underwrote over $1 billion of CRE transactions and helped manage a 2,000 unit multifamily portfolio while working in private equity.
                   </p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Max holds a bachelor's degree in finance, a master's in real estate, and a master's in entrepreneurship from the University of Florida. His background in both private and public markets informs Zenith's distinctive approach to financial modeling and investment advisory.
+                    His multidisciplinary background in both buy-side and sell-side roles provides Zenith with unique insights into the analytical needs across the investment spectrum. Max holds a bachelor's degree in Finance and master's degrees in Entrepreneurship and Real Estate from the University of Florida.
                   </p>
-                  <div className="flex space-x-3 mt-6">
+                  <div className="flex space-x-3 mt-auto">
                     <a href="#" className="text-gray-400 hover:text-navy-700 dark:hover:text-white">
                       <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
                         <path fillRule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clipRule="evenodd" />
@@ -255,8 +255,65 @@ export default function About() {
               </div>
             </Motion>
             
-            {/* Add more leadership profiles here in the future */}
-            {/* The grid layout will automatically adjust as new profiles are added */}
+            {/* Gediminas Bulota Profile */}
+            <Motion animation="fade" direction="up" delay={300}>
+              <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden h-full flex flex-col">
+                <div className="relative h-[400px] bg-gray-200 dark:bg-navy-700 flex items-center justify-center">
+                  <div className="h-40 w-40 bg-navy-500 rounded-full flex items-center justify-center text-white text-6xl font-bold">
+                    GB
+                  </div>
+                </div>
+                <div className="p-8 flex-grow flex flex-col">
+                  <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-1">
+                    Gediminas Bulota
+                  </h3>
+                  <p className="text-teal-500 font-medium mb-4">Senior Advisor, Quantitative Finance</p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    Gediminas brings over 15 years of experience in quantitative finance and derivatives modeling. Previously, he served as Head of Quantitative Strategy at a major global investment bank and led the development of proprietary pricing models for complex structured products.
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    He holds a Ph.D. in Financial Mathematics from MIT and has published numerous papers on derivatives pricing and risk management. His expertise in mathematical finance provides an invaluable perspective to Zenith's modeling approach.
+                  </p>
+                  <div className="flex space-x-3 mt-auto">
+                    <a href="#" className="text-gray-400 hover:text-navy-700 dark:hover:text-white">
+                      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fillRule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clipRule="evenodd" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </Motion>
+            
+            {/* Matthew Yance Profile */}
+            <Motion animation="fade" direction="up" delay={400}>
+              <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden h-full flex flex-col">
+                <div className="relative h-[400px] bg-gray-200 dark:bg-navy-700 flex items-center justify-center">
+                  <div className="h-40 w-40 bg-navy-500 rounded-full flex items-center justify-center text-white text-6xl font-bold">
+                    MY
+                  </div>
+                </div>
+                <div className="p-8 flex-grow flex flex-col">
+                  <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-1">
+                    Matthew Yance
+                  </h3>
+                  <p className="text-teal-500 font-medium mb-4">Senior Advisor, Private Equity</p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    Matthew has over two decades of experience in private equity investing, having most recently served as Managing Director at a leading global private equity firm where he led investments in the technology and healthcare sectors with deal sizes ranging from $500M to $5B.
+                  </p>
+                  <p className="text-gray-600 dark:text-gray-300 mb-4">
+                    He holds an MBA from Harvard Business School and a bachelor's degree in Economics from Princeton University. Matthew provides invaluable insights into the practical applications of financial models in the private equity investment process.
+                  </p>
+                  <div className="flex space-x-3 mt-auto">
+                    <a href="#" className="text-gray-400 hover:text-navy-700 dark:hover:text-white">
+                      <svg className="h-5 w-5" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+                        <path fillRule="evenodd" d="M19 0h-14c-2.761 0-5 2.239-5 5v14c0 2.761 2.239 5 5 5h14c2.762 0 5-2.239 5-5v-14c0-2.761-2.238-5-5-5zm-11 19h-3v-11h3v11zm-1.5-12.268c-.966 0-1.75-.79-1.75-1.764s.784-1.764 1.75-1.764 1.75.79 1.75 1.764-.783 1.764-1.75 1.764zm13.5 12.268h-3v-5.604c0-3.368-4-3.113-4 0v5.604h-3v-11h3v1.765c1.396-2.586 7-2.777 7 2.476v6.759z" clipRule="evenodd" />
+                      </svg>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </Motion>
           </div>
         </div>
       </section>
