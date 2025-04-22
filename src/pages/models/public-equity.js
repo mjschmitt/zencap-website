@@ -6,15 +6,63 @@ import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
 import Link from 'next/link';
 
-// Sample model data - in a real app, this would be imported from a data file
+// Updated model data with new public equity models
 const PUBLIC_EQUITY_MODELS = [
+  {
+    id: 'applovin-3-statement-model',
+    slug: 'applovin-3-statement-model',
+    title: 'AppLovin (APP) 3-Statement Model',
+    excerpt: 'Comprehensive financial model for AppLovin Corporation with integrated income statement, balance sheet, and cash flow projections.',
+    category: 'Public Equity',
+    price: 4985,
+    imagePlaceholder: 'AppLovin Model Preview',
+    features: [
+      'Detailed revenue breakdown by segment',
+      'Historical data and forward projections',
+      'Fully integrated 3-statement model',
+      'Operating metrics and KPIs dashboard',
+      'Sensitivity analysis on key drivers'
+    ]
+  },
+  {
+    id: 'nvidia-3-statement-model',
+    slug: 'nvidia-3-statement-model',
+    title: 'NVIDIA (NVDA) 3-Statement Model',
+    excerpt: 'Integrated financial model for NVIDIA Corporation with segment analysis, growth projections, and valuation framework.',
+    category: 'Public Equity',
+    price: 4985,
+    imagePlaceholder: 'NVIDIA Model Preview',
+    features: [
+      'Revenue modeling by business segment',
+      'AI/GPU market growth projections',
+      'R&D and capex investment modeling',
+      'Competitor performance benchmarking',
+      'Multiple valuation methodologies'
+    ]
+  },
+  {
+    id: 'tesla-3-statement-model',
+    slug: 'tesla-3-statement-model',
+    title: 'Tesla (TSLA) 3-Statement Model',
+    excerpt: 'Detailed financial model for Tesla, Inc. with vehicle delivery forecasts, energy business projections, and manufacturing expansion analysis.',
+    category: 'Public Equity',
+    price: 4985,
+    imagePlaceholder: 'Tesla Model Preview',
+    features: [
+      'Vehicle production and delivery forecasts',
+      'Gross margin analysis by product line',
+      'Energy generation and storage modeling',
+      'Factory capacity and capital investments',
+      'Cash flow and liquidity analysis'
+    ]
+  },
   {
     id: 'dcf-valuation-suite',
     slug: 'dcf-valuation-suite',
     title: 'DCF Valuation Suite',
     excerpt: 'Comprehensive discounted cash flow analysis for public companies with integrated financial statement projections.',
     category: 'Public Equity',
-    price: 249,
+    price: 2985,
     imagePlaceholder: 'DCF Model Preview',
     features: [
       'Integrated 3-statement model with projections',
@@ -30,7 +78,7 @@ const PUBLIC_EQUITY_MODELS = [
     title: 'Portfolio Attribution Model',
     excerpt: 'Analyze performance drivers and attribution factors across investment positions.',
     category: 'Public Equity',
-    price: 279,
+    price: 2985,
     imagePlaceholder: 'Portfolio Model Preview',
     features: [
       'Multi-factor attribution analysis',
@@ -64,7 +112,7 @@ export default function PublicEquity() {
     <Layout>
       <SEO
         title="Public Equity Models"
-        description="Excel-based financial models for public equity investments, including DCF analysis, portfolio attribution, and valuation tools."
+        description="Excel-based financial models for public equity investments, including 3-statement models for leading companies, DCF analysis, and portfolio attribution tools."
         structuredData={structuredData}
       />
       
@@ -99,7 +147,7 @@ export default function PublicEquity() {
             </div>
           </Motion>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {/* Map through model data */}
             {PUBLIC_EQUITY_MODELS.map((model, index) => (
               <Motion key={model.id} animation="fade" direction="up" delay={200 + (index * 100)}>
@@ -129,7 +177,7 @@ export default function PublicEquity() {
                       </div>
                       
                       <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <span className="font-bold text-navy-700 dark:text-white text-lg">${model.price}</span>
+                        <span className="font-bold text-navy-700 dark:text-white text-lg">${model.price.toLocaleString()}</span>
                         <div className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">
                           View Details
                         </div>

@@ -8,37 +8,114 @@ import Link from 'next/link';
 
 // Sample product data - in a real app, this would be imported from a data file
 const MODELS = [
+  // Private Equity Models
   {
-    id: 'multi-family-acquisition-model',
-    slug: 'multi-family-acquisition-model',
-    title: 'Multi-Family Acquisition Model',
-    excerpt: 'Comprehensive underwriting for apartment complexes with unit-level analysis, renovation scenarios, and financing options.',
+    id: 'multifamily-development-model',
+    slug: 'multifamily-development-model',
+    title: 'Multifamily Development Model',
+    excerpt: 'Comprehensive ground-up development modeling for multifamily projects with detailed construction budgeting and lease-up scenarios.',
     category: 'Private Equity',
-    price: 299,
-    imagePlaceholder: 'Multi-Family Model Preview',
+    price: 4985,
+    imagePlaceholder: 'Multifamily Development Preview',
     features: [
-      'Unit-by-unit rental analysis',
-      'Value-add renovation scenarios',
-      'Detailed financing options with sensitivity analysis',
-      'Investor waterfall and return calculations',
-      'Dynamic charts and reporting'
+      'Detailed construction budget tracking',
+      'Unit mix and lease-up modeling',
+      'Financing scenarios with construction and permanent debt',
+      'Investor waterfall distributions',
+      'Sensitivity analysis on key variables'
     ]
   },
   {
-    id: 'office-property-acquisition-model',
-    slug: 'office-property-acquisition-model',
-    title: 'Office Property Acquisition Model',
-    excerpt: 'Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for office investments.',
+    id: 'multifamily-acquisition-model',
+    slug: 'multifamily-acquisition-model',
+    title: 'Multifamily Acquisition Model',
+    excerpt: 'Comprehensive underwriting for apartment complexes with unit-level analysis, renovation scenarios, and financing options.',
     category: 'Private Equity',
-    price: 349,
-    imagePlaceholder: 'Office Property Model Preview',
-    features: [
-      'Tenant-by-tenant lease analysis',
-      'Renewal probability scenarios',
-      'TI/LC and capital expenditure modeling',
-      'Detailed debt and equity structures',
-      'Sensitivity analysis dashboard'
-    ]
+    price: 4985,
+    imagePlaceholder: 'Multifamily Acquisition Preview'
+  },
+  {
+    id: 'mixed-use-development-model',
+    slug: 'mixed-use-development-model',
+    title: 'Mixed-Use Development Model',
+    excerpt: 'Ground-up development analysis for mixed-use projects combining retail, office, residential, and other property types.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Mixed-Use Development Preview'
+  },
+  {
+    id: 'mixed-use-acquisition-model',
+    slug: 'mixed-use-acquisition-model',
+    title: 'Mixed-Use Acquisition Model',
+    excerpt: 'Acquisition analysis for properties with multiple components including retail, office, residential, and other property types.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Mixed-Use Acquisition Preview'
+  },
+  {
+    id: 'commercial-development-model',
+    slug: 'commercial-development-model',
+    title: 'Commercial Development Model',
+    excerpt: 'Development underwriting for office, retail, industrial and other commercial property types with detailed construction tracking.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Commercial Development Preview'
+  },
+  {
+    id: 'commercial-acquisition-model',
+    slug: 'commercial-acquisition-model',
+    title: 'Commercial Acquisition Model',
+    excerpt: 'Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for commercial property investments.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Commercial Acquisition Preview'
+  },
+  {
+    id: 'hospitality-development-model',
+    slug: 'hospitality-development-model',
+    title: 'Hospitality Development Model',
+    excerpt: 'Ground-up development modeling for hotel and resort properties with ADR, occupancy, and departmental revenue/expense projections.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Hospitality Development Preview'
+  },
+  {
+    id: 'hospitality-acquisition-model',
+    slug: 'hospitality-acquisition-model',
+    title: 'Hospitality Acquisition Model',
+    excerpt: 'Acquisition analysis for hotel and resort properties with RevPAR modeling, brand conversion scenarios, and renovation budgeting.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Hospitality Acquisition Preview'
+  },
+  
+  // Public Equity Models
+  {
+    id: 'applovin-3-statement-model',
+    slug: 'applovin-3-statement-model',
+    title: 'AppLovin (APP) 3-Statement Model',
+    excerpt: 'Comprehensive financial model for AppLovin Corporation with integrated income statement, balance sheet, and cash flow projections.',
+    category: 'Public Equity',
+    price: 4985,
+    imagePlaceholder: 'AppLovin Model Preview'
+  },
+  {
+    id: 'nvidia-3-statement-model',
+    slug: 'nvidia-3-statement-model',
+    title: 'NVIDIA (NVDA) 3-Statement Model',
+    excerpt: 'Integrated financial model for NVIDIA Corporation with segment analysis, growth projections, and valuation framework.',
+    category: 'Public Equity',
+    price: 4985,
+    imagePlaceholder: 'NVIDIA Model Preview'
+  },
+  {
+    id: 'tesla-3-statement-model',
+    slug: 'tesla-3-statement-model',
+    title: 'Tesla (TSLA) 3-Statement Model',
+    excerpt: 'Detailed financial model for Tesla, Inc. with vehicle delivery forecasts, energy business projections, and manufacturing expansion analysis.',
+    category: 'Public Equity',
+    price: 4985,
+    imagePlaceholder: 'Tesla Model Preview'
   },
   {
     id: 'dcf-valuation-suite',
@@ -46,15 +123,8 @@ const MODELS = [
     title: 'DCF Valuation Suite',
     excerpt: 'Comprehensive discounted cash flow analysis for public companies with integrated financial statement projections.',
     category: 'Public Equity',
-    price: 249,
-    imagePlaceholder: 'DCF Model Preview',
-    features: [
-      'Integrated 3-statement model with projections',
-      'Multiple valuation methodologies (DCF, Multiples)',
-      'Detailed WACC calculation',
-      'Flexible scenario analysis',
-      'Sensitivity tables and tornado charts'
-    ]
+    price: 2985,
+    imagePlaceholder: 'DCF Model Preview'
   },
   {
     id: 'portfolio-attribution-model',
@@ -62,15 +132,8 @@ const MODELS = [
     title: 'Portfolio Attribution Model',
     excerpt: 'Analyze performance drivers and attribution factors across investment positions.',
     category: 'Public Equity',
-    price: 279,
-    imagePlaceholder: 'Portfolio Model Preview',
-    features: [
-      'Multi-factor attribution analysis',
-      'Sector and style performance breakdown',
-      'Risk analytics (beta, volatility, Sharpe ratio)',
-      'Custom benchmark comparisons',
-      'Interactive performance dashboards'
-    ]
+    price: 2985,
+    imagePlaceholder: 'Portfolio Model Preview'
   }
 ];
 
@@ -178,7 +241,7 @@ export default function Models() {
                           {model.excerpt}
                         </p>
                         <div className="flex justify-between items-center">
-                          <span className="font-bold text-navy-700 dark:text-white">${model.price}</span>
+                          <span className="font-bold text-navy-700 dark:text-white">${model.price.toLocaleString()}</span>
                           <div className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">View Details</div>
                         </div>
                       </div>
@@ -221,7 +284,7 @@ export default function Models() {
                           {model.excerpt}
                         </p>
                         <div className="flex justify-between items-center">
-                          <span className="font-bold text-navy-700 dark:text-white">${model.price}</span>
+                          <span className="font-bold text-navy-700 dark:text-white">${model.price.toLocaleString()}</span>
                           <div className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">View Details</div>
                         </div>
                       </div>

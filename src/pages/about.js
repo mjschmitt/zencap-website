@@ -71,7 +71,7 @@ export default function About() {
                 <Motion animation="fade" direction="up" delay={200}>
                   <div className="prose prose-lg max-w-none text-gray-600 dark:text-gray-300">
                     <p className="mb-4">
-                      Zenith Capital Advisors was founded in 2023 by Maximilian Schmitt, drawing on his extensive experience across both private and public equity markets. After witnessing firsthand the limitations of existing financial models – either overly simplistic or unnecessarily complex – Max recognized the need for analytical tools that balanced mathematical rigor with practical usability.
+                      Zenith Capital Advisors was founded in 2023 by Maximilian Schmitt, drawing on his formative experiences across both private and public equity markets. After witnessing firsthand the limitations of existing financial models – either overly simplistic or unnecessarily complex – Max recognized the need for analytical tools that balanced mathematical rigor with practical usability.
                     </p>
                     <p className="mb-4">
                       Our approach combines rigorous quantitative methods with practical investment experience. We believe that the most effective models are those that provide transparency into key drivers and assumptions, allowing investment professionals to exercise their judgment with better information.
@@ -221,7 +221,7 @@ export default function About() {
               <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden h-full flex flex-col">
                 <div className="relative h-[400px]">
                   <Image 
-                    src="/images/about/founder.jpg" 
+                    src="/images/about/max-profile.jpg" 
                     alt="Maximilian Schmitt"
                     fill
                     className="object-cover object-top"
@@ -367,7 +367,7 @@ export default function About() {
                   </li>
                 </ul>
                 <p className="text-gray-600 dark:text-gray-300 text-sm italic">
-                  Our extensive PE background, managing a $600M multifamily portfolio, informs our approach to private market modeling.
+                  Our broad PE experience informs our approach to private asset underwriting.
                 </p>
               </div>
             </Motion>

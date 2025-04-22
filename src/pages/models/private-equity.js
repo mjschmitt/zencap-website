@@ -6,16 +6,32 @@ import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
 import Link from 'next/link';
 
-// Sample model data - in a real app, this would be imported from a data file
+// Updated model data with the new private equity models
 const PRIVATE_EQUITY_MODELS = [
   {
-    id: 'multi-family-acquisition-model',
-    slug: 'multi-family-acquisition-model',
-    title: 'Multi-Family Acquisition Model',
+    id: 'multifamily-development-model',
+    slug: 'multifamily-development-model',
+    title: 'Multifamily Development Model',
+    excerpt: 'Comprehensive ground-up development modeling for multifamily projects with detailed construction budgeting and lease-up scenarios.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Multifamily Development Preview',
+    features: [
+      'Detailed construction budget tracking',
+      'Unit mix and lease-up modeling',
+      'Financing scenarios with construction and permanent debt',
+      'Investor waterfall distributions',
+      'Sensitivity analysis on key variables'
+    ]
+  },
+  {
+    id: 'multifamily-acquisition-model',
+    slug: 'multifamily-acquisition-model',
+    title: 'Multifamily Acquisition Model',
     excerpt: 'Comprehensive underwriting for apartment complexes with unit-level analysis, renovation scenarios, and financing options.',
     category: 'Private Equity',
-    price: 299,
-    imagePlaceholder: 'Multi-Family Model Preview',
+    price: 4985,
+    imagePlaceholder: 'Multifamily Acquisition Preview',
     features: [
       'Unit-by-unit rental analysis',
       'Value-add renovation scenarios',
@@ -25,19 +41,99 @@ const PRIVATE_EQUITY_MODELS = [
     ]
   },
   {
-    id: 'office-property-acquisition-model',
-    slug: 'office-property-acquisition-model',
-    title: 'Office Property Acquisition Model',
-    excerpt: 'Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for office investments.',
+    id: 'mixed-use-development-model',
+    slug: 'mixed-use-development-model',
+    title: 'Mixed-Use Development Model',
+    excerpt: 'Ground-up development analysis for mixed-use projects combining retail, office, residential, and other property types.',
     category: 'Private Equity',
-    price: 349,
-    imagePlaceholder: 'Office Property Model Preview',
+    price: 4985,
+    imagePlaceholder: 'Mixed-Use Development Preview',
+    features: [
+      'Multi-component property type modeling',
+      'Phased development scenarios',
+      'Integrated construction budget tracking',
+      'Component-specific lease-up assumptions',
+      'Complex financing structures'
+    ]
+  },
+  {
+    id: 'mixed-use-acquisition-model',
+    slug: 'mixed-use-acquisition-model',
+    title: 'Mixed-Use Acquisition Model',
+    excerpt: 'Acquisition analysis for properties with multiple components including retail, office, residential, and other property types.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Mixed-Use Acquisition Preview',
+    features: [
+      'Component-level cash flow analysis',
+      'Multi-tenant rollover scheduling',
+      'Property-specific renovation budgeting',
+      'Cross-collateralized financing options',
+      'Blended return metrics by component'
+    ]
+  },
+  {
+    id: 'commercial-development-model',
+    slug: 'commercial-development-model',
+    title: 'Commercial Development Model',
+    excerpt: 'Development underwriting for office, retail, industrial and other commercial property types with detailed construction tracking.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Commercial Development Preview',
+    features: [
+      'Customizable for different commercial property types',
+      'Detailed construction draw schedules',
+      'Pre-leasing scenarios and tenant improvements',
+      'Development fee calculations',
+      'Sponsor promote and waterfall structures'
+    ]
+  },
+  {
+    id: 'commercial-acquisition-model',
+    slug: 'commercial-acquisition-model',
+    title: 'Commercial Acquisition Model',
+    excerpt: 'Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for commercial property investments.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Commercial Acquisition Preview',
     features: [
       'Tenant-by-tenant lease analysis',
       'Renewal probability scenarios',
       'TI/LC and capital expenditure modeling',
       'Detailed debt and equity structures',
       'Sensitivity analysis dashboard'
+    ]
+  },
+  {
+    id: 'hospitality-development-model',
+    slug: 'hospitality-development-model',
+    title: 'Hospitality Development Model',
+    excerpt: 'Ground-up development modeling for hotel and resort properties with ADR, occupancy, and departmental revenue/expense projections.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Hospitality Development Preview',
+    features: [
+      'Hotel flag/brand assumptions',
+      'ADR and occupancy ramp-up modeling',
+      'Departmental revenue and expense tracking',
+      'FF&E reserve and replacement scheduling',
+      'Operator performance incentives'
+    ]
+  },
+  {
+    id: 'hospitality-acquisition-model',
+    slug: 'hospitality-acquisition-model',
+    title: 'Hospitality Acquisition Model',
+    excerpt: 'Acquisition analysis for hotel and resort properties with RevPAR modeling, brand conversion scenarios, and renovation budgeting.',
+    category: 'Private Equity',
+    price: 4985,
+    imagePlaceholder: 'Hospitality Acquisition Preview',
+    features: [
+      'Historical and projected RevPAR analysis',
+      'Property improvement plan budgeting',
+      'Brand conversion/flag change scenarios',
+      'Management agreement modeling',
+      'Seasonality and booking pattern analysis'
     ]
   }
 ];
@@ -64,7 +160,7 @@ export default function PrivateEquity() {
     <Layout>
       <SEO
         title="Private Equity Models"
-        description="Excel-based financial models for private equity investments, including multi-family and office property acquisition models."
+        description="Excel-based financial models for private equity investments, including multifamily, commercial, mixed-use and hospitality acquisition and development models."
         structuredData={structuredData}
       />
       
@@ -99,7 +195,7 @@ export default function PrivateEquity() {
             </div>
           </Motion>
           
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
             {/* Map through model data */}
             {PRIVATE_EQUITY_MODELS.map((model, index) => (
               <Motion key={model.id} animation="fade" direction="up" delay={200 + (index * 100)}>
@@ -129,7 +225,7 @@ export default function PrivateEquity() {
                       </div>
                       
                       <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <span className="font-bold text-navy-700 dark:text-white text-lg">${model.price}</span>
+                        <span className="font-bold text-navy-700 dark:text-white text-lg">${model.price.toLocaleString()}</span>
                         <div className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">
                           View Details
                         </div>
@@ -156,7 +252,7 @@ export default function PrivateEquity() {
                   <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
                 </svg>
                 <p className="text-gray-600 dark:text-gray-300 text-lg italic mb-6 pt-6">
-                  "The multi-family acquisition model from Zenith Capital has been instrumental in our ability to quickly analyze potential acquisitions. The level of detail and flexibility has impressed both our investment committee and our limited partners."
+                  "The multifamily acquisition model from Zenith Capital has been instrumental in our ability to quickly analyze potential acquisitions. The level of detail and flexibility has impressed both our investment committee and our limited partners."
                 </p>
                 <div className="flex items-center justify-center">
                   <div className="h-12 w-12 bg-navy-100 dark:bg-navy-700 rounded-full flex items-center justify-center mr-3">
