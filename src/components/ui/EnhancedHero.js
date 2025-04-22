@@ -1,6 +1,7 @@
-// src/components/ui/EnhancedHero.js
+// src/components/ui/EnhancedHero.js - Fixed Link usage
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Link from 'next/link';
 
 // Array of hero text options to cycle through
 const heroTextOptions = [
@@ -92,7 +93,7 @@ export default function EnhancedHero() {
           transition={{ delay: 0.4, duration: 0.6 }}
           className="flex flex-wrap justify-center gap-4 mt-8"
         >
-          <a 
+          <Link 
             href="/solutions" 
             className="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-md shadow-lg transform hover:-translate-y-1 transition-all duration-300 inline-flex items-center justify-center"
           >
@@ -100,13 +101,13 @@ export default function EnhancedHero() {
             <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
-          </a>
-          <a 
+          </Link>
+          <Link 
             href="/contact" 
             className="px-6 py-3 bg-transparent border-2 border-white text-white font-medium rounded-md hover:bg-white/10 transform hover:-translate-y-1 transition-all duration-300 inline-flex items-center justify-center"
           >
             Contact Us
-          </a>
+          </Link>
         </motion.div>
         
         {/* Scroll indicator */}

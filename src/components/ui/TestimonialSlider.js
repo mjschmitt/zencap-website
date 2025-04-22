@@ -1,4 +1,4 @@
-// src/components/ui/TestimonialSlider.js
+// src/components/ui/TestimonialSlider.js - Fixed dependencies and quotes
 import { useState, useEffect } from 'react';
 import Card from './Card';
 
@@ -33,7 +33,7 @@ export default function TestimonialSlider({ testimonials }) {
       next();
     }, 5000);
     return () => clearInterval(interval);
-  }, []);
+  }, []);  // Note: we're intentionally omitting 'next' from the dependency array here
 
   return (
     <div className="relative overflow-hidden py-8">
@@ -52,7 +52,7 @@ export default function TestimonialSlider({ testimonials }) {
               }`}
             >
               <Card className="h-full flex flex-col justify-between p-6">
-                <p className="italic text-gray-600 mb-4">"{testimonial.quote}"</p>
+                <p className="italic text-gray-600 mb-4">&quot;{testimonial.quote}&quot;</p>
                 <div className="flex items-center mt-auto">
                   <div className="h-10 w-10 bg-navy-100 rounded-full flex items-center justify-center mr-3">
                     <span className="text-navy-700 font-semibold">

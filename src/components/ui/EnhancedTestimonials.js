@@ -1,6 +1,7 @@
-// src/components/ui/EnhancedTestimonials.js
+// src/components/ui/EnhancedTestimonials.js - Fixed quotes and img tag
 import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import Image from 'next/image';
 
 // Sample testimonial data - replace with your actual testimonials
 const TESTIMONIALS = [
@@ -137,17 +138,21 @@ export default function EnhancedTestimonials() {
                   </div>
                   
                   <p className="text-xl text-gray-700 dark:text-gray-200 italic leading-relaxed mb-6">
-                    "{testimonial.quote}"
+                    &quot;{testimonial.quote}&quot;
                   </p>
                   
                   <div className="flex items-center mt-auto">
-                    <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mr-4 flex-shrink-0">
+                    <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mr-3">
                       {testimonial.avatar ? (
-                        <img 
-                          src={testimonial.avatar} 
-                          alt={testimonial.name} 
-                          className="h-10 w-10 rounded-full object-cover"
-                        />
+                        <div className="relative h-10 w-10 rounded-full overflow-hidden">
+                          <Image 
+                            src={testimonial.avatar} 
+                            alt={testimonial.name} 
+                            fill
+                            sizes="40px"
+                            className="object-cover"
+                          />
+                        </div>
                       ) : (
                         <span className="text-teal-700 dark:text-teal-300 font-semibold text-lg">
                           {testimonial.name.charAt(0)}

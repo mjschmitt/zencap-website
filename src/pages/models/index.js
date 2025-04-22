@@ -242,7 +242,7 @@ export default function Models() {
                         </p>
                         <div className="flex justify-between items-center">
                           <span className="font-bold text-navy-700 dark:text-white">${model.price.toLocaleString()}</span>
-                          <div className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">View Details</div>
+                          <div className="text-teal-600 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-medium text-sm">View Details</div>
                         </div>
                       </div>
                     </Card>
@@ -285,7 +285,7 @@ export default function Models() {
                         </p>
                         <div className="flex justify-between items-center">
                           <span className="font-bold text-navy-700 dark:text-white">${model.price.toLocaleString()}</span>
-                          <div className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">View Details</div>
+                          <div className="text-teal-600 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-medium text-sm">View Details</div>
                         </div>
                       </div>
                     </Card>

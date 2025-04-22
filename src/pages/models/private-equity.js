@@ -226,7 +226,7 @@ export default function PrivateEquity() {
                       
                       <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
                         <span className="font-bold text-navy-700 dark:text-white text-lg">${model.price.toLocaleString()}</span>
-                        <div className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">
+                        <div className="text-teal-600 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-medium text-sm">
                           View Details
                         </div>
                       </div>

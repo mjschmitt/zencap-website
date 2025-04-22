@@ -1,4 +1,4 @@
-// src/components/ui/ContactForm.js
+// src/components/ui/ContactForm.js - Fixed unescaped entities
 import { useState } from 'react';
 import Button from './Button';
 
@@ -101,7 +101,7 @@ export default function ContactForm({ onSubmit }) {
             </svg>
             <div>
               <p className="font-medium">Message sent successfully!</p>
-              <p className="text-sm mt-1">Thank you for reaching out. We'll get back to you shortly.</p>
+              <p className="text-sm mt-1">Thank you for reaching out. We&apos;ll get back to you shortly.</p>
               <button 
                 onClick={() => setSubmitSuccess(false)}
                 className="mt-2 text-sm font-medium text-green-700 hover:text-green-900"
@@ -170,7 +170,7 @@ export default function ContactForm({ onSubmit }) {
             
             <div>
               <label htmlFor="interest" className="block text-sm font-medium text-navy-600 mb-1">
-                I'm interested in
+                I&apos;m interested in
               </label>
               <select 
                 id="interest" 
