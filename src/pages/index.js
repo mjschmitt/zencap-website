@@ -5,6 +5,7 @@ import EnhancedHero from '@/components/ui/EnhancedHero';
 import EnhancedTestimonials from '@/components/ui/EnhancedTestimonials';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
+import Link from 'next/link';
 
 export default function Home() {
   // Structured data for rich search results
@@ -81,7 +82,7 @@ export default function Home() {
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
                   Custom financial models that provide deep analytical insights and support better investment decisions.
                 </p>
-                <a 
+                <Link 
                   href="/solutions/financial-modeling" 
                   className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
                 >
@@ -89,7 +90,7 @@ export default function Home() {
                   <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
-                </a>
+                </Link>
               </div>
             </motion.div>
             
@@ -115,7 +116,7 @@ export default function Home() {
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
                   End-to-end systems to streamline your investment operations, improve data management, and enhance decision-making.
                 </p>
-                <a 
+                <Link 
                   href="/solutions/infrastructure" 
                   className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
                 >
@@ -123,7 +124,7 @@ export default function Home() {
                   <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
-                </a>
+                </Link>
               </div>
             </motion.div>
             
@@ -149,7 +150,7 @@ export default function Home() {
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
                   Specialized research to inform your investment strategy, identify opportunities, and navigate market complexities.
                 </p>
-                <a 
+                <Link 
                   href="/solutions/research" 
                   className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
                 >
@@ -157,7 +158,7 @@ export default function Home() {
                   <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
-                </a>
+                </Link>
               </div>
             </motion.div>
           </div>
@@ -224,7 +225,7 @@ export default function Home() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.6, delay: 0.2 }}
                   >
-                    Join leading investment firms who've enhanced their decision-making with our financial models and advisory services.
+                    Join leading investment firms who&apos;ve enhanced their decision-making with our financial models and advisory services.
                   </motion.p>
                   
                   <motion.div
@@ -233,7 +234,7 @@ export default function Home() {
                     transition={{ duration: 0.6, delay: 0.4 }}
                   >
                     <div className="flex flex-wrap gap-4">
-                      <a 
+                      <Link 
                         href="/contact"
                         className="relative inline-flex group"
                       >
@@ -244,10 +245,10 @@ export default function Home() {
                             <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                           </svg>
                         </button>
-                      </a>
-                      <a href="/models" className="px-8 py-4 bg-transparent border border-white/30 rounded-lg text-white font-semibold hover:bg-white/10 transition-colors duration-300">
+                      </Link>
+                      <Link href="/models" className="px-8 py-4 bg-transparent border border-white/30 rounded-lg text-white font-semibold hover:bg-white/10 transition-colors duration-300">
                         Explore Our Models
-                      </a>
+                      </Link>
                     </div>
                   </motion.div>
                 </div>

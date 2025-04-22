@@ -1,4 +1,4 @@
-// src/pages/contact.js
+// src/pages/contact.js - line 87 fix
 import { useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
@@ -84,12 +84,13 @@ export default function Contact() {
           
           <Motion animation="fade" direction="up" delay={200} duration={800}>
             <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Let's discuss how we can help elevate your investment process
+              Let&apos;s discuss how we can help elevate your investment process
             </p>
           </Motion>
         </div>
       </section>
       
+      {/* Rest of the component remains the same */}
       {/* Contact Form and Info */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">

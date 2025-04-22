@@ -23,14 +23,14 @@ export default function AnimatedElement({
       { threshold }
     );
 
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
+    const currentRef = elementRef.current; // Store current value
+    
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (elementRef.current) {
-        observer.disconnect();
-      }
+      observer.disconnect(); // No need to check ref again
     };
   }, [threshold]);
 

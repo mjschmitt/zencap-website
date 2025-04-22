@@ -48,7 +48,7 @@ export default function About() {
                 Our Mission
               </h2>
               <p className="text-xl text-navy-700 dark:text-white font-serif italic mb-6">
-                "To equip investment professionals with powerful analytical tools that transform complex data into actionable insights, driving better decisions and superior returns."
+                &quot;To equip investment professionals with powerful analytical tools that transform complex data into actionable insights, driving better decisions and superior returns.&quot;
               </p>
               <div className="h-1 w-24 bg-teal-500 mx-auto"></div>
             </div>
@@ -77,7 +77,7 @@ export default function About() {
                       Our approach combines rigorous quantitative methods with practical investment experience. We believe that the most effective models are those that provide transparency into key drivers and assumptions, allowing investment professionals to exercise their judgment with better information.
                     </p>
                     <p className="mb-4">
-                      What sets Zenith apart is our commitment to creating tools that aren't just technically sound but are genuinely useful in real-world investment settings. Our models strip away unnecessary detail while preserving the sophisticated analysis needed for informed decision-making. We focus on making the important variables clear and actionable, rather than hiding them behind layers of complexity.
+                      What sets Zenith apart is our commitment to creating tools that aren&apos;t just technically sound but are genuinely useful in real-world investment settings. Our models strip away unnecessary detail while preserving the sophisticated analysis needed for informed decision-making. We focus on making the important variables clear and actionable, rather than hiding them behind layers of complexity.
                     </p>
                     <p>
                       Today, Zenith serves clients ranging from boutique real estate investment firms to global asset managers, providing both standardized models that save countless development hours and bespoke solutions tailored to specific investment strategies.
@@ -168,7 +168,7 @@ export default function About() {
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300">
                   We view our client relationships as long-term partnerships. We succeed when you succeed, 
-                  and we're committed to your continued investment performance beyond any single project.
+                  and we&apos;re committed to your continued investment performance beyond any single project.
                 </p>
               </div>
             </Motion>
@@ -237,7 +237,7 @@ export default function About() {
                     Max has over 10 years of experience in public and private equity investing, bringing a comprehensive perspective to financial modeling. His career spans senior research roles at Evercore ISI and Macquarie Capital, where he developed innovative analytical frameworks for equity valuation and investment decision-making. Prior to Wall Street, Max underwrote over $1 billion of CRE transactions and helped manage a 2,000 unit multifamily portfolio while working in private equity.
                   </p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    His multidisciplinary background in both buy-side and sell-side roles provides Zenith with unique insights into the analytical needs across the investment spectrum. Max holds a bachelor's degree in Finance and master's degrees in Entrepreneurship and Real Estate from the University of Florida.
+                    His multidisciplinary background in both buy-side and sell-side roles provides Zenith with unique insights into the analytical needs across the investment spectrum. Max holds a bachelor&apos;s degree in Finance and master&apos;s degrees in Entrepreneurship and Real Estate from the University of Florida.
                   </p>
                   <div className="flex space-x-3 mt-auto">
                     <a href="#" className="text-gray-400 hover:text-navy-700 dark:hover:text-white">
@@ -272,7 +272,7 @@ export default function About() {
                     Gediminas brings over 15 years of experience in quantitative finance and derivatives modeling. Previously, he served as Head of Quantitative Strategy at a major global investment bank and led the development of proprietary pricing models for complex structured products.
                   </p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    He holds a Ph.D. in Financial Mathematics from MIT and has published numerous papers on derivatives pricing and risk management. His expertise in mathematical finance provides an invaluable perspective to Zenith's modeling approach.
+                    He holds a Ph.D. in Financial Mathematics from MIT and has published numerous papers on derivatives pricing and risk management. His expertise in mathematical finance provides an invaluable perspective to Zenith&apos;s modeling approach.
                   </p>
                   <div className="flex space-x-3 mt-auto">
                     <a href="#" className="text-gray-400 hover:text-navy-700 dark:hover:text-white">
@@ -302,7 +302,7 @@ export default function About() {
                     Matthew has over two decades of experience in private equity investing, having most recently served as Managing Director at a leading global private equity firm where he led investments in the technology and healthcare sectors with deal sizes ranging from $500M to $5B.
                   </p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    He holds an MBA from Harvard Business School and a bachelor's degree in Economics from Princeton University. Matthew provides invaluable insights into the practical applications of financial models in the private equity investment process.
+                    He holds an MBA from Harvard Business School and a bachelor&apos;s degree in Economics from Princeton University. Matthew provides invaluable insights into the practical applications of financial models in the private equity investment process.
                   </p>
                   <div className="flex space-x-3 mt-auto">
                     <a href="#" className="text-gray-400 hover:text-navy-700 dark:hover:text-white">
@@ -428,7 +428,7 @@ export default function About() {
           
           <Motion animation="fade" direction="up" delay={200}>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Let's discuss how Zenith Capital can transform your investment process and decision-making.
+              Let&apos;s discuss how Zenith Capital can transform your investment process and decision-making.
             </p>
           </Motion>
           

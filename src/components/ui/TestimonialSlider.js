@@ -1,24 +1,26 @@
-// src/components/ui/TestimonialSlider.js - Fixed dependencies and quotes
-import { useState, useEffect } from 'react';
+// src/components/ui/TestimonialSlider.js
+import { useState, useEffect, useCallback } from 'react';
 import Card from './Card';
 
 export default function TestimonialSlider({ testimonials }) {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [animating, setAnimating] = useState(false);
 
-  const next = () => {
+  // Wrap next in useCallback
+  const next = useCallback(() => {
     if (animating) return;
     setAnimating(true);
     setCurrentIndex((prevIndex) => (prevIndex + 1) % testimonials.length);
-  };
+  }, [animating, testimonials.length]);
 
-  const prev = () => {
+  // Wrap prev in useCallback too for consistency
+  const prev = useCallback(() => {
     if (animating) return;
     setAnimating(true);
     setCurrentIndex((prevIndex) => 
       prevIndex === 0 ? testimonials.length - 1 : prevIndex - 1
     );
-  };
+  }, [animating, testimonials.length]);
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -33,7 +35,7 @@ export default function TestimonialSlider({ testimonials }) {
       next();
     }, 5000);
     return () => clearInterval(interval);
-  }, []);  // Note: we're intentionally omitting 'next' from the dependency array here
+  }, [next]);  // now this dependency is stable
 
   return (
     <div className="relative overflow-hidden py-8">

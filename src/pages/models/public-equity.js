@@ -204,7 +204,7 @@ export default function PublicEquity() {
                   <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
                 </svg>
                 <p className="text-gray-600 dark:text-gray-300 text-lg italic mb-6 pt-6">
-                  "The DCF Valuation Suite has become an essential tool in our investment process. The ability to quickly model different scenarios and see the impact on valuation has improved both our speed and the depth of our analysis."
+                  &quot;The DCF Valuation Suite has become an essential tool in our investment process. The ability to quickly model different scenarios and see the impact on valuation has improved both our speed and the depth of our analysis.&quot;
                 </p>
                 <div className="flex items-center justify-center">
                   <div className="h-12 w-12 bg-navy-100 dark:bg-navy-700 rounded-full flex items-center justify-center mr-3">

@@ -1,6 +1,7 @@
 // src/components/ui/ModernCTA.js
 import { motion } from 'framer-motion';
 import { useState } from 'react';
+import Link from 'next/link';
 
 export default function ModernCTA() {
   const [isHovered, setIsHovered] = useState(false);
@@ -62,7 +63,7 @@ export default function ModernCTA() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  Join leading investment firms who've enhanced their decision-making with our financial models and advisory services.
+                  Join leading investment firms who&apos;ve enhanced their decision-making with our financial models and advisory services.
                 </motion.p>
                 
                 <motion.div
@@ -71,7 +72,7 @@ export default function ModernCTA() {
                   transition={{ duration: 0.6, delay: 0.4 }}
                 >
                   <div className="flex flex-wrap gap-4">
-                    <a 
+                    <Link 
                       href="/contact"
                       onMouseEnter={() => setIsHovered(true)}
                       onMouseLeave={() => setIsHovered(false)}
@@ -84,10 +85,10 @@ export default function ModernCTA() {
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                       </button>
-                    </a>
-                    <a href="/models" className="px-8 py-4 bg-transparent border border-white/30 rounded-lg text-white font-semibold hover:bg-white/10 transition-colors duration-300">
+                    </Link>
+                    <Link href="/models" className="px-8 py-4 bg-transparent border border-white/30 rounded-lg text-white font-semibold hover:bg-white/10 transition-colors duration-300">
                       Explore Our Models
-                    </a>
+                    </Link>
                   </div>
                 </motion.div>
               </div>

@@ -159,8 +159,8 @@ export default function PrivateEquity() {
   return (
     <Layout>
       <SEO
-        title="Private Equity Models"
-        description="Excel-based financial models for private equity investments, including multifamily, commercial, mixed-use and hospitality acquisition and development models."
+        title="Public Equity Models"
+        description="Excel-based financial models for public equity investments, including 3-statement models for leading companies, DCF analysis, and portfolio attribution tools."
         structuredData={structuredData}
       />
       
@@ -169,13 +169,13 @@ export default function PrivateEquity() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
           <Motion animation="fade" direction="down" duration={800}>
             <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
-              Private Equity Models
+              Public Equity Models
             </h1>
           </Motion>
           
           <Motion animation="fade" direction="up" delay={200} duration={800}>
             <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Sophisticated Excel-based financial models for private equity investments
+              Sophisticated valuation and analysis tools for public market investments
             </p>
           </Motion>
         </div>
@@ -187,10 +187,10 @@ export default function PrivateEquity() {
           <Motion animation="fade" direction="up">
             <div className="mb-12 max-w-3xl mx-auto">
               <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-4">
-                Private Equity Models Overview
+                Public Equity Models Overview
               </h2>
               <p className="text-gray-600 dark:text-gray-300">
-                Our private equity models are designed to help investment professionals analyze and evaluate potential acquisitions, manage their portfolio, and make better investment decisions. Each model is built with flexibility and thoroughness in mind, allowing you to customize inputs and scenarios while maintaining analytical rigor.
+                Our public equity models provide institutional-grade analysis tools for evaluating stocks, tracking portfolio performance, and developing investment theses. Built with the professional investor in mind, these models combine analytical rigor with practical usability.
               </p>
             </div>
           </Motion>
@@ -226,7 +226,7 @@ export default function PrivateEquity() {
                       
                       <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
                         <span className="font-bold text-navy-700 dark:text-white text-lg">${model.price.toLocaleString()}</span>
-                        <div className="text-teal-600 dark:text-teal-400 hover:text-teal-800 dark:hover:text-teal-300 font-medium text-sm">
+                        <div className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">
                           View Details
                         </div>
                       </div>
@@ -252,15 +252,15 @@ export default function PrivateEquity() {
                   <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
                 </svg>
                 <p className="text-gray-600 dark:text-gray-300 text-lg italic mb-6 pt-6">
-                  "The multifamily acquisition model from Zenith Capital has been instrumental in our ability to quickly analyze potential acquisitions. The level of detail and flexibility has impressed both our investment committee and our limited partners."
+                  &quot;The DCF Valuation Suite has become an essential tool in our investment process. The ability to quickly model different scenarios and see the impact on valuation has improved both our speed and the depth of our analysis.&quot;
                 </p>
                 <div className="flex items-center justify-center">
                   <div className="h-12 w-12 bg-navy-100 dark:bg-navy-700 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-navy-700 dark:text-white font-semibold">JW</span>
+                    <span className="text-navy-700 dark:text-white font-semibold">AP</span>
                   </div>
                   <div className="text-left">
-                    <p className="font-bold text-navy-700 dark:text-white">James Wilson</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Acquisitions Director, Summit Partners</p>
+                    <p className="font-bold text-navy-700 dark:text-white">Alex Peterson</p>
+                    <p className="text-sm text-gray-500 dark:text-gray-400">Senior Analyst, Capital Group</p>
                   </div>
                 </div>
               </div>

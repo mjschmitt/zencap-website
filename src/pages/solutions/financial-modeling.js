@@ -57,8 +57,7 @@ export default function FinancialModeling() {
                 At Zenith Capital Advisors, we build sophisticated financial models that go beyond standard templates to address your unique investment approach and analytical requirements. Our models are designed to streamline decision-making, reveal key insights, and scale with your organization.
               </p>
               <p className="text-gray-600 dark:text-gray-300">
-                Whether you're evaluating a specific investment opportunity or building out your entire analytical infrastructure, our team brings both technical expertise and practical investment experience to create solutions that drive better decisions.
-              </p>
+                Whether you&apos;re evaluating a specific investment opportunity or building out your entire analytical infrastructure, our team brings both technical expertise and practical investment experience to create solutions that drive better decisions.              </p>
             </div>
           </Motion>
           
@@ -245,7 +244,7 @@ export default function FinancialModeling() {
           
           <Motion animation="fade" direction="up" delay={200}>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Let's discuss how our financial modeling services can transform your investment process and decision-making.
+              Let&apos;s discuss how our financial modeling services can transform your investment process.
             </p>
           </Motion>
           

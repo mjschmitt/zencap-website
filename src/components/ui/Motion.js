@@ -1,14 +1,12 @@
-// src/components/ui/Motion.js
+// src/components/ui/AnimatedElement.js
 import { useEffect, useRef, useState } from 'react';
 
-export default function Motion({
+export default function AnimatedElement({
   children,
-  animation = 'fade',
-  direction = 'up',
+  animation = 'fade-up',
   delay = 0,
-  duration = 500,
-  distance = 20,
-  once = true,
+  duration = 700,
+  threshold = 0.1,
   className = '',
 }) {
   const [isVisible, setIsVisible] = useState(false);
@@ -19,57 +17,48 @@ export default function Motion({
       ([entry]) => {
         if (entry.isIntersecting) {
           setIsVisible(true);
-          if (once) {
-            observer.disconnect();
-          }
-        } else if (!once) {
-          setIsVisible(false);
+          observer.disconnect();
         }
       },
-      { threshold: 0.1 }
+      { threshold }
     );
 
-    if (elementRef.current) {
-      observer.observe(elementRef.current);
+    const currentRef = elementRef.current; // Store current value
+    
+    if (currentRef) {
+      observer.observe(currentRef);
     }
 
     return () => {
-      if (elementRef.current) {
-        observer.disconnect();
-      }
+      observer.disconnect(); // No need to check ref again
     };
-  }, [once]);
+  }, [threshold]);
 
-  // Define transform properties based on direction
-  let initialTransform = 'none';
-  if (animation === 'fade') {
-    switch (direction) {
-      case 'up':
-        initialTransform = `translateY(${distance}px)`;
-        break;
-      case 'down':
-        initialTransform = `translateY(-${distance}px)`;
-        break;
-      case 'left':
-        initialTransform = `translateX(${distance}px)`;
-        break;
-      case 'right':
-        initialTransform = `translateX(-${distance}px)`;
-        break;
-    }
-  } else if (animation === 'zoom') {
-    initialTransform = direction === 'in' ? 'scale(0.95)' : 'scale(1.05)';
-  }
+  const animations = {
+    'fade-in': 'opacity-0 transition-opacity',
+    'fade-up': 'opacity-0 translate-y-8 transition-all',
+    'fade-down': 'opacity-0 -translate-y-8 transition-all',
+    'fade-left': 'opacity-0 translate-x-8 transition-all',
+    'fade-right': 'opacity-0 -translate-x-8 transition-all',
+    'zoom-in': 'opacity-0 scale-95 transition-all',
+    'zoom-out': 'opacity-0 scale-105 transition-all',
+  };
 
-  const style = {
+  const baseAnimation = animations[animation] || animations['fade-in'];
+  
+  const animationStyle = {
     opacity: isVisible ? 1 : 0,
-    transform: isVisible ? 'none' : initialTransform,
-    transition: `opacity ${duration}ms ease, transform ${duration}ms ease`,
+    transform: isVisible ? 'none' : '',
+    transitionDuration: `${duration}ms`,
     transitionDelay: `${delay}ms`,
   };
 
   return (
-    <div ref={elementRef} className={className} style={style}>
+    <div
+      ref={elementRef}
+      className={`${baseAnimation} ${className}`}
+      style={animationStyle}
+    >
       {children}
     </div>
   );
