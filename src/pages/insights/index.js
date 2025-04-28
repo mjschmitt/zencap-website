@@ -8,102 +8,134 @@ import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
 import NewsletterSignup from '@/components/ui/NewsletterSignup';
 
-// Sample insights data - in a real application, this would be fetched from an API or CMS
+// Updated insights data with tech-focused public equity and commercial real estate private equity content
 const INSIGHTS = [
   {
     id: 'earnings-q1-2025-tech-giants',
     slug: 'earnings-q1-2025-tech-giants',
     title: 'Q1 2025 Earnings Snapshot: Major Tech Platforms',
     excerpt: 'Analysis of Q1 earnings reports from leading technology companies, highlighting key trends, surprises, and implications for investors.',
-    category: 'Earnings Analysis',
+    category: 'Public Equity',
     date: 'March 30, 2025',
     readTime: '8 min read',
     featured: true,
     imagePlaceholder: 'Tech earnings chart',
     author: {
-      name: 'Sarah Chen',
-      title: 'Senior Analyst',
-      avatar: '/images/avatars/sarah.jpg'
+      name: 'Maximilian Schmitt',
+      title: 'Founder & CEO',
+      avatar: '/images/about/max-profile.jpg'
     }
   },
   {
-    id: 'renewable-energy-investment-trends',
-    slug: 'renewable-energy-investment-trends',
-    title: 'Investment Trends in Renewable Energy Infrastructure',
-    excerpt: 'Examination of capital allocation patterns in renewable energy projects, key growth areas, and emerging investment opportunities.',
-    category: 'Market Trends',
+    id: 'ai-impact-saas-valuations',
+    slug: 'ai-impact-saas-valuations',
+    title: "AI Impact on SaaS Valuations: A New Multiple Framework",
+    excerpt: 'How AI capabilities are reshaping valuation multiples for software companies, with a proposed framework for measuring AI-driven value creation.',
+    category: 'Public Equity',
     date: 'March 22, 2025',
-    readTime: '12 min read',
-    featured: true,
-    imagePlaceholder: 'Solar panel installation',
-    author: {
-      name: 'Michael Zhang',
-      title: 'Research Director',
-      avatar: '/images/avatars/michael.jpg'
-    }
-  },
-  {
-    id: 'biotech-innovation-landscape',
-    slug: 'biotech-innovation-landscape',
-    title: 'Biotech Innovation Landscape: Areas to Watch',
-    excerpt: 'Analysis of emerging therapeutic approaches, breakthrough technologies, and potential investment targets in the biotechnology sector.',
-    category: 'Research Report',
-    date: 'March 15, 2025',
-    readTime: '15 min read',
-    featured: false,
-    imagePlaceholder: 'Lab research',
-    author: {
-      name: 'Rebecca Johnson',
-      title: 'Healthcare Analyst',
-      avatar: '/images/avatars/rebecca.jpg'
-    }
-  },
-  {
-    id: 'retail-sector-analysis',
-    slug: 'retail-sector-analysis',
-    title: 'Retail Sector: Post-Pandemic Evolution and Outlook',
-    excerpt: 'How retail business models are adapting to changing consumer behavior, with implications for real estate, technology, and omnichannel strategies.',
-    category: 'Sector Analysis',
-    date: 'March 8, 2025',
     readTime: '10 min read',
-    featured: false,
-    imagePlaceholder: 'Modern retail store',
+    featured: true,
+    imagePlaceholder: 'AI valuation model',
     author: {
-      name: 'James Wilson',
-      title: 'Consumer Sector Lead',
-      avatar: '/images/avatars/james.jpg'
+      name: 'Maximilian Schmitt',
+      title: 'Founder & CEO',
+      avatar: '/images/about/max-profile.jpg'
     }
   },
   {
-    id: 'ai-in-financial-services',
-    slug: 'ai-in-financial-services',
-    title: 'AI Implementation in Financial Services',
-    excerpt: 'Examination of how artificial intelligence is transforming financial services operations, customer experiences, and competitive dynamics.',
-    category: 'Technology Trends',
+    id: 'multifamily-investment-interest-rates',
+    slug: 'multifamily-investment-interest-rates',
+    title: 'Multifamily Investments in a Shifting Rate Environment',
+    excerpt: 'Analysis of how changing interest rates impact multifamily valuations, cash flows, and investment strategies in the current market.',
+    category: 'Private Equity',
+    date: 'March 15, 2025',
+    readTime: '12 min read',
+    featured: false,
+    imagePlaceholder: 'Apartment building investments',
+    author: {
+      name: 'Maximilian Schmitt',
+      title: 'Founder & CEO',
+      avatar: '/images/about/max-profile.jpg'
+    }
+  },
+  {
+    id: 'semiconductor-supply-chain-resilience',
+    slug: 'semiconductor-supply-chain-resilience',
+    title: 'Semiconductor Supply Chain Resilience: Investment Implications',
+    excerpt: 'Examining how geopolitical tensions and reshoring efforts are transforming semiconductor manufacturing investments and public equity valuations.',
+    category: 'Public Equity',
+    date: 'March 8, 2025',
+    readTime: '9 min read',
+    featured: false,
+    imagePlaceholder: 'Semiconductor manufacturing',
+    author: {
+      name: 'Maximilian Schmitt',
+      title: 'Founder & CEO',
+      avatar: '/images/about/max-profile.jpg'
+    }
+  },
+  {
+    id: 'commercial-real-estate-data-centers',
+    slug: 'commercial-real-estate-data-centers',
+    title: 'Data Centers: The New Essential Commercial Real Estate',
+    excerpt: 'How AI computing demands are driving unprecedented growth in data center development and creating compelling investment opportunities.',
+    category: 'Private Equity',
     date: 'March 1, 2025',
     readTime: '11 min read',
     featured: false,
-    imagePlaceholder: 'AI visualization',
+    imagePlaceholder: 'Data center infrastructure',
     author: {
-      name: 'David Martinez',
-      title: 'Technology Analyst',
-      avatar: '/images/avatars/david.jpg'
+      name: 'Maximilian Schmitt',
+      title: 'Founder & CEO',
+      avatar: '/images/about/max-profile.jpg'
     }
   },
   {
-    id: 'infrastructure-investment-outlook',
-    slug: 'infrastructure-investment-outlook',
-    title: 'Infrastructure Investment Outlook: 2025-2030',
-    excerpt: 'Analysis of global infrastructure investment trends, highlighting regional growth areas, funding models, and projected returns.',
-    category: 'Market Trends',
+    id: 'fintech-embedded-finance-trends',
+    slug: 'fintech-embedded-finance-trends',
+    title: 'Embedded Finance: The Next Growth Vector for Fintech',
+    excerpt: 'Analysis of how non-financial companies are integrating financial services, creating new revenue streams and investment opportunities.',
+    category: 'Public Equity',
     date: 'February 22, 2025',
-    readTime: '13 min read',
+    readTime: '8 min read',
     featured: false,
-    imagePlaceholder: 'Infrastructure construction',
+    imagePlaceholder: 'Embedded finance diagram',
     author: {
-      name: 'Michael Zhang',
-      title: 'Research Director',
-      avatar: '/images/avatars/michael.jpg'
+      name: 'Maximilian Schmitt',
+      title: 'Founder & CEO',
+      avatar: '/images/about/max-profile.jpg'
+    }
+  },
+  {
+    id: 'industrial-real-estate-ecommerce',
+    slug: 'industrial-real-estate-ecommerce',
+    title: 'Industrial Real Estate: Riding the E-commerce Wave',
+    excerpt: 'Examining how continued e-commerce growth is transforming industrial real estate demand, pricing dynamics, and investment strategies.',
+    category: 'Private Equity',
+    date: 'February 15, 2025',
+    readTime: '10 min read',
+    featured: false,
+    imagePlaceholder: 'Modern logistics facility',
+    author: {
+      name: 'Maximilian Schmitt',
+      title: 'Founder & CEO',
+      avatar: '/images/about/max-profile.jpg'
+    }
+  },
+  {
+    id: 'cloud-infrastructure-pricing-models',
+    slug: 'cloud-infrastructure-pricing-models',
+    title: 'Cloud Infrastructure Pricing Models: Implications for Margins',
+    excerpt: 'Analysis of how evolving cloud pricing strategies impact the profitability of major providers and influence enterprise technology decisions.',
+    category: 'Public Equity',
+    date: 'February 8, 2025',
+    readTime: '9 min read',
+    featured: false,
+    imagePlaceholder: 'Cloud pricing dashboard',
+    author: {
+      name: 'Maximilian Schmitt',
+      title: 'Founder & CEO',
+      avatar: '/images/about/max-profile.jpg'
     }
   }
 ];
@@ -111,11 +143,11 @@ const INSIGHTS = [
 // Categories for filtering
 const CATEGORIES = [
   { id: 'all', name: 'All Insights' },
-  { id: 'earnings-analysis', name: 'Earnings Analysis' },
-  { id: 'market-trends', name: 'Market Trends' },
-  { id: 'research-report', name: 'Research Reports' },
-  { id: 'sector-analysis', name: 'Sector Analysis' },
-  { id: 'technology-trends', name: 'Technology Trends' }
+  { id: 'public-equity', name: 'Public Equity' },
+  { id: 'private-equity', name: 'Private Equity' },
+  { id: 'technology', name: 'Technology' },
+  { id: 'real-estate', name: 'Real Estate' },
+  { id: 'financial-markets', name: 'Financial Markets' }
 ];
 
 export default function Insights() {
@@ -124,7 +156,14 @@ export default function Insights() {
   // Filter insights based on selected category
   const filteredInsights = activeCategory === 'all'
     ? INSIGHTS
-    : INSIGHTS.filter(insight => insight.category.toLowerCase().replace(' ', '-') === activeCategory);
+    : INSIGHTS.filter(insight => {
+        if (activeCategory === 'public-equity') return insight.category === 'Public Equity';
+        if (activeCategory === 'private-equity') return insight.category === 'Private Equity';
+        if (activeCategory === 'technology') return insight.category === 'Public Equity' && (insight.title.includes('Tech') || insight.title.includes('AI') || insight.title.includes('Cloud') || insight.title.includes('Semiconductor'));
+        if (activeCategory === 'real-estate') return insight.category === 'Private Equity' && (insight.title.includes('Real Estate') || insight.title.includes('Multifamily') || insight.title.includes('Data Centers'));
+        if (activeCategory === 'financial-markets') return insight.title.includes('Interest Rates') || insight.title.includes('Fintech') || insight.title.includes('Finance');
+        return false;
+      });
   
   // Separate featured and regular insights
   const featuredInsights = filteredInsights.filter(insight => insight.featured);
@@ -160,7 +199,7 @@ export default function Insights() {
     <Layout>
       <SEO
         title="Investment Insights"
-        description="Expert analysis, market trends, and earnings snapshots from Zenith Capital's research team."
+        description="Expert analysis of technology trends in public equity markets and commercial real estate opportunities in private equity."
         structuredData={structuredData}
       />
       
