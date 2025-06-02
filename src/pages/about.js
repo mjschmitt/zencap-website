@@ -1,4 +1,4 @@
-// src/pages/about.js - with taller photo windows and removed overlays
+// src/pages/about.js - with team photos for all three members
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
 import Motion from '@/components/ui/Motion';
@@ -182,7 +182,7 @@ export default function About() {
         </div>
       </section>
       
-      {/* Leadership Section - with three profiles of equal size */}
+      {/* Leadership Section - with all three team photos */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
@@ -234,10 +234,14 @@ export default function About() {
             {/* Gediminas Bulota Profile */}
             <Motion animation="fade" direction="up" delay={300}>
               <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden h-full flex flex-col">
-                <div className="relative h-[400px] bg-gray-200 dark:bg-navy-700 flex items-center justify-center">
-                  <div className="h-40 w-40 bg-navy-500 rounded-full flex items-center justify-center text-white text-6xl font-bold">
-                    GB
-                  </div>
+                <div className="relative h-[400px]">
+                  <Image 
+                    src="/images/about/gediminas-profile.jpg" 
+                    alt="Gediminas Bulota"
+                    fill
+                    className="object-cover object-top"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
                 </div>
                 <div className="p-8 flex-grow flex flex-col">
                   <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-1">
@@ -264,10 +268,14 @@ export default function About() {
             {/* Matthew Yance Profile */}
             <Motion animation="fade" direction="up" delay={400}>
               <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden h-full flex flex-col">
-                <div className="relative h-[400px] bg-gray-200 dark:bg-navy-700 flex items-center justify-center">
-                  <div className="h-40 w-40 bg-navy-500 rounded-full flex items-center justify-center text-white text-6xl font-bold">
-                    MY
-                  </div>
+                <div className="relative h-[400px]">
+                  <Image 
+                    src="/images/about/matthew-profile.jpg" 
+                    alt="Matthew Yance"
+                    fill
+                    className="object-cover object-top"
+                    sizes="(max-width: 768px) 100vw, 33vw"
+                  />
                 </div>
                 <div className="p-8 flex-grow flex flex-col">
                   <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-1">
