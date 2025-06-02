@@ -1,4 +1,4 @@
-// src/pages/about.js - with team photos for all three members
+// src/pages/about.js - with hero background image and team photos
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
 import Motion from '@/components/ui/Motion';
@@ -22,9 +22,15 @@ export default function About() {
         structuredData={structuredData}
       />
       
-      {/* Hero Section */}
-      <section className="bg-navy-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
+      {/* Hero Section with Background Image */}
+      <section 
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat"
+        style={{ backgroundImage: 'url(/images/about/about-hero.jpg)' }}
+      >
+        {/* Gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center relative z-10">
           <Motion animation="fade" direction="down" duration={800}>
             <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
               About Zenith Capital
