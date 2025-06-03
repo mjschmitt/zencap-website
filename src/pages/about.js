@@ -1,4 +1,4 @@
-// src/pages/about.js - with hero background image and team photos
+// src/pages/about.js - with larger hero background image
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
 import Motion from '@/components/ui/Motion';
@@ -22,15 +22,15 @@ export default function About() {
         structuredData={structuredData}
       />
       
-      {/* Hero Section with Background Image */}
+      {/* Hero Section with Larger Background Image */}
       <section 
-        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat"
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
         style={{ backgroundImage: 'url(/images/about/about-hero.jpg)' }}
       >
         {/* Gradient overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center relative z-10">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10 w-full">
           <Motion animation="fade" direction="down" duration={800}>
             <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
               About Zenith Capital
@@ -45,7 +45,7 @@ export default function About() {
         </div>
       </section>
       
-      {/* Mission Statement Section - New */}
+      {/* Mission Statement Section */}
       <section className="py-12 bg-gray-50 dark:bg-navy-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
@@ -62,7 +62,7 @@ export default function About() {
         </div>
       </section>
       
-      {/* Our Story Section - Enhanced with taller image container and more content */}
+      {/* Our Story Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md p-8 mb-12">
@@ -109,7 +109,7 @@ export default function About() {
         </div>
       </section>
       
-      {/* Our Values Section - Enhanced with images, overlays removed */}
+      {/* Our Values Section */}
       <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Motion animation="fade" direction="up">
@@ -119,7 +119,6 @@ export default function About() {
           </Motion>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Value 1 */}
             <Motion animation="fade" direction="up" delay={200}>
               <div className="bg-white dark:bg-navy-800 p-8 rounded-lg shadow-md">
                 <div className="relative h-48 mb-6 rounded-lg overflow-hidden">
@@ -141,7 +140,6 @@ export default function About() {
               </div>
             </Motion>
             
-            {/* Value 2 */}
             <Motion animation="fade" direction="up" delay={300}>
               <div className="bg-white dark:bg-navy-800 p-8 rounded-lg shadow-md">
                 <div className="relative h-48 mb-6 rounded-lg overflow-hidden">
@@ -163,7 +161,6 @@ export default function About() {
               </div>
             </Motion>
             
-            {/* Value 3 */}
             <Motion animation="fade" direction="up" delay={400}>
               <div className="bg-white dark:bg-navy-800 p-8 rounded-lg shadow-md">
                 <div className="relative h-48 mb-6 rounded-lg overflow-hidden">
@@ -188,7 +185,7 @@ export default function About() {
         </div>
       </section>
       
-      {/* Leadership Section - with all three team photos */}
+      {/* Leadership Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
@@ -198,7 +195,6 @@ export default function About() {
           </Motion>
           
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {/* Maximilian Schmitt Profile */}
             <Motion animation="fade" direction="up" delay={200}>
               <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden h-full flex flex-col">
                 <div className="relative h-[400px]">
@@ -237,7 +233,6 @@ export default function About() {
               </div>
             </Motion>
             
-            {/* Gediminas Bulota Profile */}
             <Motion animation="fade" direction="up" delay={300}>
               <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden h-full flex flex-col">
                 <div className="relative h-[400px]">
@@ -271,7 +266,6 @@ export default function About() {
               </div>
             </Motion>
             
-            {/* Matthew Yance Profile */}
             <Motion animation="fade" direction="up" delay={400}>
               <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md overflow-hidden h-full flex flex-col">
                 <div className="relative h-[400px]">
@@ -318,7 +312,6 @@ export default function About() {
           </Motion>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Private Equity Expertise */}
             <Motion animation="fade" direction="right" delay={200}>
               <div className="bg-white dark:bg-navy-800 p-8 rounded-lg shadow-md h-full">
                 <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-4">
@@ -362,7 +355,6 @@ export default function About() {
               </div>
             </Motion>
             
-            {/* Public Equity Expertise */}
             <Motion animation="fade" direction="left" delay={300}>
               <div className="bg-white dark:bg-navy-800 p-8 rounded-lg shadow-md h-full">
                 <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-4">

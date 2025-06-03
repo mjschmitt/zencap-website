@@ -1,4 +1,4 @@
-// src/pages/insights/index.js
+// src/pages/insights/index.js - with larger hero background
 import { useState } from 'react';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
@@ -203,9 +203,15 @@ export default function Insights() {
         structuredData={structuredData}
       />
       
-      {/* Hero Section */}
-      <section className="bg-navy-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
+      {/* Hero Section with Background Image */}
+      <section 
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
+        style={{ backgroundImage: 'url(/images/insights/insights-hero.jpg)' }}
+      >
+        {/* Gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10 w-full">
           <Motion animation="fade" direction="down" duration={800}>
             <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
               Insights
