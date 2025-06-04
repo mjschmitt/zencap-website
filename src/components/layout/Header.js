@@ -40,7 +40,7 @@ export default function Header() {
   }, [mobileMenuOpen]);
   
   return (
-    <header className="bg-white dark:bg-navy-900 shadow-sm dark:shadow-navy-800 transition-colors duration-200">
+    <header className="bg-white dark:bg-navy-900 shadow-sm dark:shadow-navy-800 transition-colors duration-200 relative z-50">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
@@ -192,7 +192,7 @@ export default function Header() {
                 </div>
               </div>
               
-              {/* Insights Link - New addition */}
+              {/* Insights Link */}
               <Link 
                 href="/insights" 
                 className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/insights') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}

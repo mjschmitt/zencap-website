@@ -26,23 +26,20 @@ export default function Footer() {
           
           {/* Models Links */}
           <div className="col-span-1">
-            <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">
-              Models
-            </h3>
+            <Link href="/models" className="cursor-pointer">
+              <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4 hover:text-teal-300 transition-colors">
+                Models
+              </h3>
+            </Link>
             <ul className="space-y-2">
               <li>
-                <Link href="/models/private-equity" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/models/private-equity" className="text-gray-300 hover:text-teal-300 text-sm cursor-pointer transition-colors duration-150">
                   Private Equity Models
                 </Link>
               </li>
               <li>
-                <Link href="/models/public-equity" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/models/public-equity" className="text-gray-300 hover:text-teal-300 text-sm cursor-pointer transition-colors duration-150">
                   Public Equity Models
-                </Link>
-              </li>
-              <li>
-                <Link href="/models" className="text-gray-300 hover:text-white text-sm cursor-pointer">
-                  Model Documentation
                 </Link>
               </li>
             </ul>
@@ -50,22 +47,24 @@ export default function Footer() {
           
           {/* Solutions Links */}
           <div className="col-span-1">
-            <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4">
-              Solutions
-            </h3>
+            <Link href="/solutions" className="cursor-pointer">
+              <h3 className="text-sm font-semibold text-white tracking-wider uppercase mb-4 hover:text-teal-300 transition-colors">
+                Solutions
+              </h3>
+            </Link>
             <ul className="space-y-2">
               <li>
-                <Link href="/solutions/financial-modeling" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/solutions/financial-modeling" className="text-gray-300 hover:text-teal-300 text-sm cursor-pointer transition-colors duration-150">
                   Financial Modeling
                 </Link>
               </li>
               <li>
-                <Link href="/solutions/infrastructure" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/solutions/infrastructure" className="text-gray-300 hover:text-teal-300 text-sm cursor-pointer transition-colors duration-150">
                   Investment Infrastructure
                 </Link>
               </li>
               <li>
-                <Link href="/solutions/research" className="text-gray-300 hover:text-white text-sm cursor-pointer">
+                <Link href="/solutions/research" className="text-gray-300 hover:text-teal-300 text-sm cursor-pointer transition-colors duration-150">
                   Industry Research
                 </Link>
               </li>

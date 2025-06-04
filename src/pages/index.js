@@ -42,7 +42,170 @@ export default function Home() {
       {/* Enhanced Hero Section with rotating text */}
       <EnhancedHero />
       
-      {/* Services Section */}
+      {/* Our Models Section */}
+      <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.7 }}
+            className="text-center mb-12"
+          >
+            <h2 className="text-3xl font-bold text-navy-700 dark:text-white mb-4">
+              Our Models
+            </h2>
+            <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+              Professional-grade financial models designed for sophisticated investment analysis
+            </p>
+          </motion.div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+            {/* Private Equity Models */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
+            >
+              <div className="h-52 relative">
+                <div className="h-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center">
+                  <div className="text-center">
+                    <svg className="h-16 w-16 text-blue-600 dark:text-blue-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+                    </svg>
+                    <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm">Real Estate Investment Models</span>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
+                    Private Equity
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">8 Models</span>
+                </div>
+                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
+                  Private Equity Models
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Comprehensive models for real estate development, acquisition, and investment analysis across all major property types.
+                </p>
+                <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
+                  <div className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Multifamily & Commercial Properties
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Mixed-Use & Hospitality Development
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Detailed Construction & Financing
+                  </div>
+                </div>
+                <Link 
+                  href="/models/private-equity" 
+                  className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
+                >
+                  Explore Private Equity Models
+                  <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
+              </div>
+            </motion.div>
+            
+            {/* Public Equity Models */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+              className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
+            >
+              <div className="h-52 relative">
+                <div className="h-full bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 flex items-center justify-center">
+                  <div className="text-center">
+                    <svg className="h-16 w-16 text-green-600 dark:text-green-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                    <span className="text-green-600 dark:text-green-400 font-semibold text-sm">Equity Analysis & Valuation</span>
+                  </div>
+                </div>
+              </div>
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-3">
+                  <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900 text-navy-700 dark:text-green-300 rounded-full text-xs font-medium">
+                    Public Equity
+                  </span>
+                  <span className="text-sm text-gray-500 dark:text-gray-400">5 Models</span>
+                </div>
+                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
+                  Public Equity Models
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Sophisticated valuation models and analytical tools for public company analysis and portfolio management.
+                </p>
+                <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
+                  <div className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    3-Statement Integration Models
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    DCF & Valuation Frameworks
+                  </div>
+                  <div className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Portfolio Attribution Analysis
+                  </div>
+                </div>
+                <Link 
+                  href="/models/public-equity" 
+                  className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
+                >
+                  Explore Public Equity Models
+                  <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </Link>
+              </div>
+            </motion.div>
+          </div>
+          
+          {/* Browse All Models CTA */}
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5, delay: 0.6 }}
+            className="text-center"
+          >
+            <Link 
+              href="/models"
+              className="inline-flex items-center px-6 py-3 bg-navy-700 hover:bg-navy-800 text-white font-medium rounded-md shadow-lg transform hover:-translate-y-1 transition-all duration-300"
+            >
+              Browse All Models
+              <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+              </svg>
+            </Link>
+          </motion.div>
+        </div>
+      </section>
+      
+      {/* Our Solutions Section */}
       <section className="py-16 bg-white dark:bg-navy-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div 
@@ -52,15 +215,15 @@ export default function Home() {
             className="text-center mb-12"
           >
             <h2 className="text-3xl font-bold text-navy-700 dark:text-white mb-4">
-              Our Services
+              Our Solutions
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Comprehensive financial solutions designed to enhance your investment capabilities
+              Comprehensive advisory services designed to enhance your investment capabilities
             </p>
           </motion.div>
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {/* Service 1 */}
+            {/* Financial Modeling */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -94,7 +257,7 @@ export default function Home() {
               </div>
             </motion.div>
             
-            {/* Service 2 */}
+            {/* Investment Infrastructure */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
@@ -128,7 +291,7 @@ export default function Home() {
               </div>
             </motion.div>
             
-            {/* Service 3 */}
+            {/* Industry Research */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
