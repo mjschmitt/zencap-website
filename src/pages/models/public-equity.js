@@ -1,19 +1,18 @@
-// src/pages/models/public-equity.js
+// src/pages/models/public-equity.js - with larger hero background
+import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
 import Motion from '@/components/ui/Motion';
 import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
-import Link from 'next/link';
 
-// Updated model data with new public equity models
+// Public Equity Models Data
 const PUBLIC_EQUITY_MODELS = [
   {
     id: 'applovin-3-statement-model',
     slug: 'applovin-3-statement-model',
     title: 'AppLovin (APP) 3-Statement Model',
     excerpt: 'Comprehensive financial model for AppLovin Corporation with integrated income statement, balance sheet, and cash flow projections.',
-    category: 'Public Equity',
     price: 4985,
     imagePlaceholder: 'AppLovin Model Preview',
     features: [
@@ -22,14 +21,14 @@ const PUBLIC_EQUITY_MODELS = [
       'Fully integrated 3-statement model',
       'Operating metrics and KPIs dashboard',
       'Sensitivity analysis on key drivers'
-    ]
+    ],
+    featured: true
   },
   {
     id: 'nvidia-3-statement-model',
     slug: 'nvidia-3-statement-model',
     title: 'NVIDIA (NVDA) 3-Statement Model',
     excerpt: 'Integrated financial model for NVIDIA Corporation with segment analysis, growth projections, and valuation framework.',
-    category: 'Public Equity',
     price: 4985,
     imagePlaceholder: 'NVIDIA Model Preview',
     features: [
@@ -38,14 +37,14 @@ const PUBLIC_EQUITY_MODELS = [
       'R&D and capex investment modeling',
       'Competitor performance benchmarking',
       'Multiple valuation methodologies'
-    ]
+    ],
+    featured: true
   },
   {
     id: 'tesla-3-statement-model',
     slug: 'tesla-3-statement-model',
     title: 'Tesla (TSLA) 3-Statement Model',
     excerpt: 'Detailed financial model for Tesla, Inc. with vehicle delivery forecasts, energy business projections, and manufacturing expansion analysis.',
-    category: 'Public Equity',
     price: 4985,
     imagePlaceholder: 'Tesla Model Preview',
     features: [
@@ -54,14 +53,14 @@ const PUBLIC_EQUITY_MODELS = [
       'Energy generation and storage modeling',
       'Factory capacity and capital investments',
       'Cash flow and liquidity analysis'
-    ]
+    ],
+    featured: false
   },
   {
     id: 'dcf-valuation-suite',
     slug: 'dcf-valuation-suite',
     title: 'DCF Valuation Suite',
     excerpt: 'Comprehensive discounted cash flow analysis for public companies with integrated financial statement projections.',
-    category: 'Public Equity',
     price: 2985,
     imagePlaceholder: 'DCF Model Preview',
     features: [
@@ -70,14 +69,14 @@ const PUBLIC_EQUITY_MODELS = [
       'Detailed WACC calculation',
       'Flexible scenario analysis',
       'Sensitivity tables and tornado charts'
-    ]
+    ],
+    featured: false
   },
   {
     id: 'portfolio-attribution-model',
     slug: 'portfolio-attribution-model',
     title: 'Portfolio Attribution Model',
     excerpt: 'Analyze performance drivers and attribution factors across investment positions.',
-    category: 'Public Equity',
     price: 2985,
     imagePlaceholder: 'Portfolio Model Preview',
     features: [
@@ -86,39 +85,49 @@ const PUBLIC_EQUITY_MODELS = [
       'Risk analytics (beta, volatility, Sharpe ratio)',
       'Custom benchmark comparisons',
       'Interactive performance dashboards'
-    ]
+    ],
+    featured: false
   }
 ];
 
-export default function PublicEquity() {
+export default function PublicEquityModels() {
+  // Separate featured and regular models
+  const featuredModels = PUBLIC_EQUITY_MODELS.filter(model => model.featured);
+  const regularModels = PUBLIC_EQUITY_MODELS.filter(model => !model.featured);
+  
   // Structured data for rich search results
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "ItemList",
-    "itemListElement": PUBLIC_EQUITY_MODELS.map((model, index) => ({
-      "@type": "Product",
-      "position": index + 1,
-      "name": model.title,
-      "description": model.excerpt,
-      "offers": {
-        "@type": "Offer",
-        "price": model.price.toString(),
-        "priceCurrency": "USD"
+    "@type": "ProductCatalog",
+    "name": "Public Equity Financial Models",
+    "description": "Professional financial models for public equity analysis including 3-statement models, DCF valuations, and portfolio analytics.",
+    "publisher": {
+      "@type": "Organization",
+      "name": "Zenith Capital Advisors",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://zencap.co/logo.png"
       }
-    }))
+    }
   };
 
   return (
     <Layout>
       <SEO
         title="Public Equity Models"
-        description="Excel-based financial models for public equity investments, including 3-statement models for leading companies, DCF analysis, and portfolio attribution tools."
+        description="Professional financial models for public equity analysis. 3-statement models, DCF valuations, and portfolio attribution tools for investment professionals."
         structuredData={structuredData}
       />
       
-      {/* Hero Section */}
-      <section className="bg-navy-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
+      {/* Hero Section with Background Image */}
+      <section 
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
+        style={{ backgroundImage: 'url(/images/models/public-equity-hero.jpg)' }}
+      >
+        {/* Gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10 w-full">
           <Motion animation="fade" direction="down" duration={800}>
             <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
               Public Equity Models
@@ -127,60 +136,122 @@ export default function PublicEquity() {
           
           <Motion animation="fade" direction="up" delay={200} duration={800}>
             <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Sophisticated valuation and analysis tools for public market investments
+              Comprehensive financial models and valuation tools for public company analysis and portfolio management
             </p>
+          </Motion>
+          
+          <Motion animation="fade" direction="up" delay={400} duration={800}>
+            <Button href="#featured" variant="accent" size="lg">
+              Explore Models
+            </Button>
           </Motion>
         </div>
       </section>
       
-      {/* Models Section */}
-      <section className="py-12">
+      {/* Overview Section */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 mb-12">
+            <Motion animation="fade" direction="up" delay={200}>
+              <Card className="text-center p-6 bg-white dark:bg-navy-800">
+                <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <svg className="h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Equity Research Focus
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Models built by former sell-side analysts with deep understanding of equity research methodologies and best practices.
+                </p>
+              </Card>
+            </Motion>
+            
+            <Motion animation="fade" direction="up" delay={300}>
+              <Card className="text-center p-6 bg-white dark:bg-navy-800">
+                <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <svg className="h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Sophisticated Analytics
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Advanced modeling capabilities including scenario analysis, Monte Carlo simulations, and comprehensive valuation frameworks.
+                </p>
+              </Card>
+            </Motion>
+            
+            <Motion animation="fade" direction="up" delay={400}>
+              <Card className="text-center p-6 bg-white dark:bg-navy-800">
+                <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center mx-auto mb-4">
+                  <svg className="h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 100 4m0-4v2m0-6V4" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Flexible Framework
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Easily adaptable models that can be customized for different industries, company sizes, and analytical approaches.
+                </p>
+              </Card>
+            </Motion>
+          </div>
+        </div>
+      </section>
+      
+      {/* Featured Models */}
+      <section id="featured" className="py-12 bg-gray-50 dark:bg-navy-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
-            <div className="mb-12 max-w-3xl mx-auto">
-              <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-4">
-                Public Equity Models Overview
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300">
-                Our public equity models provide institutional-grade analysis tools for evaluating stocks, tracking portfolio performance, and developing investment theses. Built with the professional investor in mind, these models combine analytical rigor with practical usability.
-              </p>
-            </div>
+            <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-8">
+              Featured Models
+            </h2>
           </Motion>
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            {/* Map through model data */}
-            {PUBLIC_EQUITY_MODELS.map((model, index) => (
-              <Motion key={model.id} animation="fade" direction="up" delay={200 + (index * 100)}>
+            {featuredModels.map((model) => (
+              <Motion key={model.id} animation="fade" direction="up" delay={200} className="h-full">
                 <Link href={`/models/${model.slug}`} className="block h-full">
-                  <Card className="flex flex-col h-full">
-                    <div className="h-48 bg-gray-100 dark:bg-navy-700 rounded-t-lg flex items-center justify-center text-gray-400 dark:text-gray-500">
+                  <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
+                    <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
                       [{model.imagePlaceholder}]
                     </div>
-                    <div className="p-6 flex-grow">
-                      <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium mb-2">
-                        {model.category}
-                      </span>
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900 text-navy-700 dark:text-green-300 rounded-full text-xs font-medium">
+                          Public Equity
+                        </span>
+                        <span className="text-lg font-bold text-teal-500">
+                          ${model.price.toLocaleString()}
+                        </span>
+                      </div>
                       <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
                         {model.title}
                       </h3>
                       <p className="text-gray-600 dark:text-gray-300 mb-4">
                         {model.excerpt}
                       </p>
-                      
-                      <div className="mb-4">
-                        <h4 className="font-semibold text-navy-700 dark:text-white mb-2">Key Features:</h4>
-                        <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 space-y-1">
-                          {model.features.map((feature, i) => (
-                            <li key={i}>{feature}</li>
-                          ))}
-                        </ul>
+                      <div className="space-y-2 mb-4">
+                        {model.features.slice(0, 3).map((feature, index) => (
+                          <div key={index} className="flex items-center text-sm text-gray-600 dark:text-gray-300">
+                            <svg className="h-4 w-4 text-teal-500 mr-2 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                            </svg>
+                            {feature}
+                          </div>
+                        ))}
                       </div>
-                      
-                      <div className="flex justify-between items-center mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                        <span className="font-bold text-navy-700 dark:text-white text-lg">${model.price.toLocaleString()}</span>
-                        <div className="text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-300 font-medium text-sm">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-teal-600 dark:text-teal-400 font-medium">
                           View Details
-                        </div>
+                        </span>
+                        <svg className="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
                       </div>
                     </div>
                   </Card>
@@ -191,56 +262,200 @@ export default function PublicEquity() {
         </div>
       </section>
       
-      {/* Testimonial Section */}
-      <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      {/* All Models */}
+      <section className="py-12">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
-            <div className="max-w-3xl mx-auto">
-              <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-8">
-                Client Feedback
+            <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-8">
+              All Public Equity Models
+            </h2>
+          </Motion>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            {regularModels.map((model) => (
+              <Motion key={model.id} animation="fade" direction="up" delay={200} className="h-full">
+                <Link href={`/models/${model.slug}`} className="block h-full">
+                  <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
+                    <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                      [{model.imagePlaceholder}]
+                    </div>
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900 text-navy-700 dark:text-green-300 rounded-full text-xs font-medium">
+                          Public Equity
+                        </span>
+                        <span className="text-lg font-bold text-teal-500">
+                          ${model.price.toLocaleString()}
+                        </span>
+                      </div>
+                      <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                        {model.title}
+                      </h3>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                        {model.excerpt}
+                      </p>
+                      <div className="flex items-center justify-between mt-auto">
+                        <span className="text-sm text-teal-600 dark:text-teal-400 font-medium">
+                          View Details
+                        </span>
+                        <svg className="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                        </svg>
+                      </div>
+                    </div>
+                  </Card>
+                </Link>
+              </Motion>
+            ))}
+          </div>
+        </div>
+      </section>
+      
+      {/* Model Types Section */}
+      <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Motion animation="fade" direction="up">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-navy-700 dark:text-white mb-4">
+                Model Categories
               </h2>
-              <div className="bg-white dark:bg-navy-800 p-8 rounded-lg shadow-md relative">
-                <svg className="absolute top-4 left-4 h-8 w-8 text-navy-200 dark:text-navy-700" fill="currentColor" viewBox="0 0 32 32">
-                  <path d="M9.352 4C4.456 7.456 1 13.12 1 19.36c0 5.088 3.072 8.064 6.624 8.064 3.36 0 5.856-2.688 5.856-5.856 0-3.168-2.208-5.472-5.088-5.472-.576 0-1.344.096-1.536.192.48-3.264 3.552-7.104 6.624-9.024L9.352 4zm16.512 0c-4.8 3.456-8.256 9.12-8.256 15.36 0 5.088 3.072 8.064 6.624 8.064 3.264 0 5.856-2.688 5.856-5.856 0-3.168-2.304-5.472-5.184-5.472-.576 0-1.248.096-1.44.192.48-3.264 3.456-7.104 6.528-9.024L25.864 4z" />
-                </svg>
-                <p className="text-gray-600 dark:text-gray-300 text-lg italic mb-6 pt-6">
-                  &quot;The DCF Valuation Suite has become an essential tool in our investment process. The ability to quickly model different scenarios and see the impact on valuation has improved both our speed and the depth of our analysis.&quot;
-                </p>
-                <div className="flex items-center justify-center">
-                  <div className="h-12 w-12 bg-navy-100 dark:bg-navy-700 rounded-full flex items-center justify-center mr-3">
-                    <span className="text-navy-700 dark:text-white font-semibold">AP</span>
-                  </div>
-                  <div className="text-left">
-                    <p className="font-bold text-navy-700 dark:text-white">Alex Peterson</p>
-                    <p className="text-sm text-gray-500 dark:text-gray-400">Senior Analyst, Capital Group</p>
-                  </div>
-                </div>
-              </div>
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Comprehensive coverage across equity analysis methodologies and investment approaches
+              </p>
             </div>
           </Motion>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
+            <Motion animation="fade" direction="up" delay={200}>
+              <div className="text-center">
+                <div className="h-16 w-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="h-8 w-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  3-Statement Models
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Integrated financial statement models with historical data and forward projections for comprehensive analysis.
+                </p>
+              </div>
+            </Motion>
+            
+            <Motion animation="fade" direction="up" delay={300}>
+              <div className="text-center">
+                <div className="h-16 w-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="h-8 w-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  DCF Valuations
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Sophisticated discounted cash flow models with multiple valuation methodologies and scenario analysis.
+                </p>
+              </div>
+            </Motion>
+            
+            <Motion animation="fade" direction="up" delay={400}>
+              <div className="text-center">
+                <div className="h-16 w-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="h-8 w-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Portfolio Analytics
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Performance attribution, risk analytics, and portfolio optimization tools for institutional investors.
+                </p>
+              </div>
+            </Motion>
+            
+            <Motion animation="fade" direction="up" delay={500}>
+              <div className="text-center">
+                <div className="h-16 w-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <svg className="h-8 w-8 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                  </svg>
+                </div>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Industry Specific
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Specialized models for technology, healthcare, energy, and other sectors with unique characteristics.
+                </p>
+              </div>
+            </Motion>
+          </div>
+        </div>
+      </section>
+      
+      {/* Industries Covered */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Motion animation="fade" direction="up">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-navy-700 dark:text-white mb-4">
+                Industries Covered
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Our models span key growth sectors and established industries
+              </p>
+            </div>
+          </Motion>
+          
+          <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+            {[
+              'Technology',
+              'Healthcare',
+              'Financial Services',
+              'Consumer Goods',
+              'Energy',
+              'Industrials',
+              'Real Estate',
+              'Telecommunications',
+              'Materials',
+              'Utilities',
+              'Transportation',
+              'Media & Entertainment'
+            ].map((industry, index) => (
+              <Motion key={industry} animation="fade" direction="up" delay={index * 50}>
+                <div className="text-center p-4 bg-gray-50 dark:bg-navy-800 rounded-lg">
+                  <p className="text-sm font-medium text-navy-700 dark:text-white">
+                    {industry}
+                  </p>
+                </div>
+              </Motion>
+            ))}
+          </div>
         </div>
       </section>
       
       {/* CTA Section */}
-      <section className="bg-navy-900 text-white py-16">
+      <section className="py-16 bg-navy-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Motion animation="fade" direction="up">
-            <h2 className="text-3xl font-bold mb-4">Need Something More Tailored?</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Need a Custom Equity Model?
+            </h2>
           </Motion>
           
           <Motion animation="fade" direction="up" delay={200}>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Our custom financial modeling services can create bespoke solutions for your specific investment needs.
+              Our team can create bespoke models tailored to your specific company, industry, or analytical requirements.
             </p>
           </Motion>
           
           <Motion animation="fade" direction="up" delay={400}>
-            <div className="flex flex-wrap gap-4 justify-center">
-              <Button href="/solutions/financial-modeling" variant="accent" size="lg">
-                Learn About Custom Services
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button href="/contact" variant="accent" size="lg">
+                Request Custom Model
               </Button>
-              <Button href="/contact" variant="secondary" size="lg">
-                Contact Us
+              <Button href="/models/private-equity" variant="secondary" size="lg">
+                View Private Equity Models
               </Button>
             </div>
           </Motion>

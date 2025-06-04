@@ -1,4 +1,4 @@
-// src/pages/models/[slug].js
+// src/pages/models/[slug].js - with larger hero background
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
@@ -750,9 +750,15 @@ export default function ModelDetail() {
         structuredData={structuredData}
       />
       
-      {/* Model Header */}
-      <section className="bg-navy-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24">
+      {/* Model Header with Larger Hero */}
+      <section 
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
+        style={{ backgroundImage: 'url(/images/models/model-detail-hero.jpg)' }}
+      >
+        {/* Gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 relative z-10 w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 items-center">
             <Motion animation="fade" direction="right">
               <div>
@@ -887,7 +893,9 @@ export default function ModelDetail() {
                           <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
                             {related.category}
                           </span>
-                          <span className="font-bold text-navy-700 dark:text-white">${related.price.toLocaleString()}</span>
+                          <span className="text-lg font-bold text-teal-500">
+                            ${related.price.toLocaleString()}
+                          </span>
                         </div>
                         <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
                           {related.title}
@@ -895,6 +903,14 @@ export default function ModelDetail() {
                         <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
                           {related.excerpt}
                         </p>
+                        <div className="flex items-center justify-between">
+                          <span className="text-sm text-teal-600 dark:text-teal-400 font-medium">
+                            View Details
+                          </span>
+                          <svg className="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                          </svg>
+                        </div>
                       </div>
                     </Card>
                   </Link>
@@ -906,39 +922,29 @@ export default function ModelDetail() {
       )}
       
       {/* CTA Section */}
-      <section className="py-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
+      <section className="py-16 bg-navy-900 text-white">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Motion animation="fade" direction="up">
-            <Card className="bg-white dark:bg-navy-800 p-8">
-              <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-4">
-                Ready to elevate your investment analysis?
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-6">
-                Purchase {model.title} today and start making better investment decisions.
-              </p>
+            <h2 className="text-3xl font-bold mb-4">
+              Ready to Purchase This Model?
+            </h2>
+          </Motion>
+          
+          <Motion animation="fade" direction="up" delay={200}>
+            <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
+              Get instant access to this professional-grade financial model with comprehensive documentation and support.
+            </p>
+          </Motion>
+          
+          <Motion animation="fade" direction="up" delay={400}>
+            <div className="flex flex-wrap justify-center gap-4">
               <Button href="#" variant="accent" size="lg">
                 Purchase for ${model.price.toLocaleString()}
               </Button>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
-                30-day satisfaction guarantee. Full support included.
-              </p>
-            </Card>
-          </Motion>
-        </div>
-      </section>
-      
-      {/* Back to Models Button */}
-      <section className="pb-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <Motion animation="fade" direction="up">
-            <Link href="/models">
-              <Button variant="ghost" size="lg">
-                <svg className="w-4 h-4 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 19l-7-7m0 0l7-7m-7 7h18" />
-                </svg>
-                Back to All Models
+              <Button href="/contact" variant="secondary" size="lg">
+                Contact Sales
               </Button>
-            </Link>
+            </div>
           </Motion>
         </div>
       </section>
@@ -948,7 +954,7 @@ export default function ModelDetail() {
 
 // This function gets called at build time
 export async function getStaticPaths() {
-  // In a real app, this would fetch data from an API or CMS
+  // Generate paths for all models
   const paths = MODELS.map((model) => ({
     params: { slug: model.slug },
   }));
@@ -958,7 +964,7 @@ export async function getStaticPaths() {
 
 // This function gets called at build time
 export async function getStaticProps({ params }) {
-  // In a real app, this would fetch data from an API or CMS
+  // Find the model based on the slug
   const model = MODELS.find((item) => item.slug === params.slug) || null;
 
   return {

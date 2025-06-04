@@ -1,9 +1,11 @@
-// src/pages/solutions/infrastructure.js
+// src/pages/solutions/infrastructure.js - with larger hero background
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
 import Motion from '@/components/ui/Motion';
 import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
+import Image from 'next/image';
+import Link from 'next/link';
 
 export default function InvestmentInfrastructure() {
   // Structured data for rich search results
@@ -11,26 +13,36 @@ export default function InvestmentInfrastructure() {
     "@context": "https://schema.org",
     "@type": "Service",
     "name": "Investment Infrastructure Services",
-    "description": "End-to-end investment infrastructure solutions for asset managers and investment firms.",
+    "description": "End-to-end investment infrastructure solutions including deal management platforms, portfolio monitoring, and automated reporting systems.",
     "provider": {
       "@type": "Organization",
-      "name": "Zenith Capital Advisors"
+      "name": "Zenith Capital Advisors",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://zencap.co/logo.png"
+      }
     },
-    "serviceType": "Financial Advisory",
+    "serviceType": "Investment Technology",
     "areaServed": "Global"
   };
 
   return (
     <Layout>
       <SEO
-        title="Investment Infrastructure Solutions"
-        description="Our investment infrastructure solutions for asset managers and investment firms. Build end-to-end systems to streamline operations and enhance decision-making."
+        title="Investment Infrastructure"
+        description="End-to-end investment infrastructure solutions including deal management platforms, portfolio monitoring dashboards, and automated reporting systems."
         structuredData={structuredData}
       />
       
-      {/* Hero Section */}
-      <section className="bg-navy-700 text-white">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 md:py-24 text-center">
+      {/* Hero Section with Background Image */}
+      <section 
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
+        style={{ backgroundImage: 'url(/images/solutions/infrastructure-hero.jpg)' }}
+      >
+        {/* Gradient overlay for better text readability */}
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
+        
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10 w-full">
           <Motion animation="fade" direction="down" duration={800}>
             <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
               Investment Infrastructure
@@ -39,8 +51,14 @@ export default function InvestmentInfrastructure() {
           
           <Motion animation="fade" direction="up" delay={200} duration={800}>
             <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              End-to-end systems to streamline operations and enhance investment decision-making
+              Streamline your investment operations with integrated systems that enhance decision-making and operational efficiency
             </p>
+          </Motion>
+          
+          <Motion animation="fade" direction="up" delay={400} duration={800}>
+            <Button href="#solutions" variant="accent" size="lg">
+              Explore Solutions
+            </Button>
           </Motion>
         </div>
       </section>
@@ -48,297 +66,509 @@ export default function InvestmentInfrastructure() {
       {/* Overview Section */}
       <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <Motion animation="fade" direction="right">
+              <div>
+                <h2 className="text-3xl font-bold text-navy-700 dark:text-white mb-6">
+                  Modernize Your Investment Operations
+                </h2>
+                <p className="text-lg text-gray-600 dark:text-gray-300 mb-6">
+                  In today&apos;s competitive investment landscape, operational efficiency can be the difference between capturing opportunities and missing them. Our investment infrastructure solutions are designed to automate routine tasks, centralize critical information, and provide real-time insights that enable faster, more informed decision-making.
+                </p>
+                <p className="text-lg text-gray-600 dark:text-gray-300 mb-8">
+                  Whether you&apos;re managing a private equity fund, real estate portfolio, or institutional investment program, our technology solutions scale with your needs and integrate seamlessly with your existing workflows.
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-teal-500 mb-1">75%</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">Time Savings</div>
+                  </div>
+                  <div className="text-center">
+                    <div className="text-3xl font-bold text-teal-500 mb-1">40%</div>
+                    <div className="text-sm text-gray-600 dark:text-gray-300">Faster Reporting</div>
+                  </div>
+                </div>
+              </div>
+            </Motion>
+            
+            <Motion animation="fade" direction="left">
+              <div className="relative h-96 rounded-lg overflow-hidden">
+                <Image 
+                  src="/images/solutions/infrastructure-overview.jpg" 
+                  alt="Investment infrastructure and technology"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </div>
+            </Motion>
+          </div>
+        </div>
+      </section>
+      
+      {/* Solutions Section */}
+      <section id="solutions" className="py-16 bg-gray-50 dark:bg-navy-900/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
-            <div className="mb-12 max-w-3xl mx-auto">
-              <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-4">
-                Comprehensive Investment Infrastructure Solutions
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-navy-700 dark:text-white mb-4">
+                Our Infrastructure Solutions
               </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-4">
-                At Zenith Capital Advisors, we build the technological and analytical backbone that powers modern investment operations. Our solutions connect data, analysis, and decision-making in seamless systems that scale with your organization.
-              </p>
-              <p className="text-gray-600 dark:text-gray-300">
-                Whether you need to optimize a specific component of your investment process or build a comprehensive infrastructure from the ground up, our team brings both technical expertise and investment knowledge to create solutions that drive better outcomes.
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Comprehensive technology solutions designed to optimize every aspect of your investment operations
               </p>
             </div>
           </Motion>
           
-          {/* Services Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-            {/* Service 1 */}
-            <Motion animation="fade" direction="up" delay={200}>
-              <Card className="h-full p-6">
-                <div className="h-12 w-12 bg-teal-100 dark:bg-navy-700 rounded-full flex items-center justify-center mb-4">
-                  <svg className="h-6 w-6 text-teal-500 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {/* Deal Management Platform */}
+            <Motion animation="fade" direction="up" delay={200} className="h-full">
+              <Card className="h-full bg-white dark:bg-navy-800 p-6">
+                <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
+                  Deal Management Platform
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Centralized platform for tracking deal flow, managing due diligence processes, and coordinating investment committee workflows.
+                </p>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Deal pipeline management
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Due diligence tracking
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Investment committee workflows
+                  </li>
+                </ul>
+              </Card>
+            </Motion>
+            
+            {/* Portfolio Monitoring */}
+            <Motion animation="fade" direction="up" delay={300} className="h-full">
+              <Card className="h-full bg-white dark:bg-navy-800 p-6">
+                <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
+                  Portfolio Monitoring
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Real-time dashboards and analytics for monitoring portfolio performance, tracking key metrics, and identifying trends.
+                </p>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Real-time performance dashboards
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Risk monitoring and alerts
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Benchmark comparisons
+                  </li>
+                </ul>
+              </Card>
+            </Motion>
+            
+            {/* Automated Reporting */}
+            <Motion animation="fade" direction="up" delay={400} className="h-full">
+              <Card className="h-full bg-white dark:bg-navy-800 p-6">
+                <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                </div>
+                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
+                  Automated Reporting
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 mb-4">
+                  Streamlined reporting systems that automatically generate investor reports, regulatory filings, and internal analytics.
+                </p>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Investor reporting automation
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Regulatory compliance reports
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Custom analytics dashboards
+                  </li>
+                </ul>
+              </Card>
+            </Motion>
+            
+            {/* Data Integration */}
+            <Motion animation="fade" direction="up" delay={500} className="h-full">
+              <Card className="h-full bg-white dark:bg-navy-800 p-6">
+                <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                  Investment Data Management
+                  Data Integration
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Comprehensive solutions for collecting, organizing, and leveraging investment data across your organization.
+                  Seamless integration with existing systems, data providers, and third-party services to create a unified data ecosystem.
                 </p>
-                <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 space-y-1 mb-4">
-                  <li>Data warehouse design and implementation</li>
-                  <li>Integration with external data providers</li>
-                  <li>Automated data collection and validation</li>
-                  <li>Master data management</li>
-                  <li>Historical data preservation and access</li>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    API integrations
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Data validation and cleansing
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Real-time data synchronization
+                  </li>
                 </ul>
               </Card>
             </Motion>
             
-            {/* Service 2 */}
-            <Motion animation="fade" direction="up" delay={300}>
-              <Card className="h-full p-6">
-                <div className="h-12 w-12 bg-teal-100 dark:bg-navy-700 rounded-full flex items-center justify-center mb-4">
-                  <svg className="h-6 w-6 text-teal-500 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
+            {/* Compliance & Security */}
+            <Motion animation="fade" direction="up" delay={600} className="h-full">
+              <Card className="h-full bg-white dark:bg-navy-800 p-6">
+                <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                  Portfolio Management Systems
+                  Compliance & Security
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Integrated systems for tracking, analyzing, and optimizing investment portfolios across asset classes.
+                  Enterprise-grade security and compliance frameworks designed to meet regulatory requirements and protect sensitive data.
                 </p>
-                <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 space-y-1 mb-4">
-                  <li>Position tracking and reporting</li>
-                  <li>Performance measurement and attribution</li>
-                  <li>Risk monitoring and management</li>
-                  <li>Trade order management</li>
-                  <li>Compliance and restriction monitoring</li>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    SOC 2 compliance
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Data encryption and backup
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Audit trails and access controls
+                  </li>
                 </ul>
               </Card>
             </Motion>
             
-            {/* Service 3 */}
-            <Motion animation="fade" direction="up" delay={400}>
-              <Card className="h-full p-6">
-                <div className="h-12 w-12 bg-teal-100 dark:bg-navy-700 rounded-full flex items-center justify-center mb-4">
-                  <svg className="h-6 w-6 text-teal-500 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+            {/* Business Intelligence */}
+            <Motion animation="fade" direction="up" delay={700} className="h-full">
+              <Card className="h-full bg-white dark:bg-navy-800 p-6">
+                <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-lg flex items-center justify-center mb-4">
+                  <svg className="h-6 w-6 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
                   </svg>
                 </div>
                 <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                  Investment Analytics Platforms
+                  Business Intelligence
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Advanced analytical tools and dashboards that provide actionable insights for investment decision-making.
+                  Advanced analytics and machine learning capabilities to identify patterns, predict trends, and optimize investment strategies.
                 </p>
-                <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 space-y-1 mb-4">
-                  <li>Custom analytics dashboards</li>
-                  <li>Interactive visualization tools</li>
-                  <li>Automated reporting systems</li>
-                  <li>Investment decision support tools</li>
-                  <li>Scenario and sensitivity analysis frameworks</li>
-                </ul>
-              </Card>
-            </Motion>
-            
-            {/* Service 4 */}
-            <Motion animation="fade" direction="up" delay={500}>
-              <Card className="h-full p-6">
-                <div className="h-12 w-12 bg-teal-100 dark:bg-navy-700 rounded-full flex items-center justify-center mb-4">
-                  <svg className="h-6 w-6 text-teal-500 dark:text-teal-400" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 7h12m0 0l-4-4m4 4l-4 4m0 6H4m0 0l4 4m-4-4l4-4" />
-                  </svg>
-                </div>
-                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                  System Integration & Workflow Automation
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Our Investment Data Management solutions integrate seamlessly with your existing systems, ensuring that you&apos;re always working with up-to-date, accurate information.
-                </p>
-                <ul className="list-disc pl-5 text-gray-600 dark:text-gray-300 space-y-1 mb-4">
-                  <li>API development and implementation</li>
-                  <li>Cross-system data synchronization</li>
-                  <li>Investment workflow automation</li>
-                  <li>Custom integration solutions</li>
-                  <li>Middleware and ETL process design</li>
+                <ul className="text-sm text-gray-600 dark:text-gray-300 space-y-2">
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Predictive analytics
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Machine learning models
+                  </li>
+                  <li className="flex items-center">
+                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    Interactive data visualization
+                  </li>
                 </ul>
               </Card>
             </Motion>
           </div>
-          
-          {/* Additional Benefits Section */}
-          <Motion animation="fade" direction="up" delay={600}>
-            <div className="bg-gray-50 dark:bg-navy-800/50 rounded-lg shadow-md p-8 mb-12">
-              <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-6">
-                Benefits of Our Infrastructure Solutions
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                <div>
-                  <h4 className="text-lg font-bold text-navy-700 dark:text-white mb-3">
-                    Operational Efficiency
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Our solutions streamline investment processes, reduce manual work, and eliminate data silos, allowing your team to focus on high-value activities rather than administrative tasks.
-                  </p>
-                  
-                  <h4 className="text-lg font-bold text-navy-700 dark:text-white mb-3">
-                    Enhanced Decision-Making
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    By providing timely access to accurate data and analytical insights, our infrastructure solutions empower investment teams to make better-informed decisions with confidence.
-                  </p>
-                </div>
-                
-                <div>
-                  <h4 className="text-lg font-bold text-navy-700 dark:text-white mb-3">
-                    Scalability
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Our infrastructure solutions are designed to grow with your organization, accommodating increasing data volumes, new asset classes, and expanding investment teams without sacrificing performance.
-                  </p>
-                  
-                  <h4 className="text-lg font-bold text-navy-700 dark:text-white mb-3">
-                    Risk Reduction
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    By automating processes, enforcing data governance standards, and providing robust audit trails, our solutions help reduce operational risk and enhance compliance capabilities.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Motion>
-          
-          {/* Implementation Approach Section */}
-          <Motion animation="fade" direction="up" delay={700}>
-            <div className="bg-white dark:bg-navy-800 rounded-lg shadow-md p-8">
-              <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-6">
-                Our Implementation Approach
-              </h3>
-              
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-                <div className="text-center">
-                  <div className="h-16 w-16 bg-teal-100 dark:bg-navy-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-teal-500">1</span>
-                  </div>
-                  <h4 className="text-lg font-bold text-navy-700 dark:text-white mb-3">
-                    Assessment
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    We begin by understanding your current processes, systems, and data infrastructure to identify opportunities for improvement and define clear objectives.
-                  </p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="h-16 w-16 bg-teal-100 dark:bg-navy-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-teal-500">2</span>
-                  </div>
-                  <h4 className="text-lg font-bold text-navy-700 dark:text-white mb-3">
-                    Design
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Our team designs a tailored solution that addresses your specific needs, integrates with existing systems, and provides a foundation for future growth.
-                  </p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="h-16 w-16 bg-teal-100 dark:bg-navy-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-teal-500">3</span>
-                  </div>
-                  <h4 className="text-lg font-bold text-navy-700 dark:text-white mb-3">
-                    Implementation
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    We execute the implementation using an agile approach, delivering value incrementally and adjusting based on feedback to ensure alignment with your objectives.
-                  </p>
-                </div>
-              </div>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mt-8">
-                <div className="text-center">
-                  <div className="h-16 w-16 bg-teal-100 dark:bg-navy-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-teal-500">4</span>
-                  </div>
-                  <h4 className="text-lg font-bold text-navy-700 dark:text-white mb-3">
-                    Training & Knowledge Transfer
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    We provide comprehensive training to ensure your team can effectively utilize and maintain the new infrastructure, maximizing the return on your investment.
-                  </p>
-                </div>
-                
-                <div className="text-center">
-                  <div className="h-16 w-16 bg-teal-100 dark:bg-navy-700 rounded-full flex items-center justify-center mx-auto mb-4">
-                    <span className="text-2xl font-bold text-teal-500">5</span>
-                  </div>
-                  <h4 className="text-lg font-bold text-navy-700 dark:text-white mb-3">
-                    Ongoing Support & Evolution
-                  </h4>
-                  <p className="text-gray-600 dark:text-gray-300">
-                    Our relationship continues beyond implementation with ongoing support, regular reviews, and enhancement recommendations to ensure your infrastructure evolves with your needs.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </Motion>
         </div>
       </section>
       
-      {/* Case Studies Section */}
-      <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
+      {/* Implementation Process */}
+      <section className="py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
-            <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-8 text-center">
-              Client Success Stories
-            </h2>
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-navy-700 dark:text-white mb-4">
+                Implementation Process
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                Our systematic approach ensures smooth deployment and rapid time-to-value
+              </p>
+            </div>
           </Motion>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-            {/* Case Study 1 */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
             <Motion animation="fade" direction="up" delay={200}>
-              <Card className="h-full p-6">
-                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                  Global Asset Manager
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  We developed a unified data platform that integrated 12 separate systems, reducing manual data processing by 85% and enabling portfolio managers to access comprehensive investment analytics through a single dashboard.
-                </p>
-                <div className="text-sm text-gray-500 dark:text-gray-400 mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <span className="font-medium">Results:</span> 60% reduction in reporting time, $1.2M annual cost savings, improved investment decision quality
+              <div className="text-center">
+                <div className="h-16 w-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-teal-500">1</span>
                 </div>
-              </Card>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Discovery & Planning
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Comprehensive assessment of your current systems, workflows, and requirements to design the optimal solution.
+                </p>
+              </div>
             </Motion>
             
-            {/* Case Study 2 */}
             <Motion animation="fade" direction="up" delay={300}>
-              <Card className="h-full p-6">
-                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                  Private Equity Firm
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  We designed and implemented a deal management system with integrated financial modeling capabilities, automating the flow of data from initial screening through due diligence, investment committee approval, and ongoing portfolio monitoring.
-                </p>
-                <div className="text-sm text-gray-500 dark:text-gray-400 mt-auto pt-4 border-t border-gray-200 dark:border-gray-700">
-                  <span className="font-medium">Results:</span> 40% increase in deal assessment capacity, standardized investment processes, enhanced institutional knowledge retention
+              <div className="text-center">
+                <div className="h-16 w-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-teal-500">2</span>
                 </div>
-              </Card>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  System Configuration
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Custom configuration and integration of platforms, data sources, and user interfaces to match your specific needs.
+                </p>
+              </div>
             </Motion>
+            
+            <Motion animation="fade" direction="up" delay={400}>
+              <div className="text-center">
+                <div className="h-16 w-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-teal-500">3</span>
+                </div>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Testing & Training
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Rigorous testing with your data and comprehensive training for your team to ensure confident adoption.
+                </p>
+              </div>
+            </Motion>
+            
+            <Motion animation="fade" direction="up" delay={500}>
+              <div className="text-center">
+                <div className="h-16 w-16 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mx-auto mb-4">
+                  <span className="text-2xl font-bold text-teal-500">4</span>
+                </div>
+                <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                  Launch & Support
+                </h3>
+                <p className="text-gray-600 dark:text-gray-300 text-sm">
+                  Seamless go-live with ongoing support, monitoring, and optimization to ensure continued success.
+                </p>
+              </div>
+            </Motion>
+          </div>
+        </div>
+      </section>
+      
+      {/* Benefits Section */}
+      <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
+            <Motion animation="fade" direction="right">
+              <div className="relative h-96 rounded-lg overflow-hidden">
+                <Image 
+                  src="/images/solutions/infrastructure-benefits.jpg" 
+                  alt="Investment infrastructure benefits and ROI"
+                  fill
+                  className="object-cover"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                />
+              </div>
+            </Motion>
+            
+            <Motion animation="fade" direction="left">
+              <div>
+                <h2 className="text-3xl font-bold text-navy-700 dark:text-white mb-6">
+                  Measurable Impact on Your Operations
+                </h2>
+                <div className="space-y-6">
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mr-4">
+                      <div className="h-8 w-8 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center">
+                        <svg className="h-5 w-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-1">Increased Efficiency</h3>
+                      <p className="text-gray-600 dark:text-gray-300">Automate routine tasks and eliminate manual processes, freeing up your team to focus on high-value activities.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mr-4">
+                      <div className="h-8 w-8 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center">
+                        <svg className="h-5 w-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-1">Enhanced Decision Making</h3>
+                      <p className="text-gray-600 dark:text-gray-300">Real-time access to comprehensive data and analytics enables faster, more informed investment decisions.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mr-4">
+                      <div className="h-8 w-8 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center">
+                        <svg className="h-5 w-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-1">Risk Mitigation</h3>
+                      <p className="text-gray-600 dark:text-gray-300">Comprehensive monitoring and alert systems help identify and address potential issues before they impact performance.</p>
+                    </div>
+                  </div>
+                  
+                  <div className="flex items-start">
+                    <div className="flex-shrink-0 mr-4">
+                      <div className="h-8 w-8 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center">
+                        <svg className="h-5 w-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />
+                        </svg>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-1">Scalable Growth</h3>
+                      <p className="text-gray-600 dark:text-gray-300">Infrastructure that grows with your organization, supporting expansion without compromising performance.</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </Motion>
+          </div>
+        </div>
+      </section>
+      
+      {/* Technology Stack */}
+      <section className="py-16">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <Motion animation="fade" direction="up">
+            <div className="text-center mb-12">
+              <h2 className="text-3xl font-bold text-navy-700 dark:text-white mb-4">
+                Technology Partners
+              </h2>
+              <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
+                We work with leading technology providers to deliver best-in-class solutions
+              </p>
+            </div>
+          </Motion>
+          
+          <div className="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-6 gap-6">
+            {[
+              'Salesforce',
+              'Microsoft',
+              'AWS',
+              'Tableau',
+              'Snowflake',
+              'Python',
+              'PostgreSQL',
+              'React',
+              'Docker',
+              'Kubernetes',
+              'PowerBI',
+              'Zapier'
+            ].map((technology, index) => (
+              <Motion key={technology} animation="fade" direction="up" delay={index * 50}>
+                <div className="text-center p-4 bg-gray-50 dark:bg-navy-800 rounded-lg">
+                  <p className="text-sm font-medium text-navy-700 dark:text-white">
+                    {technology}
+                  </p>
+                </div>
+              </Motion>
+            ))}
           </div>
         </div>
       </section>
       
       {/* CTA Section */}
-      <section className="bg-navy-900 text-white py-16">
+      <section className="py-16 bg-navy-900 text-white">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Motion animation="fade" direction="up">
-            <h2 className="text-3xl font-bold mb-4">Ready to upgrade your investment infrastructure?</h2>
+            <h2 className="text-3xl font-bold mb-4">
+              Ready to Transform Your Investment Operations?
+            </h2>
           </Motion>
           
           <Motion animation="fade" direction="up" delay={200}>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Let&apos;s explore how our investment infrastructure solutions can transform your organization.
+              Let&apos;s discuss how our infrastructure solutions can streamline your workflows and enhance your investment capabilities.
             </p>
           </Motion>
           
           <Motion animation="fade" direction="up" delay={400}>
-            <Button href="/contact" variant="accent" size="lg">
-              Schedule a Consultation
-            </Button>
+            <div className="flex flex-wrap justify-center gap-4">
+              <Button href="/contact" variant="accent" size="lg">
+                Schedule Discovery Call
+              </Button>
+              <Button href="/solutions/financial-modeling" variant="secondary" size="lg">
+                View Financial Modeling
+              </Button>
+            </div>
           </Motion>
         </div>
       </section>
