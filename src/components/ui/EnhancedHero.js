@@ -6,12 +6,12 @@ import Link from 'next/link';
 // Array of hero text options to cycle through
 const heroTextOptions = [
   {
-    title: "Elevate Your Investment Decisions",
+    title: "Elevate Your Investment Process",
     subtitle: "Precision financial modeling and advisory solutions for investors."
   },
   {
-    title: "Data-Driven Investment Strategies",
-    subtitle: "Unlock insights with powerful financial models designed for modern investors."
+    title: "Data-Driven Investment Analysis",
+    subtitle: "Unlock powerful insights with models designed for modern investors."
   },
   {
     title: "Strategic Investment Clarity",

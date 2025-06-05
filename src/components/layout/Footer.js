@@ -12,10 +12,10 @@ export default function Footer() {
               <div className="h-8 w-8 mr-2 bg-white rounded-full flex items-center justify-center">
                 <div className="h-4 w-4 bg-teal-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
               </div>
-              <span className="text-white font-serif text-2xl font-bold">Zenith</span>
+              <span className="text-white font-serif text-2xl font-bold">Zenith Capital</span>
             </div>
             <p className="text-gray-300 text-sm">
-              Elevating investment decisions through precision financial modeling and strategic advisory.
+              Elevate your investment process.
             </p>
             <div className="mt-4">
               <p className="text-gray-300 text-sm">

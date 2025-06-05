@@ -55,11 +55,11 @@ export default function Home() {
               Our Models
             </h2>
             <p className="text-lg text-gray-600 dark:text-gray-300 max-w-3xl mx-auto">
-              Professional-grade financial models designed for sophisticated investment analysis
+              Institutional-grade financial models designed for sophisticated investment analysis
             </p>
           </motion.div>
           
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12 max-w-4xl mx-auto">
             {/* Private Equity Models */}
             <motion.div
               initial={{ opacity: 0, y: 20 }}
@@ -67,10 +67,10 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.2 }}
               className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
             >
-              <div className="h-52 relative">
+              <div className="h-48 relative">
                 <div className="h-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center">
                   <div className="text-center">
-                    <svg className="h-16 w-16 text-blue-600 dark:text-blue-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-12 w-12 text-blue-600 dark:text-blue-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
                     </svg>
                     <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm">Real Estate Investment Models</span>
@@ -88,33 +88,27 @@ export default function Home() {
                   Private Equity Models
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Comprehensive models for real estate development, acquisition, and investment analysis across all major property types.
+                  Real estate development, acquisition, and investment analysis across all major property types.
                 </p>
                 <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
                   <div className="flex items-center">
                     <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Multifamily & Commercial Properties
+                    Multifamily & Commercial
                   </div>
                   <div className="flex items-center">
                     <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    Mixed-Use & Hospitality Development
-                  </div>
-                  <div className="flex items-center">
-                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Detailed Construction & Financing
+                    Development & Acquisition
                   </div>
                 </div>
                 <Link 
                   href="/models/private-equity" 
                   className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
                 >
-                  Explore Private Equity Models
+                  Explore Models
                   <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -129,10 +123,10 @@ export default function Home() {
               transition={{ duration: 0.5, delay: 0.4 }}
               className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
             >
-              <div className="h-52 relative">
+              <div className="h-48 relative">
                 <div className="h-full bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 flex items-center justify-center">
                   <div className="text-center">
-                    <svg className="h-16 w-16 text-green-600 dark:text-green-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg className="h-12 w-12 text-green-600 dark:text-green-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                     </svg>
                     <span className="text-green-600 dark:text-green-400 font-semibold text-sm">Equity Analysis & Valuation</span>
@@ -150,33 +144,27 @@ export default function Home() {
                   Public Equity Models
                 </h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Sophisticated valuation models and analytical tools for public company analysis and portfolio management.
+                  Valuation models and analytical tools for public company analysis and portfolio management.
                 </p>
                 <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
                   <div className="flex items-center">
                     <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    3-Statement Integration Models
+                    3-Statement Models
                   </div>
                   <div className="flex items-center">
                     <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    DCF & Valuation Frameworks
-                  </div>
-                  <div className="flex items-center">
-                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Portfolio Attribution Analysis
+                    DCF & Portfolio Analysis
                   </div>
                 </div>
                 <Link 
                   href="/models/public-equity" 
                   className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
                 >
-                  Explore Public Equity Models
+                  Explore Models
                   <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
@@ -189,7 +177,7 @@ export default function Home() {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.6 }}
+            transition={{ duration: 0.5, delay: 0.8 }}
             className="text-center"
           >
             <Link 
