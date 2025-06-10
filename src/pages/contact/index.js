@@ -90,7 +90,7 @@ export default function Contact() {
           
           <Motion animation="fade" direction="up" delay={200} duration={800}>
             <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Let&apos;s discuss how we can help elevate your investment process
+              Let&apos;s discuss how we can elevate your investment process
             </p>
           </Motion>
         </div>
