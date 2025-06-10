@@ -4,6 +4,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Navbar from './Navbar';
 import DarkModeToggle from '../ui/DarkModeToggle';
+import ZenithLogo from '../ui/ZenithLogo';
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -45,92 +46,50 @@ export default function Header() {
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
           <div className="flex-shrink-0">
-            <Link href="/" className="flex items-center cursor-pointer">
-              <div className="h-8 w-8 mr-2 bg-navy-700 rounded-full flex items-center justify-center">
-                <div className="h-4 w-4 bg-teal-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
-              </div>
-              <span className="text-navy-700 dark:text-white font-serif text-2xl font-bold">Zenith</span>
-              <span className="text-navy-600 dark:text-gray-300 font-sans text-lg ml-1">Capital Advisors</span>
+            <Link href="/">
+              <ZenithLogo className="hover:opacity-80 transition-opacity" />
             </Link>
           </div>
           
-          {/* Desktop Navigation and Dark Mode Toggle */}
-          <div className="hidden md:flex md:items-center md:space-x-4">
-            <DarkModeToggle />
+          {/* Desktop Navigation */}
+          <div className="hidden md:flex items-center space-x-8">
             <Navbar />
+            <DarkModeToggle />
           </div>
           
-          {/* Mobile menu button and Dark Mode Toggle */}
-          <div className="md:hidden flex items-center space-x-2">
+          {/* Mobile menu button */}
+          <div className="md:hidden flex items-center space-x-4">
             <DarkModeToggle />
-            <button 
+            <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="inline-flex items-center justify-center p-2 rounded-md text-navy-500 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-navy-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-navy-500"
-              aria-expanded={mobileMenuOpen}
+              className="inline-flex items-center justify-center p-2 rounded-md text-navy-700 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-navy-800 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500 transition duration-150 ease-in-out"
+              aria-expanded="false"
             >
               <span className="sr-only">Open main menu</span>
-              {/* Icon when menu is closed */}
-              <svg 
-                className={`${mobileMenuOpen ? 'hidden' : 'block'} h-6 w-6`} 
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor" 
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-              {/* Icon when menu is open */}
-              <svg 
-                className={`${mobileMenuOpen ? 'block' : 'hidden'} h-6 w-6`}
-                xmlns="http://www.w3.org/2000/svg" 
-                fill="none" 
-                viewBox="0 0 24 24" 
-                stroke="currentColor" 
-                aria-hidden="true"
-              >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
+              {!mobileMenuOpen ? (
+                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              ) : (
+                <svg className="block h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              )}
             </button>
           </div>
         </div>
-      </div>
-      
-      {/* Mobile menu - Improved with animation and better UX */}
-      <div 
-        className={`md:hidden fixed inset-0 z-50 bg-navy-900 bg-opacity-80 transform ${mobileMenuOpen ? 'translate-x-0' : 'translate-x-full'} transition-transform duration-300 ease-in-out`}
-        onClick={() => setMobileMenuOpen(false)}
-      >
-        <div 
-          className="absolute right-0 h-full w-3/4 max-w-sm bg-white dark:bg-navy-800 shadow-xl transform transition-transform duration-300 ease-in-out"
-          onClick={e => e.stopPropagation()}
-        >
-          <div className="px-4 pt-5 pb-6 flex flex-col h-full">
-            <div className="flex items-center justify-between mb-8">
-              <div className="flex items-center">
-                <div className="h-8 w-8 mr-2 bg-navy-700 rounded-full flex items-center justify-center">
-                  <div className="h-4 w-4 bg-teal-500" style={{ clipPath: 'polygon(50% 0%, 100% 100%, 0% 100%)' }}></div>
-                </div>
-                <span className="text-navy-700 dark:text-white font-serif text-xl font-bold">Zenith</span>
-              </div>
-              <button
-                className="inline-flex items-center justify-center p-2 rounded-md text-navy-500 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white hover:bg-gray-100 dark:hover:bg-navy-700 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-navy-500"
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                <span className="sr-only">Close menu</span>
-                <svg className="h-6 w-6" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-            
-            <nav className="flex-1 mt-4 space-y-2">
+        
+        {/* Mobile menu */}
+        <div className={`md:hidden transition-all duration-300 ease-in-out ${mobileMenuOpen ? 'max-h-screen opacity-100' : 'max-h-0 opacity-0 overflow-hidden'}`}>
+          <div className="px-2 pt-2 pb-3 space-y-1 sm:px-3 bg-white dark:bg-navy-900 border-t border-gray-200 dark:border-navy-700">
+            <nav className="flex flex-col space-y-2">
               <Link 
                 href="/" 
                 className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname === '/' ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
               >
                 Home
               </Link>
+              
               <Link 
                 href="/about" 
                 className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname === '/about' ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
@@ -138,39 +97,41 @@ export default function Header() {
                 About
               </Link>
               
-              {/* Models Section */}
-              <div className="space-y-1">
-                <Link 
-                  href="/models" 
-                  className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/models') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
-                >
-                  Models
-                </Link>
-                <div className="pl-8 space-y-1">
+              {/* Models Submenu */}
+              <div className="pl-4">
+                <div className="text-navy-700 dark:text-gray-300 text-sm font-medium mb-2">Models</div>
+                <div className="space-y-1">
+                  <Link 
+                    href="/models" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/models' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                  >
+                    All Models
+                  </Link>
                   <Link 
                     href="/models/private-equity" 
                     className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/models/private-equity' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
                   >
-                    Private Equity Models
+                    Private Equity
                   </Link>
                   <Link 
                     href="/models/public-equity" 
                     className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/models/public-equity' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
                   >
-                    Public Equity Models
+                    Public Equity
                   </Link>
                 </div>
               </div>
               
-              {/* Solutions Section */}
-              <div className="space-y-1">
-                <Link 
-                  href="/solutions" 
-                  className={`block px-4 py-3 rounded-md text-base font-medium ${router.pathname.startsWith('/solutions') ? 'bg-navy-100 dark:bg-navy-700 text-navy-900 dark:text-white' : 'text-navy-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-navy-700'}`}
-                >
-                  Solutions
-                </Link>
-                <div className="pl-8 space-y-1">
+              {/* Solutions Submenu */}
+              <div className="pl-4">
+                <div className="text-navy-700 dark:text-gray-300 text-sm font-medium mb-2">Solutions</div>
+                <div className="space-y-1">
+                  <Link 
+                    href="/solutions" 
+                    className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/solutions' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
+                  >
+                    All Solutions
+                  </Link>
                   <Link 
                     href="/solutions/financial-modeling" 
                     className={`block px-4 py-2 rounded-md text-sm font-medium ${router.pathname === '/solutions/financial-modeling' ? 'text-navy-900 dark:text-white' : 'text-navy-600 dark:text-gray-400 hover:text-navy-900 dark:hover:text-white'}`}
