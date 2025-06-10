@@ -68,14 +68,12 @@ export default function Home() {
               className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
             >
               <div className="h-48 relative">
-                <div className="h-full bg-gradient-to-br from-blue-100 to-blue-200 dark:from-blue-900 dark:to-blue-800 flex items-center justify-center">
-                  <div className="text-center">
-                    <svg className="h-12 w-12 text-blue-600 dark:text-blue-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
-                    </svg>
-                    <span className="text-blue-600 dark:text-blue-400 font-semibold text-sm">Real Estate Investment Models</span>
-                  </div>
-                </div>
+                <Image
+                  src="/images/home/private-equity-models.jpg"
+                  alt="Private Equity Models"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">
@@ -124,14 +122,12 @@ export default function Home() {
               className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
             >
               <div className="h-48 relative">
-                <div className="h-full bg-gradient-to-br from-green-100 to-green-200 dark:from-green-900 dark:to-green-800 flex items-center justify-center">
-                  <div className="text-center">
-                    <svg className="h-12 w-12 text-green-600 dark:text-green-400 mx-auto mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
-                    </svg>
-                    <span className="text-green-600 dark:text-green-400 font-semibold text-sm">Equity Analysis & Valuation</span>
-                  </div>
-                </div>
+                <Image
+                  src="/images/home/public-equity-models.jpg"
+                  alt="Public Equity Models"
+                  fill
+                  className="object-cover"
+                />
               </div>
               <div className="p-6">
                 <div className="flex items-center justify-between mb-3">

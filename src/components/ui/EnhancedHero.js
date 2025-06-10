@@ -46,7 +46,7 @@ export default function EnhancedHero() {
       {/* Background image with CSS background approach */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-        style={{ backgroundImage: 'url(/images/hero-background.jpg)' }}
+        style={{ backgroundImage: 'url(/images/home/home-hero.jpg)' }}
       >
         {/* Gradient overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60 z-10"></div>
