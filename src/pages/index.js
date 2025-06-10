@@ -216,7 +216,7 @@ export default function Home() {
             >
               <div className="h-52 relative">
                 <Image 
-                  src="/images/services/financial-modeling.jpg"
+                  src="/images/home/financial-modeling.jpg"
                   alt="Financial modeling spreadsheet with charts"
                   fill
                   className="object-cover"
@@ -250,7 +250,7 @@ export default function Home() {
             >
               <div className="h-52 relative">
                 <Image 
-                  src="/images/services/investment-infrastructure.jpg"
+                  src="/images/home/investment-infrastructure.jpg"
                   alt="Modern investment office with multiple screens displaying data"
                   fill
                   className="object-cover"
@@ -284,7 +284,7 @@ export default function Home() {
             >
               <div className="h-52 relative">
                 <Image 
-                  src="/images/services/industry-research.jpg"
+                  src="/images/home/industry-research.jpg"
                   alt="Researcher analyzing market data and reports"
                   fill
                   className="object-cover"
