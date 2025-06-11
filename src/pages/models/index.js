@@ -208,7 +208,7 @@ export default function Models() {
           
           <Motion animation="fade" direction="up" delay={200} duration={800}>
             <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Institutional-grade tools for investment professionals
+              Institutional-grade tools that transform data into actionable insights
             </p>
           </Motion>
           
