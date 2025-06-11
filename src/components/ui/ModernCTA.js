@@ -54,7 +54,7 @@ export default function ModernCTA() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
                 >
-                  Ready to transform your investment process?
+                  Ready to transform weeks of analysis into hours?
                 </motion.h2>
                 
                 <motion.p 
@@ -63,7 +63,7 @@ export default function ModernCTA() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  Join leading investment firms who&apos;ve enhanced their decision-making with our financial models and advisory services.
+                  Explore our insitutional-grade models and advisory solutions.
                 </motion.p>
                 
                 <motion.div
