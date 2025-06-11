@@ -63,7 +63,7 @@ export default function ModernCTA() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  Explore our insitutional-grade models and advisory solutions.
+                  Explore our institutional-grade tools and advisory solutions.
                 </motion.p>
                 
                 <motion.div
@@ -73,21 +73,25 @@ export default function ModernCTA() {
                 >
                   <div className="flex flex-wrap gap-4">
                     <Link 
-                      href="/contact"
-                      onMouseEnter={() => setIsHovered(true)}
-                      onMouseLeave={() => setIsHovered(false)}
+                      href="/models"
                       className="relative inline-flex group"
                     >
-                      <div className={`absolute -inset-0.5 bg-gradient-to-r from-teal-600 to-teal-400 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-1000 ${isHovered ? 'animate-pulse' : ''}`}></div>
-                      <button className="relative px-8 py-4 bg-teal-500 rounded-lg leading-none flex items-center text-white font-semibold">
-                        Schedule a Consultation
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-600 to-teal-400 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-1000 group-hover:animate-pulse"></div>
+                      <button className="relative px-8 py-4 bg-teal-500 rounded-lg leading-none flex items-center text-white font-semibold hover:bg-teal-600 transition-colors duration-300">
+                        Explore Our Models
                         <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                         </svg>
                       </button>
                     </Link>
-                    <Link href="/models" className="px-8 py-4 bg-transparent border border-white/30 rounded-lg text-white font-semibold hover:bg-white/10 transition-colors duration-300">
-                      Explore Our Models
+                    <Link 
+                      href="/solutions" 
+                      className="px-8 py-4 bg-transparent border border-white/30 rounded-lg text-white font-semibold hover:bg-white/10 transition-colors duration-300 flex items-center"
+                    >
+                      Explore Our Solutions
+                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
                     </Link>
                   </div>
                 </motion.div>
