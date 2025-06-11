@@ -49,7 +49,7 @@ export default function Solutions() {
           
           <Motion animation="fade" direction="up" delay={200} duration={800}>
             <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Comprehensive financial modeling, investment infrastructure, and research services tailored to institutional investors
+              Bespoke advisory solutions for investors and institutions
             </p>
           </Motion>
           

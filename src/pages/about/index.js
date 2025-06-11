@@ -39,7 +39,7 @@ export default function About() {
           
           <Motion animation="fade" direction="up" delay={200} duration={800}>
             <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Bridging the gap between financial theory and practical investment decisions
+              Bridging the gap between financial theory and practical investing
             </p>
           </Motion>
         </div>
@@ -350,7 +350,7 @@ export default function About() {
                   </li>
                 </ul>
                 <p className="text-gray-600 dark:text-gray-300 text-sm italic">
-                  Our broad PE experience informs our approach to private asset underwriting.
+                  Our private equity experience drives rigorous, yet practical solutions for investment decision-making.
                 </p>
               </div>
             </Motion>
@@ -393,7 +393,7 @@ export default function About() {
                   </li>
                 </ul>
                 <p className="text-gray-600 dark:text-gray-300 text-sm italic">
-                  Drawing on senior research experience at Evercore ISI and Macquarie Capital, we understand the nuances of public market valuation.
+                  Our public markets experience delivers institutional-quality tools for sophisticated equity analysis.
                 </p>
               </div>
             </Motion>
@@ -405,12 +405,12 @@ export default function About() {
       <section className="bg-navy-900 text-white py-16">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <Motion animation="fade" direction="up">
-            <h2 className="text-3xl font-bold mb-4">Ready to elevate your investment analysis?</h2>
+            <h2 className="text-3xl font-bold mb-4">Ready to elevate your investment process?</h2>
           </Motion>
           
           <Motion animation="fade" direction="up" delay={200}>
             <p className="text-xl text-gray-300 mb-8 max-w-3xl mx-auto">
-              Let&apos;s discuss how Zenith Capital can transform your investment process and decision-making.
+              Let&apos;s discuss how we can help.
             </p>
           </Motion>
           
