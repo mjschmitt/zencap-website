@@ -1,4 +1,4 @@
-// src/components/ui/EnhancedHero.js - Fixed Link usage
+// src/components/ui/EnhancedHero.js - Updated with better button strategy
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
@@ -6,7 +6,7 @@ import Link from 'next/link';
 // Array of hero text options to cycle through
 const heroTextOptions = [
   {
-    title: "Elevate Your Investment Process",
+    title: "Elevate Your Investment Decisions",
     subtitle: "Precision financial modeling and advisory solutions for investors."
   },
   {
@@ -94,10 +94,10 @@ export default function EnhancedHero() {
           className="flex flex-wrap justify-center gap-4 mt-8"
         >
           <Link 
-            href="/solutions" 
+            href="/models" 
             className="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-md shadow-lg transform hover:-translate-y-1 transition-all duration-300 inline-flex items-center justify-center"
           >
-            Explore Solutions
+            See Our Models
             <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
             </svg>
@@ -106,7 +106,7 @@ export default function EnhancedHero() {
             href="/contact" 
             className="px-6 py-3 bg-transparent border-2 border-white text-white font-medium rounded-md hover:bg-white/10 transform hover:-translate-y-1 transition-all duration-300 inline-flex items-center justify-center"
           >
-            Contact Us
+            Schedule Consultation
           </Link>
         </motion.div>
         

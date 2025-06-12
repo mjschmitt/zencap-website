@@ -15,7 +15,7 @@ export default function Footer() {
               <span className="text-white font-serif text-2xl font-bold">Zenith Capital</span>
             </div>
             <p className="text-gray-300 text-sm">
-              Elevate your investment process.
+              Elevate Your Investment Decisions
             </p>
             <div className="mt-4">
               <p className="text-gray-300 text-sm">

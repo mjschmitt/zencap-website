@@ -54,7 +54,7 @@ export default function ModernCTA() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6 }}
                 >
-                  Ready to transform weeks of analysis into hours?
+                  Ready to transform your investment capabilities?
                 </motion.h2>
                 
                 <motion.p 
@@ -63,7 +63,7 @@ export default function ModernCTA() {
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.6, delay: 0.2 }}
                 >
-                  Explore our institutional-grade tools and advisory solutions.
+                  Learn more about our work and get in touch.
                 </motion.p>
                 
                 <motion.div
@@ -73,25 +73,19 @@ export default function ModernCTA() {
                 >
                   <div className="flex flex-wrap gap-4">
                     <Link 
-                      href="/models"
+                      href="/insights"
                       className="relative inline-flex group"
                     >
-                      <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-600 to-teal-400 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-1000 group-hover:animate-pulse"></div>
-                      <button className="relative px-8 py-4 bg-teal-500 rounded-lg leading-none flex items-center text-white font-semibold hover:bg-teal-600 transition-colors duration-300">
-                        Explore Our Models
+                      <div className="absolute -inset-0.5 bg-gradient-to-r from-teal-600 to-teal-400 rounded-lg blur opacity-60 group-hover:opacity-100 transition duration-1000 animate-pulse"></div>
+                      <button className="relative px-8 py-4 bg-teal-500 rounded-lg leading-none flex items-center text-white font-semibold">
+                        Our Insights
                         <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                         </svg>
                       </button>
                     </Link>
-                    <Link 
-                      href="/solutions" 
-                      className="px-8 py-4 bg-transparent border border-white/30 rounded-lg text-white font-semibold hover:bg-white/10 transition-colors duration-300 flex items-center"
-                    >
-                      Explore Our Solutions
-                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                      </svg>
+                    <Link href="/contact" className="px-8 py-4 bg-transparent border border-white/30 rounded-lg text-white font-semibold hover:bg-white/10 transition-colors duration-300">
+                      Contact Us
                     </Link>
                   </div>
                 </motion.div>

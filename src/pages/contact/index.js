@@ -84,13 +84,13 @@ export default function Contact() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10 w-full">
           <Motion animation="fade" direction="down" duration={800}>
             <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
-              Contact Us
+              Have a complex investment challenge?
             </h1>
           </Motion>
           
           <Motion animation="fade" direction="up" delay={200} duration={800}>
             <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Let&apos;s discuss how we can elevate your investment process
+              Tell us about your project and we'll construct a plan of action.
             </p>
           </Motion>
         </div>
@@ -150,8 +150,8 @@ export default function Contact() {
                     <div>
                       <h4 className="text-base font-medium mb-1">Address</h4>
                       <p className="text-gray-300">
-                        123 Finance Street<br />
-                        New York, NY 10001
+                        4334 N Flagler Dr <br />
+                        West Palm Beach, FL 33407
                       </p>
                     </div>
                   </div>
