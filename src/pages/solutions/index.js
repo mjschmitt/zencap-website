@@ -82,7 +82,7 @@ export default function Solutions() {
                 <div className="h-52 relative">
                   <Image 
                     src="/images/solutions/financial-modeling-service.jpg"
-                    alt="Financial modeling and analysis"
+                    alt="Investment professionals analyzing complex financial models and DCF valuations on multiple screens in luxury advisory office"
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 33vw"
@@ -134,7 +134,7 @@ export default function Solutions() {
                 <div className="h-52 relative">
                   <Image 
                     src="/images/solutions/investment-infrastructure-service.jpg"
-                    alt="Investment infrastructure and systems"
+                    alt="Cutting-edge investment infrastructure and technology with integrated data and real-time analytics in modern tropical office setting"
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 33vw"
@@ -186,7 +186,7 @@ export default function Solutions() {
                 <div className="h-52 relative">
                   <Image 
                     src="/images/solutions/industry-research-service.jpg"
-                    alt="Industry research and analysis"
+                    alt="Investment research analysts conducting market analysis with advanced data visualization tools overlooking mountainous coastline from luxury investment office"
                     fill
                     className="object-cover"
                     sizes="(max-width: 768px) 100vw, 33vw"
@@ -294,8 +294,8 @@ export default function Solutions() {
             <Motion animation="fade" direction="left">
               <div className="relative h-96 rounded-lg overflow-hidden">
                 <Image 
-                  src="/images/solutions/approach-image.jpg" 
-                  alt="Our analytical approach"
+                  src="/images/solutions/investment-advisory-approach-collaboration.jpg" 
+                  alt="Analytical investment advisory approach for public and private equity solutions"
                   fill
                   className="object-cover"
                   sizes="(max-width: 1024px) 100vw, 50vw"
