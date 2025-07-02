@@ -37,7 +37,7 @@ export default function InvestmentInfrastructure() {
       {/* Hero Section with Background Image */}
       <section 
         className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
-        style={{ backgroundImage: 'url(/images/solutions/infrastructure-hero.jpg)' }}
+        style={{ backgroundImage: 'url(/images/solutions/infrastructure/infrastructure-hero.jpg)' }}
       >
         {/* Gradient overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
@@ -94,7 +94,7 @@ export default function InvestmentInfrastructure() {
             <Motion animation="fade" direction="left">
               <div className="relative h-96 rounded-lg overflow-hidden">
                 <Image 
-                  src="/images/solutions/infrastructure-overview.jpg" 
+                  src="/images/solutions/infrastructure/infrastructure-overview.jpg" 
                   alt="Investment infrastructure and technology"
                   fill
                   className="object-cover"
