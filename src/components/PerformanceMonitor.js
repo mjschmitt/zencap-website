@@ -26,52 +26,20 @@ export default function PerformanceMonitor() {
       }
     };
     
-<<<<<<< HEAD
-    // Report Web Vitals with enhanced metrics
-    // Note: Using web-vitals v4+ API (onCLS, onINP, etc.) instead of legacy API (getCLS, getFID, etc.)
-    // INP (Interaction to Next Paint) has replaced FID (First Input Delay) as a Core Web Vital
-=======
     // Report Web Vitals with enhanced metrics and proper error handling
->>>>>>> c15efed715610e362f8d71788ae857e42f5af4f4
     const reportWebVitals = async () => {
       if (typeof window === 'undefined') return;
       
       try {
-<<<<<<< HEAD
-        const { onCLS, onINP, onLCP, onFCP, onTTFB } = await import('web-vitals');
-        
-        onCLS(sendMetricToAnalytics);
-        onINP(sendMetricToAnalytics);
-        onLCP(sendMetricToAnalytics);
-        onFCP(sendMetricToAnalytics);
-        onTTFB(sendMetricToAnalytics);
-=======
         // Try to import web-vitals with proper error handling
         const webVitals = await import('web-vitals');
         
-        // Check if the functions exist before calling them
-        if (webVitals.getCLS && typeof webVitals.getCLS === 'function') {
-          webVitals.getCLS(sendMetricToAnalytics);
-        }
-        if (webVitals.getFID && typeof webVitals.getFID === 'function') {
-          webVitals.getFID(sendMetricToAnalytics);
-        }
-        if (webVitals.getLCP && typeof webVitals.getLCP === 'function') {
-          webVitals.getLCP(sendMetricToAnalytics);
-        }
-        if (webVitals.getFCP && typeof webVitals.getFCP === 'function') {
-          webVitals.getFCP(sendMetricToAnalytics);
-        }
-        if (webVitals.getTTFB && typeof webVitals.getTTFB === 'function') {
-          webVitals.getTTFB(sendMetricToAnalytics);
-        }
-        
-        // Try the new web-vitals v4 API as fallback
+        // Use the new web-vitals v4 API (onCLS, onINP, etc.) instead of legacy API
         if (webVitals.onCLS && typeof webVitals.onCLS === 'function') {
           webVitals.onCLS(sendMetricToAnalytics);
         }
-        if (webVitals.onFID && typeof webVitals.onFID === 'function') {
-          webVitals.onFID(sendMetricToAnalytics);
+        if (webVitals.onINP && typeof webVitals.onINP === 'function') {
+          webVitals.onINP(sendMetricToAnalytics);
         }
         if (webVitals.onLCP && typeof webVitals.onLCP === 'function') {
           webVitals.onLCP(sendMetricToAnalytics);
@@ -83,7 +51,14 @@ export default function PerformanceMonitor() {
           webVitals.onTTFB(sendMetricToAnalytics);
         }
         
->>>>>>> c15efed715610e362f8d71788ae857e42f5af4f4
+        // Fallback to legacy API if new API not available
+        if (webVitals.getCLS && typeof webVitals.getCLS === 'function') {
+          webVitals.getCLS(sendMetricToAnalytics);
+        }
+        if (webVitals.getFID && typeof webVitals.getFID === 'function') {
+          webVitals.getFID(sendMetricToAnalytics);
+        }
+        
       } catch (error) {
         console.error('Web Vitals reporting failed:', error);
         // Fallback to basic performance tracking
@@ -223,59 +198,45 @@ export default function PerformanceMonitor() {
         sendMetricToAnalytics({
           name: 'form_submission',
           form_id: formId,
-          timestamp: new Date().toISOString(),
-          url: window.location.href
+          timestamp: new Date().toISOString()
         });
       });
       
-      // Track CTA clicks
-      document.addEventListener('click', (event) => {
-        const target = event.target;
-        if (target.textContent?.includes('Schedule') || 
-            target.textContent?.includes('Contact') ||
-            target.textContent?.includes('Download') ||
-            target.textContent?.includes('See Our Models')) {
-          
-          sendMetricToAnalytics({
-            name: 'cta_click',
-            cta_text: target.textContent?.trim(),
-            timestamp: new Date().toISOString(),
-            url: window.location.href
-          });
-        }
-      });
-      
-      // Track page engagement time
-      let startTime = performance.now();
-      let isVisible = true;
+      // Track page engagement
+      let engagementStart = Date.now();
+      let isEngaged = false;
       
       const trackEngagement = () => {
-        if (isVisible) {
-          const engagementTime = performance.now() - startTime;
-          
+        if (!isEngaged) {
+          isEngaged = true;
           sendMetricToAnalytics({
-            name: 'page_engagement',
-            value: engagementTime,
-            url: window.location.href,
+            name: 'page_engagement_start',
             timestamp: new Date().toISOString()
           });
         }
       };
       
-      document.addEventListener('visibilitychange', () => {
-        if (document.hidden) {
-          isVisible = false;
-          trackEngagement();
-        } else {
-          isVisible = true;
-          startTime = performance.now();
+      // Start tracking engagement after 5 seconds
+      setTimeout(trackEngagement, 5000);
+      
+      // Track scroll depth
+      let maxScrollDepth = 0;
+      window.addEventListener('scroll', () => {
+        const scrollDepth = Math.round((window.scrollY / (document.body.scrollHeight - window.innerHeight)) * 100);
+        if (scrollDepth > maxScrollDepth) {
+          maxScrollDepth = scrollDepth;
+          if (scrollDepth % 25 === 0) { // Track at 25%, 50%, 75%, 100%
+            sendMetricToAnalytics({
+              name: 'scroll_depth',
+              value: scrollDepth,
+              timestamp: new Date().toISOString()
+            });
+          }
         }
       });
-      
-      window.addEventListener('beforeunload', trackEngagement);
     };
     
-    // Enhanced analytics sender
+    // Send metrics to analytics
     const sendMetricToAnalytics = (metric) => {
       if (process.env.NODE_ENV !== 'production') {
         console.log('Performance Metric:', metric);
