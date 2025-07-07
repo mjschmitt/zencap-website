@@ -27,17 +27,19 @@ export default function PerformanceMonitor() {
     };
     
     // Report Web Vitals with enhanced metrics
+    // Note: Using web-vitals v4+ API (onCLS, onINP, etc.) instead of legacy API (getCLS, getFID, etc.)
+    // INP (Interaction to Next Paint) has replaced FID (First Input Delay) as a Core Web Vital
     const reportWebVitals = async () => {
       if (typeof window === 'undefined') return;
       
       try {
-        const { getCLS, getFID, getLCP, getFCP, getTTFB } = await import('web-vitals');
+        const { onCLS, onINP, onLCP, onFCP, onTTFB } = await import('web-vitals');
         
-        getCLS(sendMetricToAnalytics);
-        getFID(sendMetricToAnalytics);
-        getLCP(sendMetricToAnalytics);
-        getFCP(sendMetricToAnalytics);
-        getTTFB(sendMetricToAnalytics);
+        onCLS(sendMetricToAnalytics);
+        onINP(sendMetricToAnalytics);
+        onLCP(sendMetricToAnalytics);
+        onFCP(sendMetricToAnalytics);
+        onTTFB(sendMetricToAnalytics);
       } catch (error) {
         console.error('Web Vitals reporting failed:', error);
       }
