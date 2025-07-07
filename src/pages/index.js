@@ -2,11 +2,53 @@
 import Layout from '@/components/layout/Layout';
 import SEO from '@/components/SEO';
 import EnhancedHero from '@/components/ui/EnhancedHero';
-import EnhancedTestimonials from '@/components/ui/EnhancedTestimonials';
-import ModernCTA from '@/components/ui/ModernCTA';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
+import dynamic from 'next/dynamic';
+
+// Dynamically import non-critical components for better performance
+const EnhancedTestimonials = dynamic(() => import('@/components/ui/EnhancedTestimonials'), {
+  loading: () => (
+    <div className="py-16 bg-gray-50 dark:bg-navy-900/50">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-300 rounded w-64 mx-auto mb-4"></div>
+            <div className="h-4 bg-gray-300 rounded w-96 mx-auto mb-8"></div>
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+              {[...Array(3)].map((_, i) => (
+                <div key={i} className="bg-white rounded-lg shadow-lg p-6">
+                  <div className="h-24 bg-gray-300 rounded mb-4"></div>
+                  <div className="h-4 bg-gray-300 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-300 rounded w-3/4"></div>
+                </div>
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ),
+  ssr: false
+});
+
+const ModernCTA = dynamic(() => import('@/components/ui/ModernCTA'), {
+  loading: () => (
+    <div className="py-16 bg-navy-700">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <div className="text-center">
+          <div className="animate-pulse">
+            <div className="h-8 bg-gray-300 rounded w-64 mx-auto mb-4"></div>
+            <div className="h-4 bg-gray-300 rounded w-96 mx-auto mb-8"></div>
+            <div className="h-12 bg-gray-300 rounded w-48 mx-auto"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  ),
+  ssr: false
+});
 
 export default function Home() {
   // Structured data for rich search results
