@@ -4,6 +4,7 @@ import Header from './Header';
 import Footer from './Footer';
 import ScrollToTop from '../ui/ScrollToTop';
 import PerformanceMonitor from '../PerformanceMonitor';
+import Analytics from '../Analytics';
 
 export default function Layout({ 
   children, 
@@ -42,6 +43,7 @@ export default function Layout({
       
       <ScrollToTop />
       <PerformanceMonitor />
+      <Analytics />
     </div>
   );
 }
