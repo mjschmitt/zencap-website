@@ -1,4 +1,4 @@
-// src/components/PerformanceMonitor.js - Enhanced version
+// src/components/PerformanceMonitor.js - Fixed web-vitals import
 import { useEffect } from 'react';
 
 export default function PerformanceMonitor() {
@@ -26,20 +26,82 @@ export default function PerformanceMonitor() {
       }
     };
     
-    // Report Web Vitals with enhanced metrics
+    // Report Web Vitals with enhanced metrics and proper error handling
     const reportWebVitals = async () => {
       if (typeof window === 'undefined') return;
       
       try {
-        const { getCLS, getFID, getLCP, getFCP, getTTFB } = await import('web-vitals');
+        // Try to import web-vitals with proper error handling
+        const webVitals = await import('web-vitals');
         
-        getCLS(sendMetricToAnalytics);
-        getFID(sendMetricToAnalytics);
-        getLCP(sendMetricToAnalytics);
-        getFCP(sendMetricToAnalytics);
-        getTTFB(sendMetricToAnalytics);
+        // Check if the functions exist before calling them
+        if (webVitals.getCLS && typeof webVitals.getCLS === 'function') {
+          webVitals.getCLS(sendMetricToAnalytics);
+        }
+        if (webVitals.getFID && typeof webVitals.getFID === 'function') {
+          webVitals.getFID(sendMetricToAnalytics);
+        }
+        if (webVitals.getLCP && typeof webVitals.getLCP === 'function') {
+          webVitals.getLCP(sendMetricToAnalytics);
+        }
+        if (webVitals.getFCP && typeof webVitals.getFCP === 'function') {
+          webVitals.getFCP(sendMetricToAnalytics);
+        }
+        if (webVitals.getTTFB && typeof webVitals.getTTFB === 'function') {
+          webVitals.getTTFB(sendMetricToAnalytics);
+        }
+        
+        // Try the new web-vitals v4 API as fallback
+        if (webVitals.onCLS && typeof webVitals.onCLS === 'function') {
+          webVitals.onCLS(sendMetricToAnalytics);
+        }
+        if (webVitals.onFID && typeof webVitals.onFID === 'function') {
+          webVitals.onFID(sendMetricToAnalytics);
+        }
+        if (webVitals.onLCP && typeof webVitals.onLCP === 'function') {
+          webVitals.onLCP(sendMetricToAnalytics);
+        }
+        if (webVitals.onFCP && typeof webVitals.onFCP === 'function') {
+          webVitals.onFCP(sendMetricToAnalytics);
+        }
+        if (webVitals.onTTFB && typeof webVitals.onTTFB === 'function') {
+          webVitals.onTTFB(sendMetricToAnalytics);
+        }
+        
       } catch (error) {
         console.error('Web Vitals reporting failed:', error);
+        // Fallback to basic performance tracking
+        trackBasicPerformance();
+      }
+    };
+    
+    // Fallback performance tracking without web-vitals
+    const trackBasicPerformance = () => {
+      if (typeof window === 'undefined' || !window.performance) return;
+      
+      try {
+        // Basic performance metrics
+        const navigation = performance.getEntriesByType('navigation')[0];
+        if (navigation) {
+          sendMetricToAnalytics({
+            name: 'page_load_time',
+            value: navigation.loadEventEnd - navigation.fetchStart,
+            timestamp: new Date().toISOString()
+          });
+        }
+        
+        // First Paint
+        const paintEntries = performance.getEntriesByType('paint');
+        paintEntries.forEach(entry => {
+          sendMetricToAnalytics({
+            name: entry.name.replace('-', '_'),
+            value: entry.startTime,
+            timestamp: new Date().toISOString()
+          });
+        });
+        
+      } catch (error) {
+        console.error('Basic performance tracking failed:', error);
       }
     };
     
@@ -77,24 +139,28 @@ export default function PerformanceMonitor() {
     const trackResourceTiming = () => {
       if (!window.PerformanceObserver) return;
       
-      const observer = new PerformanceObserver((list) => {
-        list.getEntries().forEach((entry) => {
-          if (entry.entryType === 'resource') {
-            // Track slow resources
-            if (entry.duration > 1000) { // Resources taking more than 1 second
-              sendMetricToAnalytics({
-                name: 'slow_resource',
-                value: entry.duration,
-                resource_name: entry.name,
-                resource_type: entry.initiatorType,
-                timestamp: new Date().toISOString()
-              });
+      try {
+        const observer = new PerformanceObserver((list) => {
+          list.getEntries().forEach((entry) => {
+            if (entry.entryType === 'resource') {
+              // Track slow resources
+              if (entry.duration > 1000) { // Resources taking more than 1 second
+                sendMetricToAnalytics({
+                  name: 'slow_resource',
+                  value: entry.duration,
+                  resource_name: entry.name,
+                  resource_type: entry.initiatorType,
+                  timestamp: new Date().toISOString()
+                });
+              }
             }
-          }
+          });
         });
-      });
-      
-      observer.observe({ type: 'resource', buffered: true });
+        
+        observer.observe({ type: 'resource', buffered: true });
+      } catch (error) {
+        console.error('Resource timing tracking failed:', error);
+      }
     };
     
     // Track user interaction performance
@@ -111,20 +177,22 @@ export default function PerformanceMonitor() {
           interactionStartTimes.set(identifier, startTime);
           
           // Measure interaction response time
-          requestIdleCallback(() => {
-            const endTime = performance.now();
-            const duration = endTime - startTime;
-            
-            if (duration > 100) { // Track interactions slower than 100ms
-              sendMetricToAnalytics({
-                name: 'slow_interaction',
-                value: duration,
-                interaction_type: 'click',
-                element: identifier,
-                timestamp: new Date().toISOString()
-              });
-            }
-          });
+          if (window.requestIdleCallback) {
+            requestIdleCallback(() => {
+              const endTime = performance.now();
+              const duration = endTime - startTime;
+              
+              if (duration > 100) { // Track interactions slower than 100ms
+                sendMetricToAnalytics({
+                  name: 'slow_interaction',
+                  value: duration,
+                  interaction_type: 'click',
+                  element: identifier,
+                  timestamp: new Date().toISOString()
+                });
+              }
+            });
+          }
         }
       });
     };
@@ -198,24 +266,16 @@ export default function PerformanceMonitor() {
         return;
       }
       
-      // In production, send to your analytics service
-      // Examples:
-      // - Google Analytics: gtag('event', metric.name, { value: metric.value || metric.delta });
-      // - Custom API: fetch('/api/analytics', { method: 'POST', body: JSON.stringify(metric) });
-      // - Third-party service: analytics.track(metric.name, metric);
-      
       try {
-        // Batch metrics to reduce network calls
-        const existingMetrics = JSON.parse(localStorage.getItem('pending_metrics') || '[]');
-        existingMetrics.push(metric);
-        localStorage.setItem('pending_metrics', JSON.stringify(existingMetrics));
+        // In production, send to your analytics service
+        // Examples:
+        // - Google Analytics: gtag('event', metric.name, { value: metric.value || metric.delta });
+        // - Custom API: fetch('/api/analytics', { method: 'POST', body: JSON.stringify(metric) });
         
-        // Send batch when we have 10 metrics or after 30 seconds
-        if (existingMetrics.length >= 10) {
-          sendBatchToAnalytics(existingMetrics);
-        }
+        // For now, just log in development
+        console.log('Metric:', metric);
       } catch (error) {
-        console.error('Failed to store metric:', error);
+        console.error('Failed to send metric:', error);
       }
     };
     
@@ -236,43 +296,14 @@ export default function PerformanceMonitor() {
       }
     };
     
-    // Batch analytics sender
-    const sendBatchToAnalytics = (metrics) => {
-      if (process.env.NODE_ENV !== 'production') return;
-      
-      // In production, send batch to analytics service
-      // fetch('/api/analytics/batch', {
-      //   method: 'POST',
-      //   headers: { 'Content-Type': 'application/json' },
-      //   body: JSON.stringify({ metrics, timestamp: new Date().toISOString() })
-      // }).then(() => {
-      //   localStorage.removeItem('pending_metrics');
-      // }).catch(error => {
-      //   console.error('Failed to send batch metrics:', error);
-      // });
-      
-      localStorage.removeItem('pending_metrics');
-    };
+    // Initialize monitoring with error handling
+    initializePerformanceMonitoring().catch(error => {
+      console.error('Failed to initialize performance monitoring:', error);
+    });
     
-    // Initialize monitoring
-    initializePerformanceMonitoring();
-    
-    // Send any pending metrics on load
-    const pendingMetrics = JSON.parse(localStorage.getItem('pending_metrics') || '[]');
-    if (pendingMetrics.length > 0) {
-      sendBatchToAnalytics(pendingMetrics);
-    }
-    
-    // Set up periodic batch sending
-    const batchInterval = setInterval(() => {
-      const metrics = JSON.parse(localStorage.getItem('pending_metrics') || '[]');
-      if (metrics.length > 0) {
-        sendBatchToAnalytics(metrics);
-      }
-    }, 30000); // Send every 30 seconds
-    
+    // Cleanup function
     return () => {
-      clearInterval(batchInterval);
+      // Clean up any event listeners or intervals if needed
     };
   }, []);
   
