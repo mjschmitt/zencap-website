@@ -1,6 +1,7 @@
-// src/components/ui/ContactForm.js - Fixed unescaped entities
+// src/components/ui/ContactForm.js - Integrated with formHandlers utility
 import { useState } from 'react';
 import Button from './Button';
+import { submitContactForm, trackFormEvent, sanitizeFormData } from '@/utils/formHandlers';
 
 export default function ContactForm({ onSubmit }) {
   const [formData, setFormData] = useState({
@@ -59,17 +60,15 @@ export default function ContactForm({ onSubmit }) {
       setIsSubmitting(true);
       
       try {
-        // This would be an API call in a real application
-        // await fetch('/api/contact', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(formData)
-        // });
+        // Sanitize form data
+        const sanitizedData = sanitizeFormData(formData);
         
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Submit form using utility function
+        const result = await submitContactForm(sanitizedData);
         
+        if (result.success) {
         setSubmitSuccess(true);
+          
         // Reset form after successful submission
         setFormData({
           name: '',
@@ -80,11 +79,31 @@ export default function ContactForm({ onSubmit }) {
         });
         
         if (onSubmit) {
-          onSubmit(formData);
+            onSubmit(sanitizedData);
         }
+          
+          // Track successful submission
+          trackFormEvent('form_submit', {
+            form_name: 'contact_form',
+            form_id: 'contact',
+            interest: sanitizedData.interest,
+            method: result.method
+          });
+          
+        } else {
+          throw new Error('Form submission failed');
+        }
+        
       } catch (err) {
         console.error('Error submitting form:', err);
         setErrors({ submit: 'Failed to send message. Please try again.' });
+        
+        // Track form error
+        trackFormEvent('form_error', {
+          form_name: 'contact_form',
+          form_id: 'contact',
+          error_message: err.message
+        });
       } finally {
         setIsSubmitting(false);
       }
@@ -200,23 +219,28 @@ export default function ContactForm({ onSubmit }) {
               className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 ${
                 errors.message ? 'border-red-500' : 'border-gray-300'
               }`}
-            ></textarea>
+              placeholder="Tell us about your project or how we can help..."
+            />
             {errors.message && (
               <p className="mt-1 text-sm text-red-600">{errors.message}</p>
             )}
           </div>
           
           {errors.submit && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
-              {errors.submit}
+            <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-md p-4">
+              <div className="flex">
+                <svg className="h-5 w-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <p>{errors.submit}</p>
+              </div>
             </div>
           )}
           
           <Button
             type="submit"
-            variant="accent"
+            variant="primary"
             fullWidth={true}
-            className="relative"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
@@ -227,9 +251,7 @@ export default function ContactForm({ onSubmit }) {
                 </svg>
                 Sending...
               </>
-            ) : (
-              'Send Message'
-            )}
+            ) : 'Send Message'}
           </Button>
         </form>
       )}
