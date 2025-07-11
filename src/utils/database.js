@@ -32,6 +32,7 @@ export async function initializeDatabase() {
         ip_address VARCHAR(45),
         user_agent TEXT,
         created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         status VARCHAR(50) DEFAULT 'active',
         source VARCHAR(100) DEFAULT 'website'
       );

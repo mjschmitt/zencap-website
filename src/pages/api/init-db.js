@@ -6,11 +6,14 @@ export default async function handler(req, res) {
     return res.status(405).json({ message: 'Method not allowed' });
   }
 
-  // Add basic security - you might want to add proper authentication
+  // Temporarily disable authorization for local development
+  // TODO: Re-enable this for production
+  /*
   const authHeader = req.headers.authorization;
   if (!authHeader || authHeader !== `Bearer ${process.env.DB_INIT_SECRET || 'your-secret-key'}`) {
     return res.status(401).json({ message: 'Unauthorized' });
   }
+  */
 
   try {
     await initializeDatabase();

@@ -25,16 +25,29 @@ export default function NewsletterSignup({ dark = false }) {
     setStatus('loading');
     
     try {
-      // This would be an API call in a real application
-      // Simulate API delay
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
-      setStatus('success');
-      setEmail('');
+      const response = await fetch('/api/newsletter', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          email: email.trim(),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        setStatus('success');
+        setEmail('');
+        setErrorMessage('');
+      } else {
+        throw new Error(data.error || 'Failed to subscribe');
+      }
     } catch (err) {
-      console.error('Error submitting form:', err);
+      console.error('Error submitting newsletter form:', err);
       setStatus('error');
-      setErrorMessage('Failed to subscribe. Please try again.');
+      setErrorMessage(err.message || 'Failed to subscribe. Please try again.');
     }
   };
   
@@ -53,7 +66,7 @@ export default function NewsletterSignup({ dark = false }) {
             <svg className="h-5 w-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            <span>Thanks for subscribing!</span>
+            <span>Thanks for subscribing! You'll receive our latest insights soon.</span>
           </div>
         </div>
       ) : (
