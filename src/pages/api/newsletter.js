@@ -1,8 +1,44 @@
 // src/pages/api/newsletter.js - Production-ready newsletter subscription API endpoint
 import { insertNewsletterSubscriber, logFormSubmission } from '@/utils/database';
 import { sendNewsletterWelcome } from '@/utils/email';
+import { sql } from '@vercel/postgres';
 
 export default async function handler(req, res) {
+  if (req.method === 'GET') {
+    try {
+      // Fetch all newsletter subscribers
+      const result = await sql`SELECT id, email, created_at, status, ip_address FROM newsletter_subscribers ORDER BY created_at DESC`;
+      return res.status(200).json({ success: true, subscribers: result.rows });
+    } catch (error) {
+      console.error('Failed to fetch newsletter subscribers:', error);
+      return res.status(500).json({ success: false, message: 'Failed to fetch subscribers' });
+    }
+  }
+
+  if (req.method === 'DELETE') {
+    try {
+      const { id } = req.body;
+      if (!id) return res.status(400).json({ success: false, message: 'Missing subscriber id' });
+      await sql`DELETE FROM newsletter_subscribers WHERE id = ${id}`;
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      console.error('Failed to delete newsletter subscriber:', error);
+      return res.status(500).json({ success: false, message: 'Failed to delete subscriber' });
+    }
+  }
+
+  if (req.method === 'PATCH') {
+    try {
+      const { id, status } = req.body;
+      if (!id || !status) return res.status(400).json({ success: false, message: 'Missing id or status' });
+      await sql`UPDATE newsletter_subscribers SET status = ${status} WHERE id = ${id}`;
+      return res.status(200).json({ success: true });
+    } catch (error) {
+      console.error('Failed to update newsletter subscriber status:', error);
+      return res.status(500).json({ success: false, message: 'Failed to update status' });
+    }
+  }
+
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -67,22 +103,9 @@ export default async function handler(req, res) {
     console.error('Newsletter subscription error:', error);
 
     // Log failed submission
-    try {
-      await logFormSubmission({
-        formType: 'newsletter',
-        formData: req.body,
-        ipAddress: req.headers['x-forwarded-for'] || req.connection.remoteAddress,
-        userAgent: req.headers['user-agent'],
-        status: 'error',
-        errorMessage: error.message
-      });
-    } catch (logError) {
-      console.error('Failed to log form submission error:', logError);
-    }
-
-    res.status(500).json({ 
-      message: 'Internal server error',
-      success: false 
+    res.status(500).json({
+      message: 'Failed to subscribe to newsletter',
+      success: false
     });
   }
 } 

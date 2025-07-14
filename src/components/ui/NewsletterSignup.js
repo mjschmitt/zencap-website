@@ -38,8 +38,8 @@ export default function NewsletterSignup({ dark = false }) {
       const data = await response.json();
 
       if (response.ok) {
-        setStatus('success');
-        setEmail('');
+      setStatus('success');
+      setEmail('');
         setErrorMessage('');
       } else {
         throw new Error(data.error || 'Failed to subscribe');
@@ -66,7 +66,7 @@ export default function NewsletterSignup({ dark = false }) {
             <svg className="h-5 w-5 text-green-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            <span>Thanks for subscribing! You'll receive our latest insights soon.</span>
+            <span>Thanks for subscribing! You&apos;ll receive our latest insights soon.</span>
           </div>
         </div>
       ) : (

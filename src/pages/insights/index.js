@@ -1,5 +1,5 @@
 // src/pages/insights/index.js - with larger hero background
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
@@ -150,243 +150,38 @@ const CATEGORIES = [
   { id: 'financial-markets', name: 'Financial Markets' }
 ];
 
-export default function Insights() {
-  const [activeCategory, setActiveCategory] = useState('all');
-  
-  // Filter insights based on selected category
-  const filteredInsights = activeCategory === 'all'
-    ? INSIGHTS
-    : INSIGHTS.filter(insight => {
-        if (activeCategory === 'public-equity') return insight.category === 'Public Equity';
-        if (activeCategory === 'private-equity') return insight.category === 'Private Equity';
-        if (activeCategory === 'technology') return insight.category === 'Public Equity' && (insight.title.includes('Tech') || insight.title.includes('AI') || insight.title.includes('Cloud') || insight.title.includes('Semiconductor'));
-        if (activeCategory === 'real-estate') return insight.category === 'Private Equity' && (insight.title.includes('Real Estate') || insight.title.includes('Multifamily') || insight.title.includes('Data Centers'));
-        if (activeCategory === 'financial-markets') return insight.title.includes('Interest Rates') || insight.title.includes('Fintech') || insight.title.includes('Finance');
-        return false;
+export default function InsightsPage() {
+  const [insights, setInsights] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/insights')
+      .then(res => res.json())
+      .then(data => {
+        setInsights(Array.isArray(data) ? data : []);
+        setLoading(false);
       });
-  
-  // Separate featured and regular insights
-  const featuredInsights = filteredInsights.filter(insight => insight.featured);
-  const regularInsights = filteredInsights.filter(insight => !insight.featured);
-  
-  // Structured data for rich search results
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Blog",
-    "name": "Zenith Capital Insights",
-    "description": "Investment analysis, market trends, and earnings snapshots from Zenith Capital Advisors.",
-    "publisher": {
-      "@type": "Organization",
-      "name": "Zenith Capital Advisors",
-      "logo": {
-        "@type": "ImageObject",
-        "url": "https://zencap.co/logo.png"
-      }
-    },
-    "blogPost": INSIGHTS.map(insight => ({
-      "@type": "BlogPosting",
-      "headline": insight.title,
-      "description": insight.excerpt,
-      "datePublished": insight.date,
-      "author": {
-        "@type": "Person",
-        "name": insight.author.name
-      }
-    }))
-  };
+  }, []);
+
+  if (loading) return <div className="py-16 text-center text-gray-500">Loading insights...</div>;
 
   return (
-    <Layout>
-      <SEO
-        title="Investment Insights"
-        description="Expert analysis of technology trends in public equity markets and commercial real estate opportunities in private equity."
-        structuredData={structuredData}
-      />
-      
-      {/* Hero Section with Background Image */}
-      <section 
-        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
-        style={{ backgroundImage: 'url(/images/insights/insights-hero.jpg)' }}
-      >
-        {/* Gradient overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
-        
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10 w-full">
-          <Motion animation="fade" direction="down" duration={800}>
-            <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
-              Insights
-            </h1>
-          </Motion>
-          
-          <Motion animation="fade" direction="up" delay={200} duration={800}>
-            <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Investment analysis, market trends, and earnings snapshots from our research team
-            </p>
-          </Motion>
-        </div>
-      </section>
-      
-      {/* Category Filter */}
-      <section className="py-8 border-b border-gray-200 dark:border-gray-700">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex flex-wrap items-center justify-center gap-4">
-            {CATEGORIES.map(category => (
-              <button
-                key={category.id}
-                onClick={() => setActiveCategory(category.id)}
-                className={`px-4 py-2 rounded-full text-sm font-medium transition-colors ${
-                  activeCategory === category.id
-                    ? 'bg-teal-500 text-white'
-                    : 'bg-gray-100 dark:bg-navy-700 text-navy-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-navy-600'
-                }`}
-              >
-                {category.name}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-      
-      {/* Featured Insights */}
-      {featuredInsights.length > 0 && (
-        <section className="py-12">
-          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-            <Motion animation="fade" direction="up">
-              <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-8">
-                Featured Insights
-              </h2>
-            </Motion>
-            
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {featuredInsights.map((insight) => (
-                <Motion key={insight.id} animation="fade" direction="up" delay={200} className="h-full">
-                  <Link href={`/insights/${insight.slug}`} className="block h-full">
-                    <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                      <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                        [{ insight.imagePlaceholder }]
-                      </div>
-                      <div className="p-6">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="inline-block px-2 py-1 bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 rounded-full text-xs font-medium">
-                            {insight.category}
-                          </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {insight.date} · {insight.readTime}
-                          </span>
-                        </div>
-                        <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                          {insight.title}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 mb-4">
-                          {insight.excerpt}
-                        </p>
-                        <div className="flex items-center">
-                          <div className="h-10 w-10 bg-gray-200 dark:bg-navy-600 rounded-full flex items-center justify-center mr-3">
-                            <span className="text-navy-700 dark:text-white font-semibold">
-                              {insight.author.name.charAt(0)}
-                            </span>
-                          </div>
-                          <div>
-                            <p className="font-medium text-navy-700 dark:text-white">
-                              {insight.author.name}
-                            </p>
-                            <p className="text-sm text-gray-500 dark:text-gray-400">
-                              {insight.author.title}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  </Link>
-                </Motion>
-              ))}
-            </div>
-          </div>
-        </section>
+    <div className="max-w-3xl mx-auto py-12 px-4">
+      <h1 className="text-3xl font-bold mb-8">Insights</h1>
+      {insights.length === 0 ? (
+        <div className="text-gray-500">No insights found.</div>
+      ) : (
+        <ul className="space-y-8">
+          {insights.map(insight => (
+            <li key={insight.id} className="bg-white dark:bg-navy-800 rounded-lg shadow p-6 border border-gray-100 dark:border-navy-700">
+              <h2 className="text-xl font-semibold mb-2">{insight.title}</h2>
+              <p className="text-gray-600 dark:text-gray-300 mb-2">{insight.summary}</p>
+              <div className="text-sm text-gray-400 mb-2">By {insight.author} • {new Date(insight.published_at).toLocaleDateString()}</div>
+              <a href={`/insights/${insight.slug}`} className="text-teal-600 dark:text-teal-400 hover:underline font-medium">Read more</a>
+            </li>
+          ))}
+        </ul>
       )}
-      
-      {/* Regular Insights */}
-      <section className="py-12 bg-gray-50 dark:bg-navy-900/50">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Motion animation="fade" direction="up">
-            <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-8">
-              {activeCategory === 'all' ? 'All Insights' : `${CATEGORIES.find(c => c.id === activeCategory)?.name}`}
-            </h2>
-          </Motion>
-          
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            {regularInsights.length > 0 ? (
-              regularInsights.map((insight) => (
-                <Motion key={insight.id} animation="fade" direction="up" delay={200} className="h-full">
-                  <Link href={`/insights/${insight.slug}`} className="block h-full">
-                    <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                      <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                        [{ insight.imagePlaceholder }]
-                      </div>
-                      <div className="p-6">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="inline-block px-2 py-1 bg-teal-100 dark:bg-teal-900 text-teal-700 dark:text-teal-300 rounded-full text-xs font-medium">
-                            {insight.category}
-                          </span>
-                          <span className="text-sm text-gray-500 dark:text-gray-400">
-                            {insight.readTime}
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
-                          {insight.title}
-                        </h3>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                          {insight.excerpt}
-                        </p>
-                        <div className="flex items-center justify-between mt-auto">
-                          <div className="flex items-center">
-                            <div className="h-8 w-8 bg-gray-200 dark:bg-navy-600 rounded-full flex items-center justify-center mr-2">
-                              <span className="text-navy-700 dark:text-white font-semibold text-xs">
-                                {insight.author.name.charAt(0)}
-                              </span>
-                            </div>
-                            <span className="text-sm text-gray-600 dark:text-gray-300">
-                              {insight.author.name}
-                            </span>
-                          </div>
-                          <span className="text-xs text-gray-500 dark:text-gray-400">
-                            {insight.date}
-                          </span>
-                        </div>
-                      </div>
-                    </Card>
-                  </Link>
-                </Motion>
-              ))
-            ) : (
-              <div className="col-span-1 md:col-span-3 py-12 text-center">
-                <p className="text-gray-500 dark:text-gray-400">
-                  No insights found in this category. Please check back later or select a different category.
-                </p>
-              </div>
-            )}
-          </div>
         </div>
-      </section>
-      
-      {/* Newsletter Section */}
-      <section className="py-16">
-        <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
-          <Motion animation="fade" direction="up">
-            <div className="text-center mb-8">
-              <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-4">
-                Stay Informed
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300">
-                Subscribe to receive our latest insights directly to your inbox.
-              </p>
-            </div>
-          </Motion>
-          <Motion animation="fade" direction="up" delay={200}>
-            <NewsletterSignup dark={false} />
-          </Motion>
-        </div>
-      </section>
-    </Layout>
   );
 }

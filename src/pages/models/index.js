@@ -1,5 +1,5 @@
 // src/pages/models/index.js - with larger hero background
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
@@ -153,7 +153,20 @@ const CATEGORIES = [
 
 export default function Models() {
   const [activeCategory, setActiveCategory] = useState('all');
-  
+  const [models, setModels] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetch('/api/models')
+      .then(res => res.json())
+      .then(data => {
+        setModels(Array.isArray(data) ? data : []);
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) return <div className="py-16 text-center text-gray-500">Loading models...</div>;
+
   // Filter models based on selected category
   const filteredModels = activeCategory === 'all'
     ? MODELS

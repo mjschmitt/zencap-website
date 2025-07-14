@@ -52,6 +52,41 @@ export async function initializeDatabase() {
       );
     `;
 
+    // Create insights table
+    await sql`
+      CREATE TABLE IF NOT EXISTS insights (
+        id SERIAL PRIMARY KEY,
+        slug VARCHAR(255) NOT NULL UNIQUE,
+        title VARCHAR(255) NOT NULL,
+        summary TEXT,
+        content TEXT,
+        author VARCHAR(100),
+        cover_image_url TEXT,
+        published_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        status VARCHAR(50) DEFAULT 'draft',
+        tags TEXT
+      );
+    `;
+
+    // Create models table
+    await sql`
+      CREATE TABLE IF NOT EXISTS models (
+        id SERIAL PRIMARY KEY,
+        slug VARCHAR(255) NOT NULL UNIQUE,
+        title VARCHAR(255) NOT NULL,
+        description TEXT,
+        category VARCHAR(100),
+        thumbnail_url TEXT,
+        file_url TEXT,
+        price NUMERIC,
+        published_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        status VARCHAR(50) DEFAULT 'active',
+        tags TEXT
+      );
+    `;
+
     console.log('Database tables initialized successfully');
   } catch (error) {
     console.error('Error initializing database:', error);
@@ -186,6 +221,32 @@ export async function getNewsletterSubscribersCount() {
     return result.rows[0].count;
   } catch (error) {
     console.error('Error fetching newsletter subscribers count:', error);
+    throw error;
+  }
+} 
+
+/**
+ * Get all published insights
+ */
+export async function getAllInsights() {
+  try {
+    const result = await sql`SELECT * FROM insights WHERE status = 'published' ORDER BY published_at DESC;`;
+    return result.rows;
+  } catch (error) {
+    console.error('Error fetching insights:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get all active models
+ */
+export async function getAllModels() {
+  try {
+    const result = await sql`SELECT * FROM models WHERE status = 'active' ORDER BY published_at DESC;`;
+    return result.rows;
+  } catch (error) {
+    console.error('Error fetching models:', error);
     throw error;
   }
 } 
