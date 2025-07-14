@@ -427,7 +427,7 @@ export default function InvestmentInfrastructure() {
             <Motion animation="fade" direction="right">
               <div className="relative h-96 rounded-lg overflow-hidden">
                 <Image 
-                  src="/images/solutions/infrastructure-benefits.jpg" 
+                  src="/images/solutions/infrastructure/infrastructure-benefits.jpg" 
                   alt="Investment infrastructure benefits and ROI"
                   fill
                   className="object-cover"

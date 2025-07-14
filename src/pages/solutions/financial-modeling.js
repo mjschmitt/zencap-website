@@ -310,7 +310,7 @@ export default function FinancialModeling() {
             <Motion animation="fade" direction="right">
               <div className="relative h-96 rounded-lg overflow-hidden">
                 <Image 
-                  src="/images/solutions/financial-modeling/financial-modeling-features-and-capabilities.jpg" 
+                  src="/images/solutions/financial-modeling/model-features-and-capabilities.jpg" 
                   alt="Financial model features and capabilities"
                   fill
                   className="object-cover"

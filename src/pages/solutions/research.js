@@ -37,7 +37,7 @@ export default function IndustryResearch() {
       {/* Hero Section with Background Image */}
       <section 
         className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
-        style={{ backgroundImage: 'url(/images/solutions/research-hero.jpg)' }}
+        style={{ backgroundImage: 'url(/images/solutions/research/research-hero.jpg)' }}
       >
         {/* Gradient overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
@@ -94,7 +94,7 @@ export default function IndustryResearch() {
             <Motion animation="fade" direction="left">
               <div className="relative h-96 rounded-lg overflow-hidden">
                 <Image 
-                  src="/images/solutions/research-overview.jpg" 
+                  src="/images/solutions/research/research-overview.jpg" 
                   alt="Industry research and market analysis"
                   fill
                   className="object-cover"
