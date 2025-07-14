@@ -103,7 +103,7 @@ export default function Contact() {
             {/* Contact Form */}
             <Motion animation="fade" direction="left" className="lg:col-span-2">
               <Card className="p-6">
-                <h2 className="text-2xl font-bold text-navy-700 mb-6">
+                <h2 className="text-2xl font-bold text-navy-700 dark:text-white mb-6">
                   Send Us a Message
                 </h2>
                 <ContactForm onSubmit={handleFormSubmit} />
@@ -111,9 +111,9 @@ export default function Contact() {
             </Motion>
             
             {/* Contact Information */}
-            <Motion animation="fade" direction="right" className="space-y-6">
-              <Card className="bg-navy-700 text-white p-6">
-                <h3 className="text-xl font-bold mb-6">
+            <Motion animation="fade" direction="right" className="flex flex-col h-full space-y-6">
+              <Card className="bg-navy-700 text-white p-6 flex-1 flex flex-col">
+                <h3 className="text-xl font-bold mb-6 dark:text-white">
                   Contact Information
                 </h3>
                 
@@ -123,8 +123,8 @@ export default function Contact() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                     <div>
-                      <h4 className="text-base font-medium mb-1">Email</h4>
-                      <a href="mailto:info@zencap.co" className="text-gray-300 hover:text-white">
+                      <h4 className="text-base font-bold mb-1 dark:text-white">Email</h4>
+                      <a href="mailto:info@zencap.co" className="text-navy-700 dark:text-gray-300 hover:text-navy-900 dark:hover:text-white">
                         info@zencap.co
                       </a>
                     </div>
@@ -135,8 +135,8 @@ export default function Contact() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
                     </svg>
                     <div>
-                      <h4 className="text-base font-medium mb-1">Phone</h4>
-                      <a href="tel:+15551234567" className="text-gray-300 hover:text-white">
+                      <h4 className="text-base font-bold mb-1 dark:text-white">Phone</h4>
+                      <a href="tel:+15551234567" className="text-navy-700 dark:text-gray-300 hover:text-navy-900 dark:hover:text-white">
                         +1 (555) 123-4567
                       </a>
                     </div>
@@ -148,29 +148,29 @@ export default function Contact() {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                     <div>
-                      <h4 className="text-base font-medium mb-1">Address</h4>
-                      <p className="text-gray-300">
-                        4334 N Flagler Dr <br />
-                        West Palm Beach, FL 33407
+                      <h4 className="text-base font-bold mb-1 dark:text-white">Address</h4>
+                      <p className="text-navy-700 dark:text-gray-300">
+                        West Palm Beach, FL 33480
                       </p>
                     </div>
                   </div>
                 </div>
                 
                 <div className="mt-8">
-                  <a 
-                    href="https://calendly.com" 
-                    target="_blank" 
-                    rel="noopener noreferrer" 
-                    className="block w-full py-3 px-4 bg-white text-navy-700 text-center font-medium rounded-md hover:bg-gray-100 transition duration-150 ease-in-out"
+                  <Button
+                    href="https://calendly.com"
+                    variant="secondary"
+                    fullWidth={true}
+                    target="_blank"
+                    rel="noopener noreferrer"
                   >
                     Schedule a Meeting
-                  </a>
+                  </Button>
                 </div>
               </Card>
               
               <Card className="p-6">
-                <h3 className="text-xl font-bold text-navy-700 mb-4">
+                <h3 className="text-xl font-bold text-navy-700 mb-4 dark:text-white">
                   Follow Us
                 </h3>
                 <div className="flex space-x-4">
@@ -240,10 +240,29 @@ export default function Contact() {
         </div>
       </section>
       
-      {/* Map Section - Placeholder */}
-      <div className="h-80 bg-gray-200 flex items-center justify-center text-gray-500 text-lg">
-        [Google Map Would Go Here]
-      </div>
+      {/* Map Section */}
+      <section className="py-12">
+        <div className="max-w-2xl mx-auto">
+          <div className="bg-white dark:bg-navy-800 border border-gray-100 dark:border-navy-700 rounded-lg shadow p-4 flex flex-col items-center">
+            <div className="w-full h-64 rounded overflow-hidden mb-4">
+              <iframe
+                title="West Palm Beach Map"
+                width="100%"
+                height="100%"
+                frameBorder="0"
+                style={{ border: 0 }}
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d35881.96407326244!2d-80.039485!3d26.715342!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x88d8d6b1e7e2b6e1%3A0x6e7b1e7b1e7b1e7b!2sWest%20Palm%20Beach%2C%20FL%2033480!5e0!3m2!1sen!2sus!4v1680000000000!5m2!1sen!2sus"
+                allowFullScreen=""
+                aria-hidden="false"
+                tabIndex="0"
+              ></iframe>
+            </div>
+            <div className="text-center">
+              <p className="text-navy-700 dark:text-white font-semibold">Our Home Base: West Palm Beach, FL 33480</p>
+            </div>
+          </div>
+        </div>
+      </section>
     </Layout>
   );
 }

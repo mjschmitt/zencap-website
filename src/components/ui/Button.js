@@ -12,8 +12,8 @@ export default function Button({
 }) {
   // Variant styles with consistent colors
   const variants = {
-    primary: 'bg-navy-700 hover:bg-navy-800 text-white',
-    secondary: 'bg-white border border-navy-700 text-navy-700 hover:bg-gray-50',
+    primary: 'bg-navy-700 hover:bg-teal-600 text-white dark:bg-teal-500 dark:hover:bg-teal-400',
+    secondary: 'bg-white border border-navy-700 text-navy-700 hover:bg-teal-50 dark:bg-navy-700 dark:text-white dark:hover:bg-navy-600',
     accent: 'bg-teal-500 hover:bg-teal-600 text-white',
     ghost: 'bg-transparent hover:bg-gray-50 text-navy-700'
   };

@@ -9,7 +9,12 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 // ZenCap brand colors
 const COLORS = ['#046B4E', '#3e6792', '#6187ad', '#8ba8c2', '#bccddc'];
 
+import dynamic from 'next/dynamic';
+const TipTapEditor = dynamic(() => import('../../components/ui/TipTapEditor'), { ssr: false });
+
 function InsightsAdmin() {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => { setIsClient(true); }, []);
   const [insights, setInsights] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -109,33 +114,42 @@ function InsightsAdmin() {
       )}
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-white dark:bg-navy-800 p-6 rounded shadow border border-gray-200 dark:border-navy-700 space-y-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="insight-title" className="block text-sm font-medium mb-1">Title</label>
+              <label htmlFor="insight-title" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label>
               <input id="insight-title" name="title" value={form.title} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" required />
             </div>
             <div>
-              <label htmlFor="insight-slug" className="block text-sm font-medium mb-1">Slug</label>
+              <label htmlFor="insight-slug" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Slug</label>
               <input id="insight-slug" name="slug" value={form.slug} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" required disabled={!!editInsight} />
             </div>
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Content</label>
+            {isClient && (
+              <TipTapEditor
+                initialContent={form.content}
+                onChange={html => setForm(f => ({ ...f, content: html }))}
+              />
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label htmlFor="insight-summary" className="block text-sm font-medium mb-1">Summary</label>
+              <label htmlFor="insight-summary" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Summary</label>
               <input id="insight-summary" name="summary" value={form.summary} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
             </div>
-            <div className="md:col-span-2">
-              <label htmlFor="insight-content" className="block text-sm font-medium mb-1">Content</label>
-              <textarea id="insight-content" name="content" value={form.content} onChange={handleFormChange} rows={4} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
-            </div>
             <div>
-              <label htmlFor="insight-author" className="block text-sm font-medium mb-1">Author</label>
+              <label htmlFor="insight-author" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Author</label>
               <input id="insight-author" name="author" value={form.author} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <label htmlFor="insight-cover-image-url" className="block text-sm font-medium mb-1">Cover Image URL</label>
+              <label htmlFor="insight-cover-image-url" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Cover Image URL</label>
               <input id="insight-cover-image-url" name="cover_image_url" value={form.cover_image_url} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <label htmlFor="insight-status" className="block text-sm font-medium mb-1">Status</label>
+              <label htmlFor="insight-status" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Status</label>
               <select id="insight-status" name="status" value={form.status} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white">
                 <option value="draft">Draft</option>
                 <option value="published">Published</option>
@@ -143,7 +157,7 @@ function InsightsAdmin() {
               </select>
             </div>
             <div>
-              <label htmlFor="insight-tags" className="block text-sm font-medium mb-1">Tags (comma separated)</label>
+              <label htmlFor="insight-tags" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Tags (comma separated)</label>
               <input id="insight-tags" name="tags" value={form.tags} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
             </div>
           </div>
@@ -370,6 +384,8 @@ export default function AdminDashboard() {
   const [loading, setLoading] = useState(false);
   const [activeTab, setActiveTab] = useState('overview');
   const [darkMode, setDarkMode] = useState(false);
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => { setIsClient(true); }, []);
 
   // Initialize dark mode
   useEffect(() => {

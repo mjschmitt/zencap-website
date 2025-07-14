@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import Button from './Button';
 
-export default function NewsletterSignup({ dark = false }) {
+export default function NewsletterSignup() {
   const [email, setEmail] = useState('');
   const [status, setStatus] = useState('idle'); // idle, loading, success, error
   const [errorMessage, setErrorMessage] = useState('');
@@ -52,11 +52,11 @@ export default function NewsletterSignup({ dark = false }) {
   };
   
   return (
-    <div className={`py-8 px-6 ${dark ? 'bg-navy-800 text-white' : 'bg-gray-50'} rounded-lg`}>
-      <h3 className={`text-xl font-bold ${dark ? 'text-white' : 'text-navy-700'} mb-2`}>
+    <div className="py-8 px-6 bg-gray-50 dark:bg-navy-700 text-navy-700 dark:text-white rounded-lg border border-gray-100 dark:border-navy-600 shadow-md">
+      <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2">
         Subscribe to our Newsletter
       </h3>
-      <p className={`mb-4 ${dark ? 'text-gray-300' : 'text-gray-600'}`}>
+      <p className="mb-4 text-gray-600 dark:text-gray-300">
         Receive financial modeling insights and investment tips directly to your inbox
       </p>
       
@@ -80,9 +80,11 @@ export default function NewsletterSignup({ dark = false }) {
               placeholder="Enter your email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 ${
-                status === 'error' ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 transition-colors
+                ${status === 'error' ? 'border-red-500' : 'border-gray-300 dark:border-navy-600'}
+                bg-white text-gray-900 placeholder-gray-500
+                dark:bg-navy-900 dark:text-white dark:placeholder-gray-400`
+              }
             />
             {status === 'error' && (
               <p className="mt-1 text-sm text-red-600">{errorMessage}</p>
@@ -91,7 +93,7 @@ export default function NewsletterSignup({ dark = false }) {
           
           <Button
             type="submit"
-            variant={dark ? 'accent' : 'primary'}
+            variant="accent"
             fullWidth={true}
             disabled={status === 'loading'}
           >

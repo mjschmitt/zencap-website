@@ -77,7 +77,7 @@ export default function About() {
                 <Motion animation="fade" direction="up" delay={200}>
                   <div className="prose prose-lg max-w-none text-gray-600 dark:text-gray-300">
                     <p className="mb-4">
-                      Zenith Capital Advisors was founded in 2023 by Maximilian Schmitt, drawing on his formative experiences across both private and public equity markets. After witnessing firsthand the limitations of existing financial models – either overly simplistic or unnecessarily complex – Max recognized the need for analytical tools that balanced mathematical rigor with practical usability.
+                      Zenith Capital Advisors was founded in 2023 by Max Schmitt, drawing on his formative experiences across both private and public equity markets. After witnessing firsthand the limitations of existing financial models – either overly simplistic or unnecessarily complex – Max recognized the need for analytical tools that balanced mathematical rigor with practical usability.
                     </p>
                     <p className="mb-4">
                       Our approach combines rigorous quantitative methods with practical investment experience. We believe that the most effective models are those that provide transparency into key drivers and assumptions, allowing investment professionals to exercise their judgment with better information.
@@ -96,7 +96,7 @@ export default function About() {
                   <div className="relative min-h-[400px] rounded-lg overflow-hidden">
                     <Image 
                       src="/images/about/founder.jpg" 
-                      alt="Maximilian Schmitt, Founder & CEO"
+                      alt="Max Schmitt, Founder & CEO"
                       fill
                       className="object-cover object-top"
                       sizes="(max-width: 768px) 100vw, 33vw"
@@ -200,7 +200,7 @@ export default function About() {
                 <div className="relative h-[400px]">
                   <Image 
                     src="/images/about/max-profile.jpg" 
-                    alt="Maximilian Schmitt"
+                    alt="Max Schmitt"
                     fill
                     className="object-cover object-top"
                     sizes="(max-width: 768px) 100vw, 33vw"
@@ -208,7 +208,7 @@ export default function About() {
                 </div>
                 <div className="p-8 flex-grow flex flex-col">
                   <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-1">
-                    Maximilian Schmitt
+                    Max Schmitt
                   </h3>
                   <p className="text-teal-500 font-medium mb-4">Founder & CEO</p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">

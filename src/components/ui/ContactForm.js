@@ -134,7 +134,7 @@ export default function ContactForm({ onSubmit }) {
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-navy-600 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-navy-600 dark:text-gray-200 mb-1">
                 Full Name*
               </label>
               <input 
@@ -143,9 +143,11 @@ export default function ContactForm({ onSubmit }) {
                 name="name" 
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 ${
-                  errors.name ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 transition-colors
+                  ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-navy-600'}
+                  bg-white text-gray-900 placeholder-gray-500
+                  dark:bg-navy-900 dark:text-white dark:placeholder-gray-400`
+                }
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
@@ -153,7 +155,7 @@ export default function ContactForm({ onSubmit }) {
             </div>
             
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-navy-600 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-navy-600 dark:text-gray-200 mb-1">
                 Email Address*
               </label>
               <input 
@@ -162,9 +164,11 @@ export default function ContactForm({ onSubmit }) {
                 name="email" 
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 ${
-                  errors.email ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 transition-colors
+                  ${errors.email ? 'border-red-500' : 'border-gray-300 dark:border-navy-600'}
+                  bg-white text-gray-900 placeholder-gray-500
+                  dark:bg-navy-900 dark:text-white dark:placeholder-gray-400`
+                }
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -174,7 +178,7 @@ export default function ContactForm({ onSubmit }) {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label htmlFor="company" className="block text-sm font-medium text-navy-600 mb-1">
+              <label htmlFor="company" className="block text-sm font-medium text-navy-600 dark:text-gray-200 mb-1">
                 Company
               </label>
               <input 
@@ -183,12 +187,12 @@ export default function ContactForm({ onSubmit }) {
                 name="company" 
                 value={formData.company}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
               />
             </div>
             
             <div>
-              <label htmlFor="interest" className="block text-sm font-medium text-navy-600 mb-1">
+              <label htmlFor="interest" className="block text-sm font-medium text-navy-600 dark:text-gray-200 mb-1">
                 I&apos;m interested in
               </label>
               <select 
@@ -196,7 +200,7 @@ export default function ContactForm({ onSubmit }) {
                 name="interest" 
                 value={formData.interest}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 bg-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
               >
                 <option value="general">General Inquiry</option>
                 <option value="products">Financial Models</option>
@@ -207,7 +211,7 @@ export default function ContactForm({ onSubmit }) {
           </div>
           
           <div className="mb-6">
-            <label htmlFor="message" className="block text-sm font-medium text-navy-600 mb-1">
+            <label htmlFor="message" className="block text-sm font-medium text-navy-600 dark:text-gray-200 mb-1">
               Message*
             </label>
             <textarea 
@@ -216,9 +220,11 @@ export default function ContactForm({ onSubmit }) {
               rows="5" 
               value={formData.message}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 ${
-                errors.message ? 'border-red-500' : 'border-gray-300'
-              }`}
+              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 transition-colors
+                ${errors.message ? 'border-red-500' : 'border-gray-300 dark:border-navy-600'}
+                bg-white text-gray-900 placeholder-gray-500
+                dark:bg-navy-900 dark:text-white dark:placeholder-gray-400`
+              }
               placeholder="Tell us about your project or how we can help..."
             />
             {errors.message && (
