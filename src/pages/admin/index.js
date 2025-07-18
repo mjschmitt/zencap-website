@@ -10,7 +10,14 @@ import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContai
 const COLORS = ['#046B4E', '#3e6792', '#6187ad', '#8ba8c2', '#bccddc'];
 
 import dynamic from 'next/dynamic';
-const TipTapEditor = dynamic(() => import('../../components/ui/TipTapEditor'), { ssr: false });
+
+const RichTextEditor = dynamic(
+  () => import('@/components/ui/RichTextEditor'),
+  { 
+    ssr: false,
+    loading: () => <div className="p-4 text-center text-gray-500">Loading editor...</div>
+  }
+);
 
 function InsightsAdmin() {
   const [isClient, setIsClient] = useState(false);
@@ -41,14 +48,113 @@ function InsightsAdmin() {
 
   const handleAdd = () => {
     setEditInsight(null);
-    setForm({ slug: '', title: '', summary: '', content: '', author: '', cover_image_url: '', status: 'draft', tags: '' });
+    setForm({ 
+      slug: '', 
+      title: '', 
+      summary: '', 
+      content: getSampleContent(), 
+      author: '', 
+      cover_image_url: '', 
+      status: 'draft', 
+      tags: '' 
+    });
     setShowForm(true);
     setError('');
   };
 
+  // Sample professional content template showcasing all editor features
+  const getSampleContent = () => {
+    return `<h1>Investment Strategy Analysis: Q4 2024 Market Outlook</h1>
+
+<div class="callout-box">
+  <strong>Executive Summary:</strong> This comprehensive analysis examines key market trends, investment opportunities, and risk factors for the fourth quarter of 2024, providing actionable insights for portfolio optimization.
+</div>
+
+<h2>Market Overview</h2>
+
+<p>The current market environment presents both <strong>significant opportunities</strong> and <em>notable challenges</em> for investors. Our analysis indicates three primary factors driving market dynamics:</p>
+
+<ul>
+  <li><strong>Technology Sector Momentum:</strong> Continued innovation in AI and cloud computing</li>
+  <li><strong>Interest Rate Environment:</strong> Federal Reserve policy implications</li>
+  <li><strong>Global Economic Recovery:</strong> Post-pandemic growth patterns</li>
+</ul>
+
+<h3>Key Investment Themes</h3>
+
+<p>We've identified several compelling investment themes that warrant attention:</p>
+
+<ol>
+  <li><span style="color: #046B4E;">Green Energy Transition</span> - Renewable energy infrastructure</li>
+  <li><span style="color: #3B82F6;">Digital Transformation</span> - Cloud and cybersecurity</li>
+  <li><span style="color: #8B5CF6;">Healthcare Innovation</span> - Biotech and telemedicine</li>
+</ol>
+
+<h2>Portfolio Recommendations</h2>
+
+<blockquote>
+  "Diversification remains the cornerstone of successful portfolio management. Our analysis suggests a balanced approach combining growth and value strategies."
+</blockquote>
+
+<h3>Asset Allocation Strategy</h3>
+
+<table border="1" style="width: 100%; border-collapse: collapse; margin: 1.5em 0;">
+  <tr style="background-color: #f8f9fa;">
+    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Asset Class</th>
+    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">Target Allocation</th>
+    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">Risk Level</th>
+  </tr>
+  <tr>
+    <td style="padding: 12px; border: 1px solid #dee2e6;"><strong>Equities</strong></td>
+    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">60%</td>
+    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">Medium-High</td>
+  </tr>
+  <tr>
+    <td style="padding: 12px; border: 1px solid #dee2e6;"><strong>Fixed Income</strong></td>
+    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">25%</td>
+    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">Low</td>
+  </tr>
+  <tr>
+    <td style="padding: 12px; border: 1px solid #dee2e6;"><strong>Alternatives</strong></td>
+    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">15%</td>
+    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">High</td>
+  </tr>
+</table>
+
+<h2>Risk Management Considerations</h2>
+
+<p>Effective risk management requires attention to several critical factors:</p>
+
+<div style="margin-left: 2em;">
+  <p><strong>Market Volatility:</strong> Implement hedging strategies for downside protection</p>
+  <p><strong>Liquidity Management:</strong> Maintain adequate cash reserves for opportunities</p>
+  <p><strong>Currency Exposure:</strong> Consider international diversification benefits</p>
+</div>
+
+<hr style="margin: 2em 0; border: none; border-top: 2px solid #046B4E;">
+
+<h2>Conclusion</h2>
+
+<p>As we approach the end of 2024, investors should remain <em>vigilant</em> while maintaining a <strong>long-term perspective</strong>. The combination of careful analysis and disciplined execution will be key to achieving investment objectives.</p>
+
+<div class="callout-box">
+  <strong>Next Steps:</strong> Schedule a consultation to discuss how these insights can be applied to your specific investment strategy and portfolio requirements.
+</div>`;
+  };
+
   const handleEdit = (insight) => {
     setEditInsight(insight);
-    setForm({ ...insight });
+    // Ensure all fields are properly set with fallbacks
+    setForm({ 
+      slug: insight.slug || '',
+      title: insight.title || '',
+      summary: insight.summary || '',
+      content: insight.content || '',
+      author: insight.author || '',
+      cover_image_url: insight.cover_image_url || '',
+      status: insight.status || 'draft',
+      tags: insight.tags || ''
+    });
     setShowForm(true);
     setError('');
   };
@@ -128,7 +234,8 @@ function InsightsAdmin() {
           <div className="mb-6">
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Content</label>
             {isClient && (
-              <TipTapEditor
+              <RichTextEditor
+                key={editInsight?.slug || 'new-insight'} // Force re-render when editing different insights
                 initialContent={form.content}
                 onChange={html => setForm(f => ({ ...f, content: html }))}
               />

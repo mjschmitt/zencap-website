@@ -121,7 +121,7 @@ export default function InsightDetail() {
       />
       
       {/* Article Header */}
-      <section className="bg-gradient-to-b from-gray-50 to-white dark:from-navy-900 dark:to-navy-800 py-16">
+      <section className="bg-gradient-to-b from-gray-50 to-white dark:from-navy-900 dark:to-navy-800 pt-16 pb-8">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion variant="fade-in">
             {/* Back Button */}
@@ -183,7 +183,7 @@ export default function InsightDetail() {
       </section>
       
       {/* Article Content */}
-      <section className="py-16 bg-white dark:bg-navy-800">
+      <section className="pt-4 pb-16 bg-white dark:bg-navy-800">
         <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion variant="fade-in" delay={0.2}>
             {/* Cover Image */}
@@ -198,9 +198,9 @@ export default function InsightDetail() {
             )}
           
             {/* Content */}
-            <div className="prose prose-lg dark:prose-invert max-w-none">
+            <div className="prose prose-lg dark:prose-invert max-w-none article-content">
               {insight.content ? (
-                <div dangerouslySetInnerHTML={{ __html: insight.content }} />
+              <div dangerouslySetInnerHTML={{ __html: insight.content }} />
               ) : (
                 <div className="text-gray-600 dark:text-gray-400">
                   <p className="mb-6">

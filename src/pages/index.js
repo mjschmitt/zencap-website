@@ -6,6 +6,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
+import { getImageWithVersion } from '@/utils/imageUtils';
 
 // Dynamically import non-critical components for better performance
 const EnhancedTestimonials = dynamic(() => import('@/components/ui/EnhancedTestimonials'), {
@@ -108,53 +109,53 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
             >
-              <div className="h-48 relative">
-                <Image
-                  src="/images/home/private-equity-models.jpg"
-                  alt="Private Equity Models"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
-                    Private Equity
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">8 Models</span>
-                </div>
-                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                  Private Equity Models
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Real estate development, acquisition, and investment analysis across all major property types.
-                </p>
-                <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
-                  <div className="flex items-center">
-                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Multifamily & Commercial
+              <Link href="/models/private-equity">
+                <div className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group h-full">
+                  <div className="h-48 relative overflow-hidden">
+                    <Image
+                      src="/images/home/private-equity-models.jpg"
+                      alt="Private Equity Models"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                  <div className="flex items-center">
-                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Development & Acquisition
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
+                        Private Equity
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">8 Models</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      Private Equity Models
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      Real estate development, acquisition, and investment analysis across all major property types.
+                    </p>
+                    <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
+                      <div className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Multifamily & Commercial
+                      </div>
+                      <div className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Development & Acquisition
+                      </div>
+                    </div>
+                    <div className="inline-flex items-center text-teal-500 group-hover:text-teal-600 font-medium">
+                      Explore Models
+                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-                <Link 
-                  href="/models/private-equity" 
-                  className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
-                >
-                  Explore Models
-                  <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
-              </div>
+              </Link>
             </motion.div>
             
             {/* Public Equity Models */}
@@ -162,53 +163,53 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
             >
-              <div className="h-48 relative">
-                <Image
-                  src="/images/home/public-equity-models.jpg"
-                  alt="Public Equity Models"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <div className="flex items-center justify-between mb-3">
-                  <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900 text-navy-700 dark:text-green-300 rounded-full text-xs font-medium">
-                    Public Equity
-                  </span>
-                  <span className="text-sm text-gray-500 dark:text-gray-400">5 Models</span>
-                </div>
-                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
-                  Public Equity Models
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Valuation models and analytical tools for public company analysis and portfolio management.
-                </p>
-                <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
-                  <div className="flex items-center">
-                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    3-Statement Models
+              <Link href="/models/public-equity">
+                <div className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group h-full">
+                  <div className="h-48 relative overflow-hidden">
+                    <Image
+                      src="/images/home/public-equity-models.jpg"
+                      alt="Public Equity Models"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
                   </div>
-                  <div className="flex items-center">
-                    <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    DCF & Portfolio Analysis
+                  <div className="p-6">
+                    <div className="flex items-center justify-between mb-3">
+                      <span className="inline-block px-2 py-1 bg-green-100 dark:bg-green-900 text-navy-700 dark:text-green-300 rounded-full text-xs font-medium">
+                        Public Equity
+                      </span>
+                      <span className="text-sm text-gray-500 dark:text-gray-400">5 Models</span>
+                    </div>
+                    <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      Public Equity Models
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      Valuation models and analytical tools for public company analysis and portfolio management.
+                    </p>
+                    <div className="space-y-2 mb-4 text-sm text-gray-600 dark:text-gray-300">
+                      <div className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        3-Statement Models
+                      </div>
+                      <div className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        DCF & Portfolio Analysis
+                      </div>
+                    </div>
+                    <div className="inline-flex items-center text-teal-500 group-hover:text-teal-600 font-medium">
+                      Explore Models
+                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </div>
                   </div>
                 </div>
-                <Link 
-                  href="/models/public-equity" 
-                  className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
-                >
-                  Explore Models
-                  <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
-              </div>
+              </Link>
             </motion.div>
           </div>
           
@@ -255,33 +256,33 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.2 }}
-              className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
             >
-              <div className="h-52 relative">
-                <Image 
-                  src="/images/home/financial-modeling.jpg"
-                  alt="Financial modeling spreadsheet with charts"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2">
-                  Financial Modeling
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Custom financial models that provide deep analytical insights and support better investment decisions.
-                </p>
-                <Link 
-                  href="/solutions/financial-modeling" 
-                  className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
-                >
-                  Learn more
-                  <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
-              </div>
+              <Link href="/solutions/financial-modeling">
+                <div className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group h-full">
+                  <div className="h-52 relative overflow-hidden">
+                    <Image 
+                      src={getImageWithVersion('/images/home/financial-modeling.jpg', 'v2')}
+                      alt="Financial modeling spreadsheet with charts"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      Financial Modeling
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      Custom financial models that provide deep analytical insights and support better investment decisions.
+                    </p>
+                    <div className="inline-flex items-center text-teal-500 group-hover:text-teal-600 font-medium">
+                      Learn more
+                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </Link>
             </motion.div>
             
             {/* Investment Infrastructure */}
@@ -289,33 +290,33 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.4 }}
-              className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
             >
-              <div className="h-52 relative">
-                <Image 
-                  src="/images/home/investment-infrastructure.jpg"
-                  alt="Modern investment office with multiple screens displaying data"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2">
-                  Investment Infrastructure
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  End-to-end systems to streamline your investment operations, improve data management, and enhance decision-making.
-                </p>
-                <Link 
-                  href="/solutions/infrastructure" 
-                  className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
-                >
-                  Learn more
-                  <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
-              </div>
+              <Link href="/solutions/infrastructure">
+                <div className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group h-full">
+                  <div className="h-52 relative overflow-hidden">
+                    <Image 
+                      src="/images/home/investment-infrastructure.jpg"
+                      alt="Modern investment office with multiple screens displaying data"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      Investment Infrastructure
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      End-to-end systems to streamline your investment operations, improve data management, and enhance decision-making.
+                    </p>
+                    <div className="inline-flex items-center text-teal-500 group-hover:text-teal-600 font-medium">
+                      Learn more
+                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </Link>
             </motion.div>
             
             {/* Industry Research */}
@@ -323,33 +324,33 @@ export default function Home() {
               initial={{ opacity: 0, y: 20 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.5, delay: 0.6 }}
-              className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden"
             >
-              <div className="h-52 relative">
-                <Image 
-                  src="/images/home/industry-research.jpg"
-                  alt="Researcher analyzing market data and reports"
-                  fill
-                  className="object-cover"
-                />
-              </div>
-              <div className="p-6">
-                <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2">
-                  Industry Research
-                </h3>
-                <p className="text-gray-600 dark:text-gray-300 mb-4">
-                  Specialized research to inform your investment strategy, identify opportunities, and navigate market complexities.
-                </p>
-                <Link 
-                  href="/solutions/research" 
-                  className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
-                >
-                  Learn more
-                  <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
-              </div>
+              <Link href="/solutions/research">
+                <div className="bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer group h-full">
+                  <div className="h-52 relative overflow-hidden">
+                    <Image 
+                      src="/images/home/industry-research.jpg"
+                      alt="Researcher analyzing market data and reports"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      Industry Research
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      Specialized research to inform your investment strategy, identify opportunities, and navigate market complexities.
+                    </p>
+                    <div className="inline-flex items-center text-teal-500 group-hover:text-teal-600 font-medium">
+                      Learn more
+                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                      </svg>
+                    </div>
+                  </div>
+                </div>
+              </Link>
             </motion.div>
           </div>
         </div>

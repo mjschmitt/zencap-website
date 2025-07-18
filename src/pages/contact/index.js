@@ -158,11 +158,11 @@ export default function Contact() {
                 
                 <div className="mt-8">
                   <Button
-                    href="https://calendly.com"
+                    href="https://calendly.com" 
                     variant="secondary"
                     fullWidth={true}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    target="_blank" 
+                    rel="noopener noreferrer" 
                   >
                     Schedule a Meeting
                   </Button>
@@ -261,7 +261,7 @@ export default function Contact() {
               <p className="text-navy-700 dark:text-white font-semibold">Our Home Base: West Palm Beach, FL 33480</p>
             </div>
           </div>
-        </div>
+      </div>
       </section>
     </Layout>
   );

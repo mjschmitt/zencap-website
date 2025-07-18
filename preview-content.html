@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Insight Content Preview</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            line-height: 1.6;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            background: #f9fafb;
+        }
+        .content {
+            background: white;
+            padding: 2rem;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        .insight-selector {
+            margin-bottom: 2rem;
+            padding: 1rem;
+            background: #046B4E;
+            color: white;
+            border-radius: 8px;
+        }
+        select {
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: none;
+            margin-left: 1rem;
+            font-size: 1rem;
+        }
+        .copy-instructions {
+            background: #dcfce7;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+            border-left: 4px solid #16a34a;
+        }
+    </style>
+</head>
+<body>
+    <div class="insight-selector">
+        <strong>Select Insight to Preview:</strong>
+        <select id="insightSelector" onchange="loadInsight()">
+            <option value="">Choose an insight...</option>
+            <option value="q4-tech">Q4 2024 Tech Earnings</option>
+            <option value="multifamily">Multifamily Real Estate 2025</option>
+            <option value="cloud">Cloud Infrastructure Pricing</option>
+            <option value="ai-semiconductor">AI Semiconductor Revolution</option>
+            <option value="esg">ESG Integration</option>
+            <option value="fintech">Fintech Disruption</option>
+        </select>
+    </div>
+
+    <div class="copy-instructions">
+        <h3>📋 How to Copy Formatted Content:</h3>
+        <ol>
+            <li><strong>Select insight above</strong> to preview the formatted content</li>
+            <li><strong>Select all content</strong> in the preview area below (Ctrl+A)</li>
+            <li><strong>Copy</strong> the selected content (Ctrl+C)</li>
+            <li><strong>Go to admin interface</strong> at http://localhost:3001/admin</li>
+            <li><strong>Edit the insight</strong> and clear existing content</li>
+            <li><strong>Paste</strong> the formatted content (Ctrl+V)</li>
+            <li><strong>Save</strong> - the rich text editor will preserve all formatting!</li>
+        </ol>
+    </div>
+
+    <div class="content" id="contentArea">
+        <p style="text-align: center; color: #6b7280; font-style: italic;">
+            Select an insight from the dropdown above to preview the formatted content.
+        </p>
+    </div>
+
+    <script>
+        const insights = {
+            'q4-tech': `Q4 Tech content here`,
+            'multifamily': `Multifamily content here`,
+            'cloud': `Cloud content here`,
+            'ai-semiconductor': `AI Semiconductor content here`,
+            'esg': `ESG content here`,
+            'fintech': `Fintech content here`
+        };
+
+        function loadInsight() {
+            const selector = document.getElementById('insightSelector');
+            const contentArea = document.getElementById('contentArea');
+            const selectedInsight = selector.value;
+            
+            if (selectedInsight && insights[selectedInsight]) {
+                contentArea.innerHTML = insights[selectedInsight];
+            } else {
+                contentArea.innerHTML = '<p style="text-align: center; color: #6b7280; font-style: italic;">Select an insight from the dropdown above to preview the formatted content.</p>';
+            }
+        }
+    </script>
+</body>
+</html> 

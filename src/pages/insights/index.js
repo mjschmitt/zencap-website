@@ -123,6 +123,107 @@ export default function InsightsPage() {
       {/* Main Content */}
       <section className="py-16 bg-gray-50 dark:bg-navy-900" id="insights-grid">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          {/* Featured Insights */}
+          {!loading && insights.length > 0 && (
+            <Motion variant="fade-in" className="mb-16">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  Featured Insights
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Highlighted analysis from our research team
+                </p>
+              </div>
+              
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                {insights.slice(0, 2).map((insight, index) => (
+                  <Motion
+                    key={`featured-${insight.id}`}
+                    variant="slide-up"
+                    delay={index * 0.1}
+                  >
+                    <Link href={`/insights/${insight.slug}`}>
+                      <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group overflow-hidden border-2 border-teal-500/20 hover:border-teal-500/40" padding={false}>
+                        {/* Featured Badge */}
+                        <div className="absolute top-4 left-4 z-10">
+                          <span className="inline-block px-3 py-1 bg-teal-500 text-white text-xs font-medium rounded-full">
+                            Featured
+                          </span>
+                        </div>
+                        
+                        {/* Cover Image */}
+                        {insight.cover_image_url && (
+                          <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-t-lg">
+                            <img 
+                              src={insight.cover_image_url} 
+                              alt={insight.title}
+                              className="w-full h-64 object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                        )}
+                        
+                        {!insight.cover_image_url && (
+                          <div className="h-64 bg-gradient-to-br from-teal-500 to-navy-600 rounded-t-lg flex items-center justify-center">
+                            <span className="text-white text-4xl font-bold opacity-20">
+                              {insight.title.charAt(0)}
+                            </span>
+                          </div>
+                        )}
+
+                        <div className="p-6">
+                          {/* Category Tag */}
+                          {insight.tags && (
+                            <div className="mb-3">
+                              <span className="inline-block px-3 py-1 bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 text-xs font-medium rounded-full">
+                                {insight.tags.split(',')[0].trim()}
+                              </span>
+                            </div>
+                          )}
+
+                          {/* Title */}
+                          <h3 className="text-xl font-semibold text-gray-900 dark:text-white mb-3 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                            {insight.title}
+                          </h3>
+
+                          {/* Summary */}
+                          <p className="text-gray-600 dark:text-gray-400 mb-4 line-clamp-3">
+                            {insight.summary || 'Explore our latest insights and analysis on investment strategies and market trends.'}
+                          </p>
+
+                          {/* Meta Information */}
+                          <div className="flex items-center justify-between text-sm text-gray-500 dark:text-gray-400">
+                            <div className="flex items-center space-x-4">
+                              <div className="flex items-center">
+                                <FiCalendar className="w-4 h-4 mr-1" />
+                                <span>{formatDate(insight.published_at)}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <FiClock className="w-4 h-4 mr-1" />
+                                <span>{estimateReadTime(insight.content)}</span>
+                              </div>
+                            </div>
+                          </div>
+
+                          {/* Author */}
+                          {insight.author && (
+                            <div className="mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
+                              <div className="flex items-center">
+                                <FiUser className="w-4 h-4 mr-2 text-gray-400" />
+                                <span className="text-sm text-gray-600 dark:text-gray-400">
+                                  {insight.author}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                        </div>
+                      </Card>
+                    </Link>
+                  </Motion>
+                ))}
+              </div>
+            </Motion>
+          )}
+
           {/* Search Bar */}
           <Motion variant="fade-in" className="mb-8">
             <div className="bg-white dark:bg-navy-800 rounded-xl shadow-sm p-6 border border-gray-100 dark:border-navy-700">
@@ -158,18 +259,21 @@ export default function InsightsPage() {
             </div>
           </Motion>
 
-          {/* Results Count */}
-          <Motion variant="fade-in" className="mb-8">
-            <div className="text-center text-sm text-gray-600 dark:text-gray-400">
-              {loading ? (
-                <span>Loading insights...</span>
-              ) : (
-                <span>
-                  Showing {filteredInsights.length} of {insights.length} insights
-                </span>
-              )}
-            </div>
-          </Motion>
+
+
+          {/* All Insights Section */}
+          {!loading && filteredInsights.length > 0 && (
+            <Motion variant="fade-in" className="mb-8">
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-2">
+                  All Insights
+                </h2>
+                <p className="text-gray-600 dark:text-gray-400">
+                  Browse our complete collection of investment analysis and market research
+                </p>
+              </div>
+            </Motion>
+          )}
 
           {/* Insights Grid */}
           {loading ? (
@@ -209,10 +313,10 @@ export default function InsightsPage() {
                   delay={index * 0.1}
                 >
                   <Link href={`/insights/${insight.slug}`}>
-                    <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group">
+                    <Card className="h-full hover:shadow-xl transition-all duration-300 cursor-pointer group overflow-hidden" padding={false}>
                       {/* Cover Image Placeholder */}
                       {insight.cover_image_url && (
-                        <div className="aspect-w-16 aspect-h-9 mb-6 overflow-hidden rounded-t-lg">
+                        <div className="aspect-w-16 aspect-h-9 overflow-hidden rounded-t-lg">
                           <img 
                             src={insight.cover_image_url} 
                             alt={insight.title}
@@ -222,14 +326,14 @@ export default function InsightsPage() {
                       )}
                       
                       {!insight.cover_image_url && (
-                        <div className="h-48 bg-gradient-to-br from-teal-500 to-navy-600 rounded-t-lg mb-6 flex items-center justify-center">
+                        <div className="h-48 bg-gradient-to-br from-teal-500 to-navy-600 rounded-t-lg flex items-center justify-center">
                           <span className="text-white text-4xl font-bold opacity-20">
                             {insight.title.charAt(0)}
                           </span>
                         </div>
                       )}
 
-                      <div className="p-6 pt-0">
+                      <div className="p-6">
                         {/* Category Tag */}
                         {insight.tags && (
                           <div className="mb-3">
@@ -279,8 +383,19 @@ export default function InsightsPage() {
                   </Link>
                 </Motion>
               ))}
-            </div>
-      )}
+                        </div>
+          )}
+
+          {/* Results Count at Bottom */}
+          {!loading && filteredInsights.length > 0 && (
+            <Motion variant="fade-in" className="mt-12">
+              <div className="text-center text-sm text-gray-600 dark:text-gray-400">
+                <span>
+                  Showing {filteredInsights.length} of {insights.length} insights
+                </span>
+              </div>
+            </Motion>
+          )}
         </div>
       </section>
 
