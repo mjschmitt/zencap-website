@@ -19,6 +19,14 @@ const RichTextEditor = dynamic(
   }
 );
 
+const ExcelPreview = dynamic(
+  () => import('@/components/ui/ExcelPreview'),
+  { 
+    ssr: false,
+    loading: () => <div className="p-4 text-center text-gray-500">Loading Excel preview...</div>
+  }
+);
+
 function InsightsAdmin() {
   const [isClient, setIsClient] = useState(false);
   useEffect(() => { setIsClient(true); }, []);
@@ -26,8 +34,9 @@ function InsightsAdmin() {
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editInsight, setEditInsight] = useState(null);
+  const [editingInsightId, setEditingInsightId] = useState(null);
   const [form, setForm] = useState({
-    slug: '', title: '', summary: '', content: '', author: '', cover_image_url: '', status: 'draft', tags: ''
+    slug: '', title: '', summary: '', content: '', author: '', cover_image_url: '', status: 'draft', tags: '', date_published: ''
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
@@ -48,6 +57,7 @@ function InsightsAdmin() {
 
   const handleAdd = () => {
     setEditInsight(null);
+    setEditingInsightId(null);
     setForm({ 
       slug: '', 
       title: '', 
@@ -56,10 +66,80 @@ function InsightsAdmin() {
       author: '', 
       cover_image_url: '', 
       status: 'draft', 
-      tags: '' 
+      tags: '',
+      date_published: ''
     });
     setShowForm(true);
     setError('');
+  };
+
+  const handleEdit = (insight) => {
+    if (editingInsightId === insight.id && showForm) {
+      // Close if already editing this insight
+      setShowForm(false);
+      setEditingInsightId(null);
+      setEditInsight(null);
+    } else {
+      setEditInsight(insight);
+      setEditingInsightId(insight.id);
+      // Format date for input field
+      const formattedDate = insight.date_published ? new Date(insight.date_published).toISOString().split('T')[0] : '';
+      setForm({ 
+        ...insight, 
+        date_published: formattedDate
+      });
+      setShowForm(true);
+      setError('');
+    }
+  };
+
+  const handleDelete = async (slug) => {
+    if (!window.confirm('Delete this insight?')) return;
+    await fetch('/api/insights', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug }) });
+    fetchInsights();
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    setSaving(true);
+    setError('');
+    const method = editInsight ? 'PUT' : 'POST';
+    const res = await fetch('/api/insights', {
+      method,
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(form)
+    });
+    if (!res.ok) {
+      setError('Failed to save.');
+      setSaving(false);
+      return;
+    }
+    setShowForm(false);
+    setEditingInsightId(null);
+    setSaving(false);
+    fetchInsights();
+  };
+
+  // Format date for display
+  const formatDateForDisplay = (dateString, status) => {
+    if (status === 'draft') return 'TBD';
+    if (!dateString) return 'No date';
+    
+    try {
+      // Parse the date string and format it properly
+      const date = new Date(dateString);
+      // Check if date is valid
+      if (isNaN(date.getTime())) return 'Invalid date';
+      
+      return date.toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric',
+        timeZone: 'UTC' // Use UTC to avoid timezone conversion issues
+      });
+    } catch (error) {
+      return 'Invalid date';
+    }
   };
 
   // Sample professional content template showcasing all editor features
@@ -96,93 +176,55 @@ function InsightsAdmin() {
   "Diversification remains the cornerstone of successful portfolio management. Our analysis suggests a balanced approach combining growth and value strategies."
 </blockquote>
 
-<h3>Asset Allocation Strategy</h3>
+<p>Based on our comprehensive analysis, we recommend the following portfolio allocation for Q4 2024:</p>
 
-<table border="1" style="width: 100%; border-collapse: collapse; margin: 1.5em 0;">
-  <tr style="background-color: #f8f9fa;">
-    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: left;">Asset Class</th>
-    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">Target Allocation</th>
-    <th style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">Risk Level</th>
-  </tr>
-  <tr>
-    <td style="padding: 12px; border: 1px solid #dee2e6;"><strong>Equities</strong></td>
-    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">60%</td>
-    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">Medium-High</td>
-  </tr>
-  <tr>
-    <td style="padding: 12px; border: 1px solid #dee2e6;"><strong>Fixed Income</strong></td>
-    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">25%</td>
-    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">Low</td>
-  </tr>
-  <tr>
-    <td style="padding: 12px; border: 1px solid #dee2e6;"><strong>Alternatives</strong></td>
-    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">15%</td>
-    <td style="padding: 12px; border: 1px solid #dee2e6; text-align: center;">High</td>
-  </tr>
+<h3>Recommended Asset Allocation</h3>
+
+<table style="width: 100%; border-collapse: collapse; margin: 1.5rem 0;">
+  <thead>
+    <tr style="background-color: #f8f9fa;">
+      <th style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: left;">Asset Class</th>
+      <th style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">Target Allocation</th>
+      <th style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">Risk Level</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr>
+      <td style="border: 1px solid #dee2e6; padding: 0.75rem;">Large Cap Equities</td>
+      <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">35%</td>
+      <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">Medium</td>
+    </tr>
+    <tr style="background-color: #f8f9fa;">
+      <td style="border: 1px solid #dee2e6; padding: 0.75rem;">Technology Sector</td>
+      <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">25%</td>
+      <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">High</td>
+    </tr>
+    <tr>
+      <td style="border: 1px solid #dee2e6; padding: 0.75rem;">Fixed Income</td>
+      <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">20%</td>
+      <td style="border: 1px solid #dee2e6; padding: 0.75rem; text-align: center;">Low</td>
+    </tr>
+  </tbody>
 </table>
 
-<h2>Risk Management Considerations</h2>
-
-<p>Effective risk management requires attention to several critical factors:</p>
-
-<div style="margin-left: 2em;">
-  <p><strong>Market Volatility:</strong> Implement hedging strategies for downside protection</p>
-  <p><strong>Liquidity Management:</strong> Maintain adequate cash reserves for opportunities</p>
-  <p><strong>Currency Exposure:</strong> Consider international diversification benefits</p>
+<div style="background-color: #e7f3ff; border-left: 4px solid #2196F3; padding: 1rem; margin: 1.5rem 0;">
+  <h4 style="color: #1976D2; margin-top: 0;">Key Insight</h4>
+  <p style="margin-bottom: 0;">The technology sector continues to demonstrate resilience and growth potential, making it an attractive component for long-term portfolio construction.</p>
 </div>
 
-<hr style="margin: 2em 0; border: none; border-top: 2px solid #046B4E;">
+<h2>Risk Considerations</h2>
 
-<h2>Conclusion</h2>
+<p>While we maintain an optimistic outlook, investors should be aware of several key risk factors:</p>
 
-<p>As we approach the end of 2024, investors should remain <em>vigilant</em> while maintaining a <strong>long-term perspective</strong>. The combination of careful analysis and disciplined execution will be key to achieving investment objectives.</p>
+<ul>
+  <li><strong>Inflation Persistence:</strong> Continued monitoring of inflation trends and Federal Reserve responses</li>
+  <li><strong>Geopolitical Tensions:</strong> Ongoing global conflicts and trade relationships</li>
+  <li><strong>Market Volatility:</strong> Potential for increased volatility during earnings season</li>
+</ul>
 
-<div class="callout-box">
-  <strong>Next Steps:</strong> Schedule a consultation to discuss how these insights can be applied to your specific investment strategy and portfolio requirements.
-</div>`;
-  };
+<hr style="margin: 2rem 0; border: none; border-top: 2px solid #e9ecef;">
 
-  const handleEdit = (insight) => {
-    setEditInsight(insight);
-    // Ensure all fields are properly set with fallbacks
-    setForm({ 
-      slug: insight.slug || '',
-      title: insight.title || '',
-      summary: insight.summary || '',
-      content: insight.content || '',
-      author: insight.author || '',
-      cover_image_url: insight.cover_image_url || '',
-      status: insight.status || 'draft',
-      tags: insight.tags || ''
-    });
-    setShowForm(true);
-    setError('');
-  };
-
-  const handleDelete = async (slug) => {
-    if (!window.confirm('Delete this insight?')) return;
-    await fetch('/api/insights', { method: 'DELETE', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ slug }) });
-    fetchInsights();
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setSaving(true);
-    setError('');
-    const method = editInsight ? 'PUT' : 'POST';
-    const res = await fetch('/api/insights', {
-      method,
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(form)
-    });
-    if (!res.ok) {
-      setError('Failed to save.');
-      setSaving(false);
-      return;
-    }
-    setShowForm(false);
-    setSaving(false);
-    fetchInsights();
+<p><em>This analysis is for informational purposes only and should not be considered as personalized investment advice. Please consult with a qualified financial advisor before making investment decisions.</em></p>`;
   };
 
   return (
@@ -194,31 +236,124 @@ function InsightsAdmin() {
       {loading ? (
         <div className="text-gray-500">Loading...</div>
       ) : (
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-navy-700 mb-6">
-          <thead className="bg-gray-50 dark:bg-navy-700">
-            <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Title</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Slug</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
-              <th className="px-4 py-2"></th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-navy-800 divide-y divide-gray-200 dark:divide-navy-700">
-            {insights.map(insight => (
-              <tr key={insight.id}>
-                <td className="px-4 py-2 text-gray-900 dark:text-white">{insight.title}</td>
-                <td className="px-4 py-2 text-gray-500 dark:text-gray-400">{insight.slug}</td>
-                <td className="px-4 py-2 text-gray-500 dark:text-gray-400">{insight.status}</td>
-                <td className="px-4 py-2 flex justify-end gap-2">
-                  <button onClick={() => handleEdit(insight)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">Edit</button>
-                  <button onClick={() => handleDelete(insight.slug)} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition">Delete</button>
-                </td>
-              </tr>
+        <div className="space-y-4">
+          {/* Table header */}
+          <div className="bg-gray-50 dark:bg-navy-700 rounded-t-lg">
+            <div className="grid gap-4 px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase" style={{gridTemplateColumns: '3fr 1.5fr 1fr 1.5fr 1fr'}}>
+              <div>Title</div>
+              <div>Slug</div>
+              <div>Status</div>
+              <div>Date</div>
+              <div className="text-right">Actions</div>
+            </div>
+          </div>
+          
+          {/* Insights list with inline editors */}
+          <div className="bg-white dark:bg-navy-800 rounded-b-lg border border-gray-200 dark:border-navy-700">
+            {insights.map((insight, index) => (
+              <div key={insight.id}>
+                {/* Insight row */}
+                <div className={`grid gap-4 px-4 py-3 hover:bg-gray-50 dark:hover:bg-navy-700 ${index !== insights.length - 1 ? 'border-b border-gray-200 dark:border-navy-700' : ''}`} style={{gridTemplateColumns: '3fr 1.5fr 1fr 1.5fr 1fr'}}>
+                  <div className="text-gray-900 dark:text-white truncate">{insight.title}</div>
+                  <div className="text-gray-500 dark:text-gray-400 truncate">{insight.slug}</div>
+                  <div className="text-gray-500 dark:text-gray-400">{insight.status}</div>
+                  <div className="text-gray-500 dark:text-gray-400">{formatDateForDisplay(insight.date_published, insight.status)}</div>
+                  <div className="flex justify-end gap-2">
+                     <button 
+                       onClick={() => handleEdit(insight)} 
+                       className={`px-3 py-1 rounded text-sm transition ${
+                         editingInsightId === insight.id && showForm 
+                           ? 'bg-gray-600 hover:bg-gray-700 text-white' 
+                           : 'bg-blue-600 hover:bg-blue-700 text-white'
+                       }`}
+                     >
+                       {editingInsightId === insight.id && showForm ? 'Close' : 'Edit'}
+                     </button>
+                     <button onClick={() => handleDelete(insight.slug)} className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition">Delete</button>
+                   </div>
+                </div>
+                
+                {/* Editor appears directly below this insight when editing */}
+                {editingInsightId === insight.id && showForm && (
+                  <div className="border-t border-gray-200 dark:border-navy-700 bg-gray-50 dark:bg-navy-900">
+                    <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                        <div>
+                          <label htmlFor="insight-title" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label>
+                          <input id="insight-title" name="title" value={form.title} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white" required />
+                        </div>
+                        <div>
+                          <label htmlFor="insight-slug" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Slug</label>
+                          <input id="insight-slug" name="slug" value={form.slug} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white" required disabled={!!editInsight} />
+                        </div>
+                      </div>
+                      
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Content</label>
+                        {isClient && (
+                          <RichTextEditor
+                            key={editInsight?.slug || 'new-insight'}
+                            initialContent={form.content}
+                            onChange={html => setForm(f => ({ ...f, content: html }))}
+                          />
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                          <label htmlFor="insight-summary" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Summary</label>
+                          <input id="insight-summary" name="summary" value={form.summary} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white" />
+                        </div>
+                        <div>
+                          <label htmlFor="insight-author" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Author</label>
+                          <input id="insight-author" name="author" value={form.author} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white" />
+                        </div>
+                        <div>
+                          <label htmlFor="insight-cover-image-url" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Cover Image URL</label>
+                          <input id="insight-cover-image-url" name="cover_image_url" value={form.cover_image_url} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white" />
+                        </div>
+                        <div>
+                          <label htmlFor="insight-status" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Status</label>
+                          <select id="insight-status" name="status" value={form.status} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white">
+                            <option value="draft">Draft</option>
+                            <option value="published">Published</option>
+                            <option value="archived">Archived</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label htmlFor="insight-date-published" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Date Published</label>
+                          <input 
+                            id="insight-date-published" 
+                            name="date_published" 
+                            type="date" 
+                            value={form.date_published} 
+                            onChange={handleFormChange} 
+                            className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white" 
+                          />
+                        </div>
+                        <div>
+                          <label htmlFor="insight-tags" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Tags (comma separated)</label>
+                          <input id="insight-tags" name="tags" value={form.tags} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white" />
+                        </div>
+                      </div>
+                      {error && <div className="text-red-600 dark:text-red-400">{error}</div>}
+                      <div className="flex gap-2 pt-4">
+                        <button type="submit" className="bg-teal-600 dark:bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700 dark:hover:bg-teal-600" disabled={saving}>
+                          {saving ? 'Saving...' : (editInsight ? 'Update' : 'Create')}
+                        </button>
+                        <button type="button" onClick={() => { setShowForm(false); setEditingInsightId(null); }} className="bg-gray-200 dark:bg-navy-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-navy-600">
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
       )}
-      {showForm && (
+      {showForm && !editingInsightId && (
         <form onSubmit={handleSubmit} className="bg-white dark:bg-navy-800 p-6 rounded shadow border border-gray-200 dark:border-navy-700 space-y-4 mb-6">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
@@ -235,7 +370,7 @@ function InsightsAdmin() {
             <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Content</label>
             {isClient && (
               <RichTextEditor
-                key={editInsight?.slug || 'new-insight'} // Force re-render when editing different insights
+                key={editInsight?.slug || 'new-insight'}
                 initialContent={form.content}
                 onChange={html => setForm(f => ({ ...f, content: html }))}
               />
@@ -264,14 +399,29 @@ function InsightsAdmin() {
               </select>
             </div>
             <div>
+              <label htmlFor="insight-date-published" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Date Published</label>
+              <input 
+                id="insight-date-published" 
+                name="date_published" 
+                type="date" 
+                value={form.date_published} 
+                onChange={handleFormChange} 
+                className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" 
+              />
+            </div>
+            <div>
               <label htmlFor="insight-tags" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Tags (comma separated)</label>
               <input id="insight-tags" name="tags" value={form.tags} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
             </div>
           </div>
           {error && <div className="text-red-600 dark:text-red-400">{error}</div>}
-          <div className="flex gap-2">
-            <button type="submit" className="bg-teal-600 dark:bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700 dark:hover:bg-teal-600" disabled={saving}>{saving ? 'Saving...' : (editInsight ? 'Update' : 'Create')}</button>
-            <button type="button" onClick={() => setShowForm(false)} className="bg-gray-200 dark:bg-navy-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-navy-600">Cancel</button>
+          <div className="flex gap-2 pt-4">
+            <button type="submit" className="bg-teal-600 dark:bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700 dark:hover:bg-teal-600" disabled={saving}>
+              {saving ? 'Saving...' : (editInsight ? 'Update' : 'Create')}
+            </button>
+            <button type="button" onClick={() => { setShowForm(false); setEditingInsightId(null); }} className="bg-gray-200 dark:bg-navy-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-navy-600">
+              Cancel
+            </button>
           </div>
         </form>
       )}
@@ -280,15 +430,21 @@ function InsightsAdmin() {
 }
 
 function ModelsAdmin() {
+  const [isClient, setIsClient] = useState(false);
+  useEffect(() => { setIsClient(true); }, []);
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
   const [editModel, setEditModel] = useState(null);
+  const [editingModelId, setEditingModelId] = useState(null);
   const [form, setForm] = useState({
-    slug: '', title: '', description: '', category: '', thumbnail_url: '', file_url: '', price: '', status: 'active', tags: ''
+    slug: '', title: '', description: '', category: '', thumbnail_url: '', file_url: '', price: '', status: 'active', tags: '', excel_url: ''
   });
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const [uploading, setUploading] = useState(false);
+  const [showExcelPreview, setShowExcelPreview] = useState(false);
+  const [newlyUploadedFile, setNewlyUploadedFile] = useState(false);
 
   useEffect(() => { fetchModels(); }, []);
 
@@ -310,18 +466,84 @@ function ModelsAdmin() {
     setForm({ ...form, [e.target.name]: e.target.value });
   };
 
+  const handleExcelUpload = async (file) => {
+    if (!file) return;
+
+    console.log('Starting Excel upload for file:', file.name, 'Size:', file.size);
+    setUploading(true);
+    setError('');
+
+    try {
+      const formData = new FormData();
+      formData.append('file', file);
+
+      console.log('Sending upload request to /api/upload-excel');
+      const response = await fetch('/api/upload-excel', {
+        method: 'POST',
+        body: formData,
+      });
+
+      console.log('Upload response status:', response.status);
+      const result = await response.json();
+      console.log('Upload result:', result);
+
+      if (result.success) {
+        setForm(f => ({ ...f, excel_url: result.file.url }));
+        setNewlyUploadedFile(true); // Mark as newly uploaded
+        setShowExcelPreview(true); // Automatically show preview for new uploads
+        setError('');
+        console.log('Excel upload successful, file URL:', result.file.url);
+      } else {
+        console.error('Upload failed:', result.error);
+        setError(result.error || 'Failed to upload Excel file');
+      }
+    } catch (err) {
+      console.error('Excel upload error:', err);
+      setError(`Failed to upload Excel file: ${err.message}`);
+    } finally {
+      setUploading(false);
+    }
+  };
+
   const handleAdd = () => {
     setEditModel(null);
-    setForm({ slug: '', title: '', description: '', category: '', thumbnail_url: '', file_url: '', price: '', status: 'active', tags: '' });
+    setEditingModelId(null);
+    setForm({ 
+      slug: '', 
+      title: '', 
+      description: '<p>Enter a comprehensive description of this financial model, including its key features, use cases, and benefits.</p>', 
+      category: '', 
+      thumbnail_url: '', 
+      file_url: '', 
+      price: '', 
+      status: 'active', 
+      tags: '',
+      excel_url: ''
+    });
     setShowForm(true);
+    setShowExcelPreview(false);
+    setNewlyUploadedFile(false); // Reset for new model
     setError('');
   };
 
   const handleEdit = (model) => {
+    if (editingModelId === model.id && showForm) {
+      // Close if already editing this model
+      setShowForm(false);
+      setEditingModelId(null);
+      setEditModel(null);
+    } else {
     setEditModel(model);
-    setForm({ ...model });
+      setEditingModelId(model.id);
+      setForm({ 
+        ...model, 
+        description: model.description || '<p>Enter a comprehensive description of this financial model, including its key features, use cases, and benefits.</p>',
+        excel_url: model.excel_url || ''
+      });
     setShowForm(true);
+    setNewlyUploadedFile(false); // Reset for existing model
     setError('');
+    }
   };
 
   const handleDelete = async (slug) => {
@@ -346,6 +568,7 @@ function ModelsAdmin() {
       return;
     }
     setShowForm(false);
+    setEditingModelId(null);
     setSaving(false);
     fetchModels();
   };
@@ -359,57 +582,265 @@ function ModelsAdmin() {
       {loading ? (
         <div className="text-gray-500">Loading...</div>
       ) : (
-        <table className="min-w-full divide-y divide-gray-200 dark:divide-navy-700 mb-6">
-          <thead className="bg-gray-50 dark:bg-navy-700">
-            <tr>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Title</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Slug</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Category</th>
-              <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 dark:text-gray-400 uppercase">Status</th>
-              <th className="px-4 py-2"></th>
-            </tr>
-          </thead>
-          <tbody className="bg-white dark:bg-navy-800 divide-y divide-gray-200 dark:divide-navy-700">
-            {models.map(model => (
-              <tr key={model.id}>
-                <td className="px-4 py-2 text-gray-900 dark:text-white">{model.title}</td>
-                <td className="px-4 py-2 text-gray-500 dark:text-gray-400">{model.slug}</td>
-                <td className="px-4 py-2 text-gray-500 dark:text-gray-400">{model.category}</td>
-                <td className="px-4 py-2 text-gray-500 dark:text-gray-400">{model.status}</td>
-                <td className="px-4 py-2 flex justify-end gap-2">
-                  <button onClick={() => handleEdit(model)} className="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded transition">Edit</button>
-                  <button onClick={() => handleDelete(model.slug)} className="bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded transition">Delete</button>
-                </td>
-              </tr>
+        <div className="space-y-4">
+          {/* Table header */}
+          <div className="bg-gray-50 dark:bg-navy-700 rounded-t-lg">
+            <div className="grid gap-4 px-4 py-3 text-xs font-medium text-gray-500 dark:text-gray-400 uppercase" style={{gridTemplateColumns: '3fr 1.5fr 1fr 1fr 1fr'}}>
+              <div>Title</div>
+              <div>Slug</div>
+              <div>Category</div>
+              <div>Status</div>
+              <div className="text-right">Actions</div>
+            </div>
+          </div>
+          
+          {/* Models list with inline editors */}
+          <div className="bg-white dark:bg-navy-800 rounded-b-lg border border-gray-200 dark:border-navy-700">
+            {models.map((model, index) => (
+              <div key={model.id}>
+                {/* Model row */}
+                <div className={`grid gap-4 px-4 py-3 hover:bg-gray-50 dark:hover:bg-navy-700 ${index !== models.length - 1 ? 'border-b border-gray-200 dark:border-navy-700' : ''}`} style={{gridTemplateColumns: '3fr 1.5fr 1fr 1fr 1fr'}}>
+                  <div className="text-gray-900 dark:text-white truncate">{model.title}</div>
+                  <div className="text-gray-500 dark:text-gray-400 truncate">{model.slug}</div>
+                  <div className="text-gray-500 dark:text-gray-400">{model.category}</div>
+                  <div className="text-gray-500 dark:text-gray-400">{model.status}</div>
+                  <div className="flex justify-end gap-2">
+                     <button 
+                       onClick={() => handleEdit(model)} 
+                       className={`px-3 py-1 rounded text-sm transition ${
+                         editingModelId === model.id && showForm 
+                           ? 'bg-gray-600 hover:bg-gray-700 text-white' 
+                           : 'bg-blue-600 hover:bg-blue-700 text-white'
+                       }`}
+                     >
+                       {editingModelId === model.id && showForm ? 'Close' : 'Edit'}
+                     </button>
+                     <button onClick={() => handleDelete(model.slug)} className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition">Delete</button>
+                   </div>
+                </div>
+                
+                {/* Editor appears directly below this model when editing */}
+                {editingModelId === model.id && showForm && (
+                  <div className="border-t border-gray-200 dark:border-navy-700 bg-gray-50 dark:bg-navy-900">
+                    <form onSubmit={handleSubmit} className="p-6 space-y-4">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div>
+                          <label htmlFor="model-title" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label>
+                          <input id="model-title" name="title" value={form.title} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white" required />
+                        </div>
+                        <div>
+                          <label htmlFor="model-slug" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Slug</label>
+                          <input id="model-slug" name="slug" value={form.slug} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-white dark:bg-navy-800 text-gray-900 dark:text-white" required disabled={!!editModel} />
+                        </div>
+                      </div>
+                      
+                      <div className="mb-6">
+                        <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Content</label>
+                        {isClient && (
+                          <RichTextEditor
+                            key={editModel?.slug || 'new-model'}
+                            initialContent={form.description}
+                            onChange={html => setForm(f => ({ ...f, description: html }))}
+                          />
+                        )}
+                      </div>
+                      
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <div className="md:col-span-2">
+                          <label htmlFor="model-category" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Category</label>
+                          <input id="model-category" name="category" value={form.category} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
+                        </div>
+                        <div>
+                          <label htmlFor="model-thumbnail-url" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Thumbnail URL</label>
+                          <input id="model-thumbnail-url" name="thumbnail_url" value={form.thumbnail_url} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
+                        </div>
+                        <div>
+                          <label htmlFor="model-file-url" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">File URL</label>
+                          <div className="flex gap-2">
+                            <input
+                              id="model-file-url"
+                              name="file_url"
+                              value={form.file_url}
+                              onChange={handleFormChange}
+                              className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white"
+                            />
+                            <input
+                              type="file"
+                              accept=".xlsx,.xls,.csv"
+                              style={{ display: 'none' }}
+                              id="model-file-upload"
+                              onChange={e => {
+                                if (e.target.files && e.target.files[0]) {
+                                  const file = e.target.files[0];
+                                  const url = `/models/${file.name}`;
+                                  setForm(f => ({ ...f, file_url: url }));
+                                }
+                              }}
+                            />
+                            <button
+                              type="button"
+                              className="bg-gray-200 dark:bg-navy-700 text-gray-700 dark:text-gray-200 px-2 py-1 rounded hover:bg-gray-300 dark:hover:bg-navy-600 text-xs"
+                              onClick={() => document.getElementById('model-file-upload').click()}
+                            >
+                              Browse
+                            </button>
+                          </div>
+                        </div>
+                        <div>
+                          <label htmlFor="model-price" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Price</label>
+                          <input id="model-price" name="price" value={form.price} onChange={handleFormChange} type="number" step="0.01" className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
+                        </div>
+                        <div>
+                          <label htmlFor="model-status" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Status</label>
+                          <select id="model-status" name="status" value={form.status} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white">
+                            <option value="active">Active</option>
+                            <option value="inactive">Inactive</option>
+                            <option value="archived">Archived</option>
+                          </select>
+                        </div>
+                        <div>
+                          <label htmlFor="model-tags" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Tags (comma separated)</label>
+                          <input id="model-tags" name="tags" value={form.tags} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
+                        </div>
+                        <div className="md:col-span-2">
+                          <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                            Excel File Upload
+                            <span className="text-xs text-gray-500 dark:text-gray-400 font-normal ml-2">(For interactive preview)</span>
+                          </label>
+                          <div className="space-y-3">
+                            <div className="flex gap-2">
+                              <input
+                                type="file"
+                                accept=".xlsx,.xls"
+                                onChange={(e) => {
+                                  if (e.target.files && e.target.files[0]) {
+                                    handleExcelUpload(e.target.files[0]);
+                                  }
+                                }}
+                                className="flex-1 px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                                disabled={uploading}
+                              />
+                              {uploading && (
+                                <div className="flex items-center">
+                                  <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-600"></div>
+                                </div>
+                              )}
+                            </div>
+
+                            {form.excel_url && newlyUploadedFile && (
+                              <div className="flex items-center p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                                <div className="flex items-center">
+                                  <svg className="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                                  </svg>
+                                  <span className="text-sm text-green-700 dark:text-green-300">Excel file uploaded successfully</span>
+                                </div>
+                              </div>
+                            )}
+                            {form.excel_url && !newlyUploadedFile && (
+                              <div className="flex items-center p-2 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg">
+                                <div className="flex items-center">
+                                  <svg className="w-4 h-4 text-blue-600 dark:text-blue-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                                  </svg>
+                                  <span className="text-xs text-blue-700 dark:text-blue-300">Excel file available for preview</span>
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() => setShowExcelPreview(!showExcelPreview)}
+                                  className={`ml-auto text-xs px-2 py-1 rounded transition-colors ${
+                                    showExcelPreview 
+                                      ? 'bg-gray-600 text-white hover:bg-gray-700' // Hide Preview - gray like close buttons
+                                      : 'bg-navy-700 text-white hover:bg-navy-800' // Preview Model - dark navy
+                                  }`}
+                                >
+                                  {showExcelPreview ? 'Hide Preview' : 'Preview Model'}
+                                </button>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+                      </div>
+                      {error && <div className="text-red-600 dark:text-red-400">{error}</div>}
+                      
+                      {/* Excel Preview Section - MOVED to appear after success banner */}
+                      {showExcelPreview && form.excel_url && isClient && (
+                        <div className="bg-white dark:bg-navy-800 p-6 rounded shadow border border-gray-200 dark:border-navy-700 space-y-4 mb-6" style={{ minHeight: '750px' }}>
+                          <div className="flex items-center justify-between">
+                            <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
+                              Model Viewer
+                            </h4>
+                            <button
+                              onClick={() => setShowExcelPreview(false)}
+                              className="text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors"
+                            >
+                              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                              </svg>
+                            </button>
+                          </div>
+                          <ExcelPreview
+                            file={form.excel_url}
+                            title={form.title || "Model Preview"}
+                            height="850px"
+                            preferInteractive={false}
+                          />
+                        </div>
+                      )}
+                      
+
+                      
+                      <div className="flex gap-2 pt-4">
+                        <button type="submit" className="bg-teal-600 dark:bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700 dark:hover:bg-teal-600" disabled={saving}>
+                          {saving ? 'Saving...' : (editModel ? 'Update' : 'Create')}
+                        </button>
+                        <button type="button" onClick={() => { setShowForm(false); setEditingModelId(null); }} className="bg-gray-200 dark:bg-navy-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-navy-600">
+                          Cancel
+                        </button>
+                      </div>
+                    </form>
+                  </div>
+                )}
+              </div>
             ))}
-          </tbody>
-        </table>
+          </div>
+        </div>
       )}
-      {showForm && (
+      {showForm && !editingModelId && (
         <form onSubmit={handleSubmit} className="bg-white dark:bg-navy-800 p-6 rounded shadow border border-gray-200 dark:border-navy-700 space-y-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
             <div>
-              <label htmlFor="model-title" className="block text-sm font-medium mb-1">Title</label>
+              <label htmlFor="model-title" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Title</label>
               <input id="model-title" name="title" value={form.title} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" required />
             </div>
             <div>
-              <label htmlFor="model-slug" className="block text-sm font-medium mb-1">Slug</label>
+              <label htmlFor="model-slug" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Slug</label>
               <input id="model-slug" name="slug" value={form.slug} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" required disabled={!!editModel} />
             </div>
+          </div>
+          
+          <div className="mb-6">
+            <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-2">Content</label>
+            {isClient && (
+              <RichTextEditor
+                key={editModel?.slug || 'new-model'}
+                initialContent={form.description}
+                onChange={html => setForm(f => ({ ...f, description: html }))}
+              />
+            )}
+          </div>
+          
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <div className="md:col-span-2">
-              <label htmlFor="model-description" className="block text-sm font-medium mb-1">Description</label>
-              <input id="model-description" name="description" value={form.description} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
-            </div>
-            <div>
-              <label htmlFor="model-category" className="block text-sm font-medium mb-1">Category</label>
+              <label htmlFor="model-category" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Category</label>
               <input id="model-category" name="category" value={form.category} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <label htmlFor="model-thumbnail-url" className="block text-sm font-medium mb-1">Thumbnail URL</label>
+              <label htmlFor="model-thumbnail-url" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Thumbnail URL</label>
               <input id="model-thumbnail-url" name="thumbnail_url" value={form.thumbnail_url} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <label htmlFor="model-file-url" className="block text-sm font-medium mb-1">File URL</label>
+              <label htmlFor="model-file-url" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">File URL</label>
               <div className="flex gap-2">
                 <input
                   id="model-file-url"
@@ -441,11 +872,11 @@ function ModelsAdmin() {
               </div>
             </div>
             <div>
-              <label htmlFor="model-price" className="block text-sm font-medium mb-1">Price</label>
+              <label htmlFor="model-price" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Price</label>
               <input id="model-price" name="price" value={form.price} onChange={handleFormChange} type="number" step="0.01" className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
             </div>
             <div>
-              <label htmlFor="model-status" className="block text-sm font-medium mb-1">Status</label>
+              <label htmlFor="model-status" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Status</label>
               <select id="model-status" name="status" value={form.status} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white">
                 <option value="active">Active</option>
                 <option value="inactive">Inactive</option>
@@ -453,14 +884,75 @@ function ModelsAdmin() {
               </select>
             </div>
             <div>
-              <label htmlFor="model-tags" className="block text-sm font-medium mb-1">Tags (comma separated)</label>
+              <label htmlFor="model-tags" className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">Tags (comma separated)</label>
               <input id="model-tags" name="tags" value={form.tags} onChange={handleFormChange} className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white" />
+            </div>
+            <div className="md:col-span-2">
+              <label className="block text-sm font-medium text-gray-700 dark:text-gray-200 mb-1">
+                Excel File Upload
+                <span className="text-xs text-gray-500 dark:text-gray-400 font-normal ml-2">(For interactive preview)</span>
+              </label>
+              <div className="space-y-3">
+                <div className="flex gap-2">
+                  <input
+                    type="file"
+                    accept=".xlsx,.xls"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleExcelUpload(e.target.files[0]);
+                      }
+                    }}
+                    className="flex-1 px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
+                    disabled={uploading}
+                  />
+                  {uploading && (
+                    <div className="flex items-center">
+                      <div className="animate-spin rounded-full h-5 w-5 border-b-2 border-teal-600"></div>
+                    </div>
+                  )}
+                </div>
+                {form.excel_url && (
+                  <div className="flex items-center justify-between p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm text-green-700 dark:text-green-300">Excel file uploaded successfully</span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setShowExcelPreview(!showExcelPreview)}
+                      className={`text-sm px-3 py-1 rounded border font-medium transition-colors ${
+                        showExcelPreview 
+                          ? 'bg-gray-600 text-white border-gray-600 hover:bg-gray-700' // Hide Preview - gray like close buttons
+                          : 'bg-navy-700 text-white border-navy-700 hover:bg-navy-800' // Show Preview - dark navy like Darkmode button
+                      }`}
+                    >
+                      {showExcelPreview ? 'Hide Preview' : 'Show Preview'}
+                    </button>
+                  </div>
+                )}
+                {form.excel_url && newlyUploadedFile && (
+                  <div className="flex items-center p-3 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <div className="flex items-center">
+                      <svg className="w-5 h-5 text-green-600 dark:text-green-400 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
+                      <span className="text-sm text-green-700 dark:text-green-300">Excel file uploaded successfully</span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
           {error && <div className="text-red-600 dark:text-red-400">{error}</div>}
-          <div className="flex gap-2">
-            <button type="submit" className="bg-teal-600 dark:bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700 dark:hover:bg-teal-600" disabled={saving}>{saving ? 'Saving...' : (editModel ? 'Update' : 'Create')}</button>
-            <button type="button" onClick={() => setShowForm(false)} className="bg-gray-200 dark:bg-navy-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-navy-600">Cancel</button>
+          <div className="flex gap-2 pt-4">
+            <button type="submit" className="bg-teal-600 dark:bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700 dark:hover:bg-teal-600" disabled={saving}>
+              {saving ? 'Saving...' : (editModel ? 'Update' : 'Create')}
+            </button>
+            <button type="button" onClick={() => { setShowForm(false); setEditingModelId(null); }} className="bg-gray-200 dark:bg-navy-700 text-gray-700 dark:text-gray-200 px-4 py-2 rounded hover:bg-gray-300 dark:hover:bg-navy-600">
+              Cancel
+            </button>
           </div>
         </form>
       )}

@@ -11,18 +11,63 @@ const SearchComponent = ({
   const [isOpen, setIsOpen] = useState(false);
   const [results, setResults] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
+  const [insights, setInsights] = useState([]);
+  const [models, setModels] = useState([]);
 
-  // Sample search data - in a real app, this would come from an API
-  const searchData = useMemo(() => [
-    { title: 'Commercial Acquisition Model', type: 'model', url: '/models/commercial-acquisition-model', description: 'Real estate acquisition analysis' },
-    { title: 'Tesla 3-Statement Model', type: 'model', url: '/models/tesla-3-statement-model', description: 'Financial modeling for Tesla' },
-    { title: 'DCF Valuation Suite', type: 'model', url: '/models/dcf-valuation-suite', description: 'Discounted cash flow models' },
-    { title: 'Financial Modeling Services', type: 'solution', url: '/solutions/financial-modeling', description: 'Custom financial modeling' },
-    { title: 'Investment Infrastructure', type: 'solution', url: '/solutions/infrastructure', description: 'End-to-end investment systems' },
-    { title: 'Industry Research', type: 'solution', url: '/solutions/research', description: 'Specialized market research' },
-    { title: 'AI Impact on SaaS Valuations', type: 'insight', url: '/insights/ai-impact-saas-valuations', description: 'Market analysis and trends' },
-    { title: 'Multifamily Investment Analysis', type: 'insight', url: '/insights/multifamily-investment-interest-rates', description: 'Interest rate impact study' },
-  ], []);
+  // Fetch insights and models on component mount
+  useEffect(() => {
+    fetchInsights();
+    fetchModels();
+  }, []);
+
+  const fetchInsights = async () => {
+    try {
+      const response = await fetch('/api/insights');
+      const data = await response.json();
+      setInsights(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching insights for search:', error);
+      setInsights([]);
+    }
+  };
+
+  const fetchModels = async () => {
+    try {
+      const response = await fetch('/api/models');
+      const data = await response.json();
+      setModels(Array.isArray(data) ? data : []);
+    } catch (error) {
+      console.error('Error fetching models for search:', error);
+      setModels([]);
+    }
+  };
+
+  // Dynamic search data that includes real insights and models from the database
+  const searchData = useMemo(() => {
+    const staticData = [
+      { title: 'Financial Modeling Services', type: 'solution', url: '/solutions/financial-modeling', description: 'Custom financial modeling' },
+      { title: 'Investment Infrastructure', type: 'solution', url: '/solutions/infrastructure', description: 'End-to-end investment systems' },
+      { title: 'Industry Research', type: 'solution', url: '/solutions/research', description: 'Specialized market research' },
+    ];
+
+    // Add real models from the database
+    const modelData = models.map(model => ({
+      title: model.title,
+      type: 'model',
+      url: `/models/${model.slug}`,
+      description: model.description || 'Financial model and analysis tool'
+    }));
+
+    // Add real insights from the database
+    const insightData = insights.map(insight => ({
+      title: insight.title,
+      type: 'insight',
+      url: `/insights/${insight.slug}`,
+      description: insight.summary || 'Investment insight and analysis'
+    }));
+
+    return [...staticData, ...modelData, ...insightData];
+  }, [insights, models]);
 
   // Debounced search function
   const debouncedSearch = useCallback(

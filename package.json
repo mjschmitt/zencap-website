@@ -35,9 +35,12 @@
     "@tiptap/starter-kit": "^3.0.1",
     "@vercel/postgres": "^0.10.0",
     "critters": "^0.0.23",
+    "dotenv": "^17.2.0",
+    "formidable": "^3.5.4",
     "framer-motion": "^12.6.2",
     "lexical": "^0.33.1",
     "lowlight": "^3.3.0",
+    "luckysheet": "^2.1.13",
     "next": "15.2.3",
     "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
@@ -48,7 +51,10 @@
     "recharts": "^3.1.0",
     "rehype-highlight": "^7.0.2",
     "remark-gfm": "^4.0.1",
-    "web-vitals": "^4.2.4"
+    "web-vitals": "^4.2.4",
+    "xlsx": "^0.18.5",
+    "exceljs": "^4.4.0",
+    "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",

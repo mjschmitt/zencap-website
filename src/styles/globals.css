@@ -26,7 +26,8 @@ a:hover {
 }
 
 button, .button {
-  background-color: #ffd700;
+  /* Remove default yellow background */
+  /* background-color: #ffd700; */
   color: #1a3a5f;
   border: none;
   padding: 0.5rem 1rem;
@@ -205,4 +206,30 @@ h6 span[data-custom-color="true"],
 
 .article-content em {
   @apply italic text-gray-900 dark:text-gray-100;
+}
+
+/* Excel Viewer specific overrides to prevent yellow colors */
+.exceljs-viewer button,
+.excel-preview-container button {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+.exceljs-viewer button:hover,
+.excel-preview-container button:hover {
+  background-color: rgba(75, 85, 99, 0.1) !important; /* gray-600 with opacity */
+  color: rgb(55, 65, 81) !important; /* gray-700 */
+}
+
+/* Ensure sheet tabs use darker grey colors */
+.exceljs-viewer button[class*="bg-gray-700"] {
+  background-color: rgb(55, 65, 81) !important; /* gray-700 */
+  color: white !important;
+}
+
+/* Override any default focus styles */
+.exceljs-viewer button:focus,
+.excel-preview-container button:focus {
+  outline: 2px solid rgb(55, 65, 81) !important; /* gray-700 */
+  outline-offset: 2px !important;
 }

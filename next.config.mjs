@@ -21,6 +21,41 @@ const nextConfig = {
     optimizeCss: true,
     optimizePackageImports: ['framer-motion'],
   },
+
+  // Webpack configuration for better chunk handling
+  webpack: (config, { isServer }) => {
+    // Optimize chunk splitting for better loading
+    config.optimization.splitChunks = {
+      chunks: 'all',
+      cacheGroups: {
+        default: false,
+        vendors: false,
+        // Create a separate chunk for ExcelJS
+        exceljs: {
+          name: 'exceljs',
+          chunks: 'all',
+          test: /[\\/]node_modules[\\/]exceljs[\\/]/,
+          priority: 20,
+          enforce: true,
+        },
+        // Create a separate chunk for other large libraries
+        vendor: {
+          name: 'vendor',
+          chunks: 'all',
+          test: /[\\/]node_modules[\\/]/,
+          priority: 10,
+          enforce: true,
+        },
+      },
+    };
+
+    // Improve chunk loading reliability
+    config.output.chunkFilename = isServer 
+      ? 'static/chunks/[id].js'
+      : 'static/chunks/[name].[chunkhash].js';
+
+    return config;
+  },
   
   // Headers for caching and security
   async headers() {

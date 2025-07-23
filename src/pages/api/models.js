@@ -22,11 +22,11 @@ export default async function handler(req, res) {
 
   if (method === 'POST') {
     // Create a new model
-    const { slug, title, description, category, thumbnail_url, file_url, price, status, tags } = req.body;
+    const { slug, title, description, category, thumbnail_url, file_url, price, status, tags, excel_url } = req.body;
     try {
       const result = await sql`
-        INSERT INTO models (slug, title, description, category, thumbnail_url, file_url, price, status, tags)
-        VALUES (${slug}, ${title}, ${description}, ${category}, ${thumbnail_url}, ${file_url}, ${price}, ${status || 'active'}, ${tags})
+        INSERT INTO models (slug, title, description, category, thumbnail_url, file_url, price, status, tags, excel_url)
+        VALUES (${slug}, ${title}, ${description}, ${category}, ${thumbnail_url}, ${file_url}, ${price}, ${status || 'active'}, ${tags}, ${excel_url || null})
         RETURNING *;
       `;
       return res.status(201).json(result.rows[0]);
@@ -50,6 +50,7 @@ export default async function handler(req, res) {
           price = ${fields.price},
           status = ${fields.status},
           tags = ${fields.tags},
+          excel_url = ${fields.excel_url || null},
           updated_at = CURRENT_TIMESTAMP
         WHERE slug = ${slug}
         RETURNING *;

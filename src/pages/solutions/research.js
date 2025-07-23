@@ -1,4 +1,5 @@
 // src/pages/solutions/research.js - with larger hero background
+import { useEffect, useState } from 'react';
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
 import Motion from '@/components/ui/Motion';
@@ -6,8 +7,55 @@ import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
 import Image from 'next/image';
 import Link from 'next/link';
+import { FiCalendar, FiClock } from 'react-icons/fi';
 
 export default function IndustryResearch() {
+  const [insights, setInsights] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchInsights();
+  }, []);
+
+  const fetchInsights = async () => {
+    try {
+      const response = await fetch('/api/insights');
+      const data = await response.json();
+      setInsights(Array.isArray(data) ? data.slice(0, 3) : []); // Limit to 3 most recent
+      setLoading(false);
+    } catch (error) {
+      console.error('Error fetching insights:', error);
+      setInsights([]);
+      setLoading(false);
+    }
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return 'No date';
+    
+    try {
+      const date = new Date(dateString);
+      if (isNaN(date.getTime())) return 'Invalid date';
+      
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        timeZone: 'UTC'
+      });
+    } catch (error) {
+      return 'Invalid date';
+    }
+  };
+
+  const estimateReadTime = (content) => {
+    if (!content) return '5 min read';
+    const wordsPerMinute = 200;
+    const wordCount = content.split(/\s+/).length;
+    const minutes = Math.ceil(wordCount / wordsPerMinute);
+    return `${minutes} min read`;
+  };
+
   // Structured data for rich search results
   const structuredData = {
     "@context": "https://schema.org",
@@ -51,7 +99,7 @@ export default function IndustryResearch() {
           
           <Motion animation="fade" direction="up" delay={200} duration={800}>
             <p className="text-xl md:text-2xl text-gray-200 mb-8 max-w-3xl mx-auto">
-              Deep sector expertise and analytical insights to enhance your investment decision-making and identify emerging opportunities
+              Deep sector expertise and analytical insights for better investment decisions
             </p>
           </Motion>
           
@@ -641,7 +689,7 @@ export default function IndustryResearch() {
         </div>
       </section>
       
-      {/* Related Insights */}
+      {/* Latest Research Insights */}
       <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
@@ -655,81 +703,99 @@ export default function IndustryResearch() {
             </div>
           </Motion>
           
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
-            <Motion animation="fade" direction="up" delay={200}>
-              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                  [AI Impact Research Preview]
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
-                    AI Impact on SaaS Valuations
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                    How AI capabilities are reshaping valuation multiples for software companies, with a proposed framework for measuring AI-driven value creation.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">March 2025</span>
-                    <Link href="/insights/ai-impact-saas-valuations" className="text-sm text-teal-600 dark:text-teal-400 font-medium">
-                      Read More
-                    </Link>
-                  </div>
-                </div>
-              </Card>
-            </Motion>
-            
-            <Motion animation="fade" direction="up" delay={300}>
-              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                  [Semiconductor Supply Chain Preview]
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
-                    Semiconductor Supply Chain Resilience
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                    Examining how geopolitical tensions and reshoring efforts are transforming semiconductor manufacturing investments.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">March 2025</span>
-                    <Link href="/insights/semiconductor-supply-chain-resilience" className="text-sm text-teal-600 dark:text-teal-400 font-medium">
-                      Read More
-                    </Link>
-                  </div>
-                </div>
-              </Card>
-            </Motion>
-            
-            <Motion animation="fade" direction="up" delay={400}>
-              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                  [Data Centers Research Preview]
-                </div>
-                <div className="p-6">
-                  <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
-                    Data Centers: The New Essential CRE
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                    How AI computing demands are driving unprecedented growth in data center development and creating compelling investment opportunities.
-                  </p>
-                  <div className="flex items-center justify-between">
-                    <span className="text-xs text-gray-500 dark:text-gray-400">March 2025</span>
-                    <Link href="/insights/commercial-real-estate-data-centers" className="text-sm text-teal-600 dark:text-teal-400 font-medium">
-                      Read More
-                    </Link>
-                  </div>
-                </div>
-              </Card>
-            </Motion>
-          </div>
-          
-          <Motion animation="fade" direction="up" delay={500}>
-            <div className="text-center mt-8">
-              <Button href="/insights" variant="primary" size="lg">
-                View All Insights
-              </Button>
+          {loading ? (
+            <div className="flex justify-center items-center py-20">
+              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-teal-500"></div>
             </div>
-          </Motion>
+          ) : insights.length === 0 ? (
+            <Motion animation="fade" direction="up">
+              <div className="text-center py-12">
+                <div className="bg-white dark:bg-navy-800 rounded-xl p-8 shadow-sm border border-gray-100 dark:border-navy-700">
+                  <h3 className="text-xl font-semibold text-navy-700 dark:text-white mb-2">
+                    No insights available
+                  </h3>
+                  <p className="text-gray-600 dark:text-gray-300 mb-6">
+                    Check back soon for new insights and analysis from our research team.
+                  </p>
+                  <Button href="/insights" variant="primary">
+                    View All Insights
+                  </Button>
+                </div>
+              </div>
+            </Motion>
+          ) : (
+            <>
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+                {insights.map((insight, index) => (
+                  <Motion key={insight.id} animation="fade" direction="up" delay={200 + (index * 100)}>
+                    <Link href={`/insights/${insight.slug}`}>
+                      <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800 cursor-pointer group">
+                        {/* Cover Image */}
+                        {insight.cover_image_url ? (
+                          <div className="aspect-w-16 aspect-h-9 overflow-hidden">
+                            <img 
+                              src={insight.cover_image_url} 
+                              alt={insight.title}
+                              className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
+                            />
+                          </div>
+                        ) : (
+                          <div className="h-48 bg-gradient-to-br from-teal-500 to-navy-600 flex items-center justify-center">
+                            <span className="text-white text-4xl font-bold opacity-20">
+                              {insight.title.charAt(0)}
+                            </span>
+                          </div>
+                        )}
+                        
+                        <div className="p-6">
+                          {/* Category Tag */}
+                          {insight.tags && (
+                            <div className="mb-3">
+                              <span className="inline-block px-3 py-1 bg-teal-50 dark:bg-teal-900/20 text-teal-600 dark:text-teal-400 text-xs font-medium rounded-full">
+                                {insight.tags.split(',')[0].trim()}
+                              </span>
+                            </div>
+                          )}
+                          
+                          <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors line-clamp-2">
+                            {insight.title}
+                          </h3>
+                          <p className="text-gray-600 dark:text-gray-300 text-sm mb-4 line-clamp-3">
+                            {insight.summary || 'Explore our latest insights and analysis on investment strategies and market trends.'}
+                          </p>
+                          
+                          {/* Meta Information */}
+                          <div className="flex items-center justify-between text-xs text-gray-500 dark:text-gray-400">
+                            <div className="flex items-center space-x-3">
+                              <div className="flex items-center">
+                                <FiCalendar className="w-3 h-3 mr-1" />
+                                <span>{formatDate(insight.date_published)}</span>
+                              </div>
+                              <div className="flex items-center">
+                                <FiClock className="w-3 h-3 mr-1" />
+                                <span>{estimateReadTime(insight.content)}</span>
+                              </div>
+                            </div>
+                            <span className="text-teal-600 dark:text-teal-400 font-medium">
+                              Read More
+                            </span>
+                          </div>
+                        </div>
+                      </Card>
+                    </Link>
+                  </Motion>
+                ))}
+              </div>
+              
+              <Motion animation="fade" direction="up" delay={500}>
+                <div className="text-center mt-8">
+                  <Button href="/insights" variant="primary" size="lg">
+                    View All Insights
+                  </Button>
+                </div>
+              </Motion>
+            </>
+          )}
         </div>
       </section>
       

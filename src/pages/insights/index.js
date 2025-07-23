@@ -77,12 +77,22 @@ export default function InsightsPage() {
   };
 
   const formatDate = (dateString) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('en-US', { 
-      year: 'numeric', 
-      month: 'long', 
-      day: 'numeric' 
-    });
+    if (!dateString) return 'No date';
+    
+    try {
+      const date = new Date(dateString);
+      // Check if date is valid
+      if (isNaN(date.getTime())) return 'Invalid date';
+      
+      return date.toLocaleDateString('en-US', { 
+        year: 'numeric', 
+        month: 'long', 
+        day: 'numeric',
+        timeZone: 'UTC' // Use UTC to avoid timezone conversion issues
+      });
+    } catch (error) {
+      return 'Invalid date';
+    }
   };
 
   const estimateReadTime = (content) => {
@@ -195,7 +205,7 @@ export default function InsightsPage() {
                             <div className="flex items-center space-x-4">
                               <div className="flex items-center">
                                 <FiCalendar className="w-4 h-4 mr-1" />
-                                <span>{formatDate(insight.published_at)}</span>
+                                <span>{formatDate(insight.date_published)}</span>
                               </div>
                               <div className="flex items-center">
                                 <FiClock className="w-4 h-4 mr-1" />
@@ -358,7 +368,7 @@ export default function InsightsPage() {
                           <div className="flex items-center space-x-4">
                             <div className="flex items-center">
                               <FiCalendar className="w-4 h-4 mr-1" />
-                              <span>{formatDate(insight.published_at)}</span>
+                              <span>{formatDate(insight.date_published)}</span>
                             </div>
                             <div className="flex items-center">
                               <FiClock className="w-4 h-4 mr-1" />

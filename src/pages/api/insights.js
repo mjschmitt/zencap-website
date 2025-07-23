@@ -13,11 +13,11 @@ export default async function handler(req, res) {
         return res.status(200).json(result.rows[0]);
       } else if (admin === 'true') {
         // Admin: return all insights
-        const result = await sql`SELECT * FROM insights ORDER BY published_at DESC, created_at DESC`;
+        const result = await sql`SELECT * FROM insights ORDER BY date_published DESC, published_at DESC, created_at DESC`;
         return res.status(200).json(result.rows);
       } else {
         // Public: only published
-        const result = await sql`SELECT * FROM insights WHERE status = 'published' ORDER BY published_at DESC`;
+        const result = await sql`SELECT * FROM insights WHERE status = 'published' ORDER BY date_published DESC, published_at DESC`;
         return res.status(200).json(result.rows);
       }
     } catch (e) {
@@ -27,7 +27,7 @@ export default async function handler(req, res) {
 
   if (method === 'POST') {
     // Create a new insight
-    let { slug, title, summary, content, author, cover_image_url, status, tags } = req.body;
+    let { slug, title, summary, content, author, cover_image_url, status, tags, date_published } = req.body;
     // Provide default values for optional fields
     summary = summary || '';
     content = content || '';
@@ -35,10 +35,11 @@ export default async function handler(req, res) {
     cover_image_url = cover_image_url || '';
     status = status || 'draft';
     tags = tags || '';
+    date_published = date_published || null;
     try {
       const result = await sql`
-        INSERT INTO insights (slug, title, summary, content, author, cover_image_url, status, tags)
-        VALUES (${slug}, ${title}, ${summary}, ${content}, ${author}, ${cover_image_url}, ${status}, ${tags})
+        INSERT INTO insights (slug, title, summary, content, author, cover_image_url, status, tags, date_published)
+        VALUES (${slug}, ${title}, ${summary}, ${content}, ${author}, ${cover_image_url}, ${status}, ${tags}, ${date_published})
         RETURNING *;
       `;
       return res.status(201).json(result.rows[0]);
@@ -59,6 +60,7 @@ export default async function handler(req, res) {
     fields.cover_image_url = fields.cover_image_url || '';
     fields.status = fields.status || 'draft';
     fields.tags = fields.tags || '';
+    fields.date_published = fields.date_published || null;
     try {
       const result = await sql`
         UPDATE insights SET 
@@ -69,6 +71,7 @@ export default async function handler(req, res) {
           cover_image_url = ${fields.cover_image_url},
           status = ${fields.status},
           tags = ${fields.tags},
+          date_published = ${fields.date_published},
           updated_at = CURRENT_TIMESTAMP
         WHERE slug = ${slug}
         RETURNING *;

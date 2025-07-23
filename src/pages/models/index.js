@@ -7,142 +7,6 @@ import Motion from '@/components/ui/Motion';
 import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
 
-// Sample models data - organized by category
-const MODELS = [
-  // Private Equity Models
-  {
-    id: 'multifamily-development-model',
-    slug: 'multifamily-development-model',
-    title: 'Multifamily Development Model',
-    excerpt: 'Comprehensive ground-up development modeling for multifamily projects with detailed construction budgeting and lease-up scenarios.',
-    category: 'Private Equity',
-    price: 4985,
-    imagePlaceholder: 'Multifamily Development Preview',
-    featured: true
-  },
-  {
-    id: 'multifamily-acquisition-model',
-    slug: 'multifamily-acquisition-model',
-    title: 'Multifamily Acquisition Model',
-    excerpt: 'Comprehensive underwriting for apartment complexes with unit-level analysis, renovation scenarios, and financing options.',
-    category: 'Private Equity',
-    price: 4985,
-    imagePlaceholder: 'Multifamily Acquisition Preview',
-    featured: true
-  },
-  {
-    id: 'mixed-use-development-model',
-    slug: 'mixed-use-development-model',
-    title: 'Mixed-Use Development Model',
-    excerpt: 'Ground-up development analysis for mixed-use projects combining retail, office, residential, and other property types.',
-    category: 'Private Equity',
-    price: 4985,
-    imagePlaceholder: 'Mixed-Use Development Preview',
-    featured: false
-  },
-  {
-    id: 'mixed-use-acquisition-model',
-    slug: 'mixed-use-acquisition-model',
-    title: 'Mixed-Use Acquisition Model',
-    excerpt: 'Acquisition analysis for properties with multiple components including retail, office, residential, and other property types.',
-    category: 'Private Equity',
-    price: 4985,
-    imagePlaceholder: 'Mixed-Use Acquisition Preview',
-    featured: false
-  },
-  {
-    id: 'commercial-development-model',
-    slug: 'commercial-development-model',
-    title: 'Commercial Development Model',
-    excerpt: 'Development underwriting for office, retail, industrial and other commercial property types with detailed construction tracking.',
-    category: 'Private Equity',
-    price: 4985,
-    imagePlaceholder: 'Commercial Development Preview',
-    featured: false
-  },
-  {
-    id: 'commercial-acquisition-model',
-    slug: 'commercial-acquisition-model',
-    title: 'Commercial Acquisition Model',
-    excerpt: 'Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for commercial property investments.',
-    category: 'Private Equity',
-    price: 4985,
-    imagePlaceholder: 'Commercial Acquisition Preview',
-    featured: false
-  },
-  {
-    id: 'hospitality-development-model',
-    slug: 'hospitality-development-model',
-    title: 'Hospitality Development Model',
-    excerpt: 'Ground-up development modeling for hotel and resort properties with ADR, occupancy, and departmental revenue/expense projections.',
-    category: 'Private Equity',
-    price: 4985,
-    imagePlaceholder: 'Hospitality Development Preview',
-    featured: false
-  },
-  {
-    id: 'hospitality-acquisition-model',
-    slug: 'hospitality-acquisition-model',
-    title: 'Hospitality Acquisition Model',
-    excerpt: 'Acquisition analysis for hotel and resort properties with RevPAR modeling, brand conversion scenarios, and renovation budgeting.',
-    category: 'Private Equity',
-    price: 4985,
-    imagePlaceholder: 'Hospitality Acquisition Preview',
-    featured: false
-  },
-  
-  // Public Equity Models
-  {
-    id: 'applovin-3-statement-model',
-    slug: 'applovin-3-statement-model',
-    title: 'AppLovin (APP) 3-Statement Model',
-    excerpt: 'Comprehensive financial model for AppLovin Corporation with integrated income statement, balance sheet, and cash flow projections.',
-    category: 'Public Equity',
-    price: 4985,
-    imagePlaceholder: 'AppLovin Model Preview',
-    featured: true
-  },
-  {
-    id: 'nvidia-3-statement-model',
-    slug: 'nvidia-3-statement-model',
-    title: 'NVIDIA (NVDA) 3-Statement Model',
-    excerpt: 'Integrated financial model for NVIDIA Corporation with segment analysis, growth projections, and valuation framework.',
-    category: 'Public Equity',
-    price: 4985,
-    imagePlaceholder: 'NVIDIA Model Preview',
-    featured: true
-  },
-  {
-    id: 'tesla-3-statement-model',
-    slug: 'tesla-3-statement-model',
-    title: 'Tesla (TSLA) 3-Statement Model',
-    excerpt: 'Detailed financial model for Tesla, Inc. with vehicle delivery forecasts, energy business projections, and manufacturing expansion analysis.',
-    category: 'Public Equity',
-    price: 4985,
-    imagePlaceholder: 'Tesla Model Preview',
-    featured: false
-  },
-  {
-    id: 'dcf-valuation-suite',
-    slug: 'dcf-valuation-suite',
-    title: 'DCF Valuation Suite',
-    excerpt: 'Comprehensive discounted cash flow analysis for public companies with integrated financial statement projections.',
-    category: 'Public Equity',
-    price: 2985,
-    imagePlaceholder: 'DCF Model Preview',
-    featured: false
-  },
-  {
-    id: 'portfolio-attribution-model',
-    slug: 'portfolio-attribution-model',
-    title: 'Portfolio Attribution Model',
-    excerpt: 'Analyze performance drivers and attribution factors across investment positions.',
-    category: 'Public Equity',
-    price: 2985,
-    imagePlaceholder: 'Portfolio Model Preview',
-    featured: false
-  }
-];
 
 // Categories for filtering
 const CATEGORIES = [
@@ -169,16 +33,16 @@ export default function Models() {
 
   // Filter models based on selected category
   const filteredModels = activeCategory === 'all'
-    ? MODELS
-    : MODELS.filter(model => {
+    ? models
+    : models.filter(model => {
         if (activeCategory === 'private-equity') return model.category === 'Private Equity';
         if (activeCategory === 'public-equity') return model.category === 'Public Equity';
         return false;
       });
   
-  // Separate featured and regular models
-  const featuredModels = filteredModels.filter(model => model.featured);
-  const regularModels = filteredModels.filter(model => !model.featured);
+  // Separate featured and regular models (mark first 2 in each category as featured)
+  const featuredModels = filteredModels.slice(0, 2);
+  const regularModels = filteredModels.slice(2);
   
   // Structured data for rich search results
   const structuredData = {
@@ -269,23 +133,33 @@ export default function Models() {
                 <Motion key={model.id} animation="fade" direction="up" delay={200} className="h-full">
                   <Link href={`/models/${model.slug}`} className="block h-full">
                     <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                      <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                        [{model.imagePlaceholder}]
-                      </div>
+                      {model.thumbnail_url ? (
+                        <div className="aspect-w-16 aspect-h-9 overflow-hidden">
+                          <img 
+                            src={model.thumbnail_url} 
+                            alt={model.title}
+                            className="w-full h-48 object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                          [{model.title} Preview]
+                        </div>
+                      )}
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-3">
                           <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
                             {model.category}
                           </span>
                           <span className="text-lg font-bold text-teal-500">
-                            ${model.price.toLocaleString()}
+                            ${model.price?.toLocaleString() || 'Contact'}
                           </span>
                         </div>
                         <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
                           {model.title}
                         </h3>
                         <p className="text-gray-600 dark:text-gray-300 mb-4">
-                          {model.excerpt}
+                          {model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : 'Professional financial model for investment analysis.'}
                         </p>
                         <div className="flex items-center justify-between">
                           <span className="text-sm text-teal-600 dark:text-teal-400 font-medium">
@@ -320,23 +194,33 @@ export default function Models() {
                 <Motion key={model.id} animation="fade" direction="up" delay={200} className="h-full">
                   <Link href={`/models/${model.slug}`} className="block h-full">
                     <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                      <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
-                        [{model.imagePlaceholder}]
-                      </div>
+                      {model.thumbnail_url ? (
+                        <div className="aspect-w-16 aspect-h-9 overflow-hidden">
+                          <img 
+                            src={model.thumbnail_url} 
+                            alt={model.title}
+                            className="w-full h-48 object-cover"
+                          />
+                        </div>
+                      ) : (
+                        <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                          [{model.title} Preview]
+                        </div>
+                      )}
                       <div className="p-6">
                         <div className="flex items-center justify-between mb-3">
                           <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
                             {model.category}
                           </span>
                           <span className="text-lg font-bold text-teal-500">
-                            ${model.price.toLocaleString()}
+                            ${model.price?.toLocaleString() || 'Contact'}
                           </span>
                         </div>
                         <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
                           {model.title}
                         </h3>
                         <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                          {model.excerpt}
+                          {model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : 'Professional financial model for investment analysis.'}
                         </p>
                         <div className="flex items-center justify-between mt-auto">
                           <span className="text-sm text-teal-600 dark:text-teal-400 font-medium">
