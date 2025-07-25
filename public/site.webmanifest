@@ -1,0 +1,16 @@
+{
+  "name": "ZenCap Financial Models",
+  "short_name": "ZenCap",
+  "description": "Professional financial modeling and investment analysis platform",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#0f766e",
+  "icons": [
+    {
+      "src": "/favicon.ico",
+      "sizes": "any",
+      "type": "image/x-icon"
+    }
+  ]
+} 

@@ -664,19 +664,19 @@ function ModelsAdmin() {
                               onChange={handleFormChange}
                               className="w-full px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white"
                             />
-                            <input
-                              type="file"
-                              accept=".xlsx,.xls,.csv"
-                              style={{ display: 'none' }}
-                              id="model-file-upload"
-                              onChange={e => {
-                                if (e.target.files && e.target.files[0]) {
-                                  const file = e.target.files[0];
-                                  const url = `/models/${file.name}`;
-                                  setForm(f => ({ ...f, file_url: url }));
-                                }
-                              }}
-                            />
+                                            <input
+                  type="file"
+                  accept=".xlsx,.xls,.xlsm,.csv"
+                  style={{ display: 'none' }}
+                  id="model-file-upload"
+                  onChange={e => {
+                    if (e.target.files && e.target.files[0]) {
+                      const file = e.target.files[0];
+                      const url = `/models/${file.name}`;
+                      setForm(f => ({ ...f, file_url: url }));
+                    }
+                  }}
+                />
                             <button
                               type="button"
                               className="bg-gray-200 dark:bg-navy-700 text-gray-700 dark:text-gray-200 px-2 py-1 rounded hover:bg-gray-300 dark:hover:bg-navy-600 text-xs"
@@ -709,14 +709,14 @@ function ModelsAdmin() {
                           </label>
                           <div className="space-y-3">
                             <div className="flex gap-2">
-                              <input
-                                type="file"
-                                accept=".xlsx,.xls"
-                                onChange={(e) => {
-                                  if (e.target.files && e.target.files[0]) {
-                                    handleExcelUpload(e.target.files[0]);
-                                  }
-                                }}
+                                                <input
+                    type="file"
+                    accept=".xlsx,.xls,.xlsm"
+                    onChange={(e) => {
+                      if (e.target.files && e.target.files[0]) {
+                        handleExcelUpload(e.target.files[0]);
+                      }
+                    }}
                                 className="flex-1 px-3 py-2 rounded border border-gray-300 dark:border-navy-600 bg-gray-50 dark:bg-navy-700 text-gray-900 dark:text-white file:mr-3 file:py-1 file:px-3 file:rounded file:border-0 file:text-sm file:font-medium file:bg-teal-50 file:text-teal-700 hover:file:bg-teal-100"
                                 disabled={uploading}
                               />
@@ -851,7 +851,7 @@ function ModelsAdmin() {
                 />
                 <input
                   type="file"
-                  accept=".xlsx,.xls,.csv"
+                  accept=".xlsx,.xls,.xlsm,.csv"
                   style={{ display: 'none' }}
                   id="model-file-upload"
                   onChange={e => {
@@ -896,7 +896,7 @@ function ModelsAdmin() {
                 <div className="flex gap-2">
                   <input
                     type="file"
-                    accept=".xlsx,.xls"
+                    accept=".xlsx,.xls,.xlsm"
                     onChange={(e) => {
                       if (e.target.files && e.target.files[0]) {
                         handleExcelUpload(e.target.files[0]);

@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(node:*)",
+      "Bash(rm:*)",
+      "Bash(del debug-font-color.js)",
+      "Bash(del debug-row-heights.js)",
+      "Bash(git add:*)",
+      "Bash(npm run dev:*)",
+      "Bash(ls:*)",
+      "Bash(npm:*)",
+      "Bash(git --version)",
+      "Bash(git checkout:*)",
+      "Bash(npx eslint:*)"
+    ],
+    "deny": []
+  }
+}

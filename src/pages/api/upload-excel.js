@@ -27,14 +27,15 @@ export default async function handler(req, res) {
       keepExtensions: true,
       maxFileSize: 50 * 1024 * 1024, // 50MB limit
       filter: function ({ name, originalFilename, mimetype }) {
-        // Only allow Excel files
+        // Only allow Excel files (including macro-enabled)
         const allowedTypes = [
           'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
           'application/vnd.ms-excel', // .xls
+          'application/vnd.ms-excel.sheet.macroEnabled.12', // .xlsm (macro-enabled)
           'application/octet-stream' // Sometimes Excel files come through as this
         ];
         
-        const allowedExtensions = ['.xlsx', '.xls'];
+        const allowedExtensions = ['.xlsx', '.xls', '.xlsm'];
         const fileExtension = path.extname(originalFilename || '').toLowerCase();
         
         return allowedTypes.includes(mimetype) || allowedExtensions.includes(fileExtension);
@@ -52,10 +53,10 @@ export default async function handler(req, res) {
     const fileExtension = path.extname(originalFilename).toLowerCase();
 
     // Validate file extension
-    if (!['.xlsx', '.xls'].includes(fileExtension)) {
+    if (!['.xlsx', '.xls', '.xlsm'].includes(fileExtension)) {
       // Clean up uploaded file
       fs.unlinkSync(uploadedFile.filepath);
-      return res.status(400).json({ error: 'Invalid file type. Please upload an Excel file (.xlsx or .xls)' });
+      return res.status(400).json({ error: 'Invalid file type. Please upload an Excel file (.xlsx, .xls, or .xlsm)' });
     }
 
     // Generate unique filename

@@ -374,7 +374,71 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       formatInfo.decimalPlaces = 1;
     }
 
+    // ENHANCED: Handle custom text patterns with quoted strings
+    // Excel format: "text"# or "Before "#" After" etc.
+    const textQuotePattern = /"([^"]*)"/g;
+    const textMatches = [];
+    let match;
+    while ((match = textQuotePattern.exec(positiveFormat)) !== null) {
+      textMatches.push(match[1]);
+    }
+    
+    if (textMatches.length > 0) {
+      formatInfo.hasCustomText = true;
+      formatInfo.customTextPattern = positiveFormat;
+      formatInfo.textParts = textMatches;
+      
+      // Still parse numeric formatting within the custom text pattern
+      // Look for number patterns like #, 0, #,##0, etc.
+      const numericPart = positiveFormat.replace(/"[^"]*"/g, ''); // Remove quoted text
+      if (numericPart.includes('.')) {
+        const decimalMatch = numericPart.match(/0\.(0+)|#\.(#+)|\.(0+)|\.(#+)/);
+        if (decimalMatch) {
+          const decimalPart = decimalMatch[1] || decimalMatch[2] || decimalMatch[3] || decimalMatch[4] || '';
+          formatInfo.decimalPlaces = decimalPart.length;
+        }
+      } else if (numericPart.includes('#') || numericPart.includes('0')) {
+        formatInfo.decimalPlaces = 0; // Integer format in custom text
+      }
+      
+      if (numericPart.includes(',') || numericPart.includes('#,##')) {
+        formatInfo.hasThousandsSeparator = true;
+      }
+    }
+
     return formatInfo;
+  }, []);
+
+  // ENHANCED: Apply Excel custom text formatting patterns
+  const applyExcelCustomTextFormat = useCallback((value, pattern, formatInfo) => {
+    if (typeof value !== 'number' || isNaN(value)) {
+      return String(value);
+    }
+
+    // Format the number part first
+    let formattedNumber;
+    if (formatInfo.hasThousandsSeparator) {
+      formattedNumber = value.toLocaleString('en-US', {
+        minimumFractionDigits: formatInfo.decimalPlaces,
+        maximumFractionDigits: formatInfo.decimalPlaces
+      });
+    } else {
+      formattedNumber = formatInfo.decimalPlaces > 0 
+        ? value.toFixed(formatInfo.decimalPlaces)
+        : Math.round(value).toString();
+    }
+
+    // Replace Excel format codes with actual values
+    let result = pattern;
+    
+    // Replace number format codes with the formatted number
+    // Handle various Excel number format codes: #, 0, #,##0, 0.00, etc.
+    result = result.replace(/#,##0\.0+|#,##0|0\.0+|#+\.#+|0+|#+/g, formattedNumber);
+    
+    // Remove quote marks from text literals
+    result = result.replace(/\"/g, '');
+    
+    return result;
   }, []);
 
   // ENHANCED format cell value using the comprehensive parser
@@ -441,8 +505,123 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       }
     }
 
+    // PRIORITY 1: Force create navigation buttons FIRST before any other detection
+    const cellRow = (cell.row || 0) + 1;
+    const cellCol = (cell.col || 0) + 1; 
+    const isTopArea = (cell.row || 0) < 10;
+    
+    // FORCE CREATE ALL 6 NAVIGATION BUTTONS at row 4, columns 3-8 (HIGHEST PRIORITY)
+    // Positioned at row 4 to avoid overlapping header text
+    if (isTopArea && cellRow === 4 && cellCol >= 3 && cellCol <= 8) {
+      const forcedNavButtons = {
+        3: 'Description',      // Column C (index 3)
+        4: 'Investment',       // Column D (index 4)
+        5: 'Operations',       // Column E (index 5)
+        6: 'Reversion (Sale)', // Column F (index 6)
+        7: 'Returns',          // Column G (index 7)
+        8: 'Sensitivity'       // Column H (index 8)
+      };
+      
+      if (forcedNavButtons[cellCol]) {
+        console.log(`🔘 PRIORITY: Creating nav button ${forcedNavButtons[cellCol]} at row 4, col ${cellCol}`);
+        return `🔘 ${forcedNavButtons[cellCol]}`;
+      }
+    }
+
     // Handle objects and JSON strings - ENHANCED to avoid raw JSON display
     if (typeof cell.value === 'object' && cell.value !== null) {
+      
+      // Debug logging for objects in top area to find all macro buttons
+      const cellAddress = `${String.fromCharCode(65 + (cell.col || 0))}${(cell.row || 0) + 1}`;
+      
+      // Removed debug logging for formula analysis
+      
+      // ENHANCED: Handle macro buttons and form controls
+      if (cell.value.type && (cell.value.type.includes('button') || cell.value.type.includes('control'))) {
+        // This is likely a macro button or form control
+        const buttonText = cell.value.text || cell.value.name || cell.value.caption || 'Button';
+        return `🔘 ${buttonText}`;
+      }
+      
+      // SPECIAL CASE: Handle Underwriting navigation buttons even without formula
+      // Note: cellRow and cellCol already declared above, reusing them
+      const isUnderwritingNavPosition = isTopArea && cellRow === 3 && cellCol >= 5 && cellCol <= 10;
+      
+      
+      
+      // REMOVED: Duplicate navigation button logic - now handled at the top with higher priority
+      
+      
+      // Check for formula-based macro buttons (like "CLICK TO RECALCULATE")
+      if (cell.value.formula && typeof cell.value.formula === 'string') {
+        const formula = cell.value.formula.toUpperCase();
+        // Note: cellRow and cellCol already declared above, reusing them
+        
+        // SPECIAL CASE: In "Underwriting" sheet row 4, columns C-H (3-8) should be navigation buttons
+        // Moved down 1 row to avoid blocking header text like "16TH TERRACE"
+        // NOTE: This is now handled by PRIORITY logic above, so this should not trigger
+        const isUnderwritingNavRow = false; // Disabled - handled by priority logic above
+        
+        
+        // EXCLUSION: Don't create recalculate buttons in navigation areas (row 3-4, columns C-H)
+        const isNavigationArea = isTopArea && 
+          ((cellRow === 3 && cellCol >= 3 && cellCol <= 8) || 
+           (cellRow === 4 && cellCol >= 3 && cellCol <= 8));
+        
+        // If this is in the navigation area, don't process formulas - let priority or fallback handle it
+        if (isNavigationArea) {
+          return ''; // Let other logic handle navigation area cells
+        }
+        
+        // Check for CLICK TO RECALCULATE button (should be dark green) - be more specific
+        if ((formula.includes('CLICK') && formula.includes('RECALCULATE')) && !isUnderwritingNavRow) {
+          const textMatch = cell.value.formula.match(/"([^"]*CLICK[^"]*RECALCULATE[^"]*)"/i) || 
+                           cell.value.formula.match(/"([^"]*RECALCULATE[^"]*CLICK[^"]*)"/i);
+          if (textMatch) {
+            return `🟢 ${textMatch[1]}`; // Green marker for recalculate button
+          }
+          return `🟢 CLICK TO RECALCULATE`;
+        }
+        
+        // Check for navigation buttons (Description, Investment, etc.)
+        const navButtons = ['DESCRIPTION', 'INVESTMENT', 'OPERATIONS', 'REVERSION', 'SALE', 'RETURNS', 'SENSITIVITY'];
+        const hasNavKeyword = navButtons.some(keyword => formula.includes(keyword));
+        
+        // SPECIAL CASE: Map Underwriting sheet row 3 navigation buttons by position
+        if (isUnderwritingNavRow) {
+          const navButtonsByCol = {
+            3: 'Description',      // Column C (index 3) - shifted left by 2
+            4: 'Investment',       // Column D (index 4) - shifted left by 2
+            5: 'Operations',       // Column E (index 5) - shifted left by 2
+            6: 'Reversion (Sale)', // Column F (index 6) - shifted left by 2
+            7: 'Returns',          // Column G (index 7) - shifted left by 2
+            8: 'Sensitivity'       // Column H (index 8) - shifted left by 2
+          };
+          const buttonText = navButtonsByCol[cellCol];
+          if (buttonText) {
+            return `🔘 ${buttonText}`;
+          }
+        }
+        
+        // CONSERVATIVE: Only show buttons that are clearly interactive (not just formula references)
+        // This reduces visual clutter from the many formula-based "buttons" that are just calculations
+        if (formula.includes('BUTTON') && cell.value.text && !hasNavKeyword) {
+          // Only show if there's explicit button text, BUTTON keyword, but NOT navigation keywords
+          // (navigation keywords are handled by the position-based logic above)
+          return `🔘 ${cell.value.text}`;
+        }
+        
+        // Don't show formula-based navigation keyword matches as they're usually just references
+        // The important navigation buttons are handled by position-based logic above
+      }
+      
+      // Check for other button-like properties
+      if (cell.value.macro || cell.value.onAction || (cell.value.text && cell.value.shapeType)) {
+        const buttonText = cell.value.text || cell.value.name || 'Macro Button';
+        // Found button-like object (removed debug logging)
+        return `🔘 ${buttonText}`;
+      }
+      
       // ENHANCED: Handle hyperlinks properly
       if (cell.value.hyperlink && cell.value.text) {
         return cell.value.text; // Display the text, not the hyperlink object
@@ -573,7 +752,7 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
 
     // For any other string or primitive value
     return String(cell.value);
-  }, [parseExcelNumberFormat, extractDateFromObject]);
+  }, [parseExcelNumberFormat, extractDateFromObject, parseISODateString, applyExcelCustomTextFormat]);
 
   // ENHANCED: Number formatting function based on Excel format codes
   const formatNumberWithExcelFormat = useCallback((value, formatInfo, cell) => {
@@ -609,6 +788,12 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       return formatted;
     }
 
+    // ENHANCED: Handle custom text patterns with Excel format codes
+    if (formatInfo.hasCustomText && formatInfo.customTextPattern) {
+      // Apply the custom Excel text pattern
+      return applyExcelCustomTextFormat(value, formatInfo.customTextPattern, formatInfo);
+    }
+
     // Standard number formatting
     const hasExcessiveDecimals = value.toString().includes('.') && 
                                 value.toString().split('.')[1]?.length > formatInfo.decimalPlaces;
@@ -628,7 +813,7 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
     }
 
     return formatted;
-  }, []);
+  }, [applyExcelCustomTextFormat]);
 
   const processCellWithStyles = useCallback((cell, rowIndex, colIndex) => {
     // Debug logging for key cells only - reduced verbosity
@@ -656,20 +841,66 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       
       // SAFETY CHECK: Ensure we never display [object Object]
       if (formattedValue === '[object Object]' || formattedValue.toString() === '[object Object]') {
-        // Log this case since it indicates an issue
-
         
         // Fallback for objects that weren't properly handled
         if (typeof cell.value === 'object') {
-          // Try to extract meaningful content from objects
-          if (cell.value.text) {
+          // Check for macro buttons and form controls first
+          if (cell.value.type && (cell.value.type.includes('button') || cell.value.type.includes('control'))) {
+            const buttonText = cell.value.text || cell.value.name || cell.value.caption || 'Button';
+            formattedValue = `🔘 ${buttonText}`;
+          } else if (cell.value.formula && typeof cell.value.formula === 'string') {
+            const formula = cell.value.formula.toUpperCase();
+            
+            // EXCLUSION: Don't create recalculate buttons in navigation areas (row 3-4, columns C-H)
+            const cellRow = (cell.row || 0) + 1;
+            const cellCol = (cell.col || 0) + 1; 
+            const isTopArea = (cell.row || 0) < 10;
+            const isNavigationArea = isTopArea && 
+              ((cellRow === 3 && cellCol >= 3 && cellCol <= 8) || 
+               (cellRow === 4 && cellCol >= 3 && cellCol <= 8));
+            
+            // If this is in the navigation area, hide the cell content
+            if (isNavigationArea) {
+              formattedValue = ''; // Hide navigation area cells that aren't handled by priority logic
+            }
+            // Handle CLICK TO RECALCULATE buttons - be more specific
+            else if (formula.includes('CLICK') && formula.includes('RECALCULATE')) {
+              const textMatch = cell.value.formula.match(/"([^"]*CLICK[^"]*RECALCULATE[^"]*)"/i) || 
+                               cell.value.formula.match(/"([^"]*RECALCULATE[^"]*CLICK[^"]*)"/i);
+              if (textMatch) {
+                formattedValue = `🟢 ${textMatch[1]}`;
+              } else {
+                formattedValue = `🟢 CLICK TO RECALCULATE`;
+              }
+            }
+            // CONSERVATIVE: Don't show formula-based navigation buttons in fallback
+            // Only show buttons with explicit BUTTON keyword and text, no navigation keywords
+            else if (formula.includes('BUTTON') && cell.value.text) {
+              const navButtons = ['DESCRIPTION', 'INVESTMENT', 'OPERATIONS', 'REVERSION', 'SALE', 'RETURNS', 'SENSITIVITY'];
+              const hasNavKeyword = navButtons.some(keyword => formula.includes(keyword));
+              
+              if (!hasNavKeyword) {
+                // Only show non-navigation buttons that have explicit text
+                formattedValue = `🔘 ${cell.value.text}`;
+              }
+              // Skip navigation keyword buttons to avoid clutter
+            }
+          } else if (cell.value.macro || cell.value.onAction || (cell.value.text && cell.value.shapeType)) {
+            const buttonText = cell.value.text || cell.value.name || 'Macro Button';
+            formattedValue = `🔘 ${buttonText}`;
+          }
+          // Try to extract meaningful content from other objects
+          else if (cell.value.text) {
             formattedValue = cell.value.text;
           } else if (cell.value.result !== undefined) {
             formattedValue = String(cell.value.result);
           } else if (cell.value.value !== undefined) {
             formattedValue = String(cell.value.value);
+          } else if (cell.value.name || cell.value.caption) {
+            // Likely a control element with a name/caption
+            formattedValue = `🔘 ${cell.value.name || cell.value.caption}`;
           } else {
-            formattedValue = cell.text || JSON.stringify(cell.value) || 'N/A';
+            formattedValue = cell.text || 'Control Element';
           }
         } else {
           formattedValue = String(cell.value);
@@ -681,6 +912,18 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
     }
 
     if (isDebugCell && formattedValue) {
+    }
+
+    // FINAL CHECK: Hide unwanted content in navigation areas that wasn't handled by priority logic
+    const cellRow = (cell.row || 0) + 1;
+    const cellCol = (cell.col || 0) + 1; 
+    const isTopArea = (cell.row || 0) < 10;
+    const isNavigationArea = isTopArea && 
+      ((cellRow === 3 && cellCol >= 3 && cellCol <= 8) || 
+       (cellRow === 4 && cellCol >= 3 && cellCol <= 8));
+    
+    if (isNavigationArea && !formattedValue.startsWith('🔘')) {
+      formattedValue = ''; // Hide non-button content in navigation area
     }
 
     // Extract ExcelJS styles and convert to CSS
@@ -738,6 +981,8 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
 
   // Memoize expensive sheet processing to prevent re-computation
   const processSheet = useCallback((worksheet, extractedImages) => {
+    
+    // Check for drawing objects and form controls (removed debug logging)
     
     // Extract worksheet view settings
     const showGridLines = worksheet.views && worksheet.views[0] ? 
@@ -864,6 +1109,9 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       
       for (let colNumber = range.startCol; colNumber <= range.endCol; colNumber++) {
         const cell = row.getCell(colNumber);
+        
+        // Check for button-like properties in cells in top area (removed debug logging)
+        
         const processedCell = processCellWithStyles(cell, rowNumber, colNumber);
         
         // ENHANCED: Handle merged cells
@@ -876,7 +1124,30 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
           rowData.push('');
           rowStyles.push({ ...processedCell.style, display: 'none' });
         } else {
-          rowData.push(processedCell.formattedValue);
+          // DEBUG: Log all row 4 cells being added to rowData
+          if (rowNumber === 4 && colNumber >= 3 && colNumber <= 8) {
+            console.log(`📝 ADDING TO SHEET DATA: Row ${rowNumber}, Col ${colNumber}, Value: "${processedCell.formattedValue}", Type: ${typeof processedCell.formattedValue}, Starts with 🔘: ${processedCell.formattedValue.startsWith('🔘')}`);
+          }
+          
+          // PRIORITY OVERRIDE: Force navigation buttons in Underwriting sheet row 4, columns 1-6
+          if (worksheet.name === 'Underwriting' && rowNumber === 4 && colNumber >= 1 && colNumber <= 6) {
+            const forcedNavButtons = {
+              1: '🔘 Description',      
+              2: '🔘 Investment',       
+              3: '🔘 Operations',       
+              4: '🔘 Reversion (Sale)', 
+              5: '🔘 Returns',          
+              6: '🔘 Sensitivity'       
+            };
+            if (forcedNavButtons[colNumber]) {
+              console.log(`🔥 FORCING NAV BUTTON: Row ${rowNumber}, Col ${colNumber}, Value: "${forcedNavButtons[colNumber]}"`);
+              rowData.push(forcedNavButtons[colNumber]);
+            } else {
+              rowData.push(processedCell.formattedValue);
+            }
+          } else {
+            rowData.push(processedCell.formattedValue);
+          }
           const cellStyle = { ...processedCell.style };
           
           // Add merge information to style for HTML rendering
@@ -1333,6 +1604,22 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
             baseColor = applyTintToColor(baseColor, tint);
           }
           
+          // Debug logging for rows 8-20, columns J+ (column 10+)
+          if (cellRef) {
+            const rowMatch = cellRef.match(/\d+/);
+            const colMatch = cellRef.match(/[A-Z]+/);
+            
+            if (rowMatch && colMatch) {
+              const rowNum = parseInt(rowMatch[0]);
+              const colLetter = colMatch[0];
+              const colNum = colLetter.split('').reduce((result, char) => result * 26 + char.charCodeAt(0) - 64, 0);
+              
+              if (rowNum >= 8 && rowNum <= 20 && colNum >= 10) {
+                console.log(`🎨 BG COLOR DEBUG: Cell ${cellRef}, theme ${theme}, tint ${tint}, baseColor ${baseColor}, finalColor ${baseColor}`);
+              }
+            }
+          }
+          
           style.backgroundColor = baseColor;
         }
       }
@@ -1470,25 +1757,6 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
         </div>
         
         <div className="flex items-center space-x-2">
-          {/* Sheet tabs */}
-          {workbookData.sheets.length > 1 && (
-            <div className="flex space-x-1">
-              {workbookData.sheets.map((sheet, index) => (
-                <button
-                  key={sheet.name}
-                  onClick={() => setActiveSheet(index)}
-                  className={`px-2 py-1 text-xs rounded transition-colors ${
-                    activeSheet === index
-                      ? 'bg-gray-700 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-100 border'
-                  }`}
-                >
-                  {sheet.name}
-                </button>
-              ))}
-            </div>
-          )}
-          
           {/* Full-screen toggle button */}
           <button
             onClick={toggleFullScreen}
@@ -1506,6 +1774,27 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       <div className="flex-1 overflow-auto bg-white">
         <FrozenExcelTable sheet={currentSheet} isFullScreen={true} />
       </div>
+      
+      {/* Sheet tabs - Excel style */}
+      {workbookData.sheets.length > 1 && (
+        <div className="px-3 py-1 bg-gray-100 border-t flex-shrink-0">
+          <div className="flex space-x-1">
+            {workbookData.sheets.map((sheet, index) => (
+              <button
+                key={sheet.name}
+                onClick={() => setActiveSheet(index)}
+                className={`px-2 py-1 text-xs rounded transition-colors ${
+                  activeSheet === index
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-100 border'
+                }`}
+              >
+                {sheet.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       
       {/* Footer info */}
       <div className="px-3 py-1 bg-gray-50 border-t text-xs text-gray-500 flex-shrink-0">
@@ -1537,25 +1826,6 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
         </div>
         
         <div className="flex items-center space-x-2">
-          {/* Sheet tabs */}
-          {workbookData.sheets.length > 1 && (
-            <div className="flex space-x-1">
-              {workbookData.sheets.map((sheet, index) => (
-                <button
-                  key={sheet.name}
-                  onClick={() => setActiveSheet(index)}
-                  className={`px-2 py-1 text-xs rounded transition-colors ${
-                    activeSheet === index
-                      ? 'bg-gray-700 text-white'
-                      : 'bg-white text-gray-600 hover:bg-gray-100 border'
-                  }`}
-                >
-                  {sheet.name}
-                </button>
-              ))}
-            </div>
-          )}
-          
           {/* Full-screen toggle button */}
           <button
             onClick={toggleFullScreen}
@@ -1580,6 +1850,27 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       >
         <FrozenExcelTable sheet={currentSheet} isFullScreen={false} />
       </div>
+      
+      {/* Sheet tabs - Excel style */}
+      {workbookData.sheets.length > 1 && (
+        <div className="px-3 py-1 bg-gray-100 border-t">
+          <div className="flex space-x-1">
+            {workbookData.sheets.map((sheet, index) => (
+              <button
+                key={sheet.name}
+                onClick={() => setActiveSheet(index)}
+                className={`px-2 py-1 text-xs rounded transition-colors ${
+                  activeSheet === index
+                    ? 'bg-gray-700 text-white'
+                    : 'bg-white text-gray-600 hover:bg-gray-100 border'
+                }`}
+              >
+                {sheet.name}
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
       
       {/* Footer info */}
       <div className="px-3 py-1 bg-gray-50 border-t text-xs text-gray-500">
@@ -1608,6 +1899,11 @@ const ExcelJSViewer = React.memo(ExcelJSViewerComponent);
 
 // Frozen Table component for freeze panes functionality
 const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
+  // Refs for scroll synchronization (must be declared before any early returns)
+  const topRightRef = React.useRef(null);
+  const bottomLeftRef = React.useRef(null);
+  const bottomRightRef = React.useRef(null);
+
   if (!sheet?.data?.length) return null;
 
   // Use actual data length with a reasonable performance limit (500 rows max)
@@ -1692,6 +1988,49 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                               }}
                             />
                           ) : (() => {
+                            // Check if this is a macro button or form control
+                            const isMacroButton = cellValue && typeof cellValue === 'string' && (cellValue.startsWith('🔘') || cellValue.startsWith('🟢'));
+                            
+                            // DEBUG: Log cells in navigation area to see what's happening
+                            if ((rowIndex + 1) === 4 && (colIndex + 1) >= 3 && (colIndex + 1) <= 8) {
+                              console.log(`🔍 ROW 4 DEBUG: Cell ${colIndex + 1}, value: "${cellValue}", isMacroButton: ${isMacroButton}`);
+                            }
+                            
+                            if (isMacroButton) {
+                              const isRecalculateButton = cellValue.startsWith('🟢');
+                              const buttonText = cellValue.replace(/^🔘 |^🟢 /, '');
+                              
+                              return (
+                                <div
+                                  style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    backgroundColor: isRecalculateButton ? '#2E7D32' : '#6B7280', // Dark green for recalculate, gray for navigation
+                                    color: 'white',
+                                    border: `1px solid ${isRecalculateButton ? '#1B5E20' : '#4B5563'}`,
+                                    borderRadius: '6px', // More rounded corners
+                                    padding: '2px 8px', // Slightly smaller padding
+                                    fontSize: '9px', // Slightly smaller font
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer',
+                                    minHeight: isRecalculateButton ? '20px' : '18px', // Slightly shorter
+                                    width: '100%', // Fit to column width
+                                    minWidth: 'auto', // Auto sizing
+                                    maxWidth: 'none', // No max width restriction
+                                    whiteSpace: 'nowrap',
+                                    overflow: 'hidden',
+                                    textAlign: 'center',
+                                    textOverflow: 'ellipsis', // Ellipsis if text too long
+                                    boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                                  }}
+                                  title={`${isRecalculateButton ? 'Recalculate' : 'Navigation'} Button: ${buttonText}`}
+                                >
+                                  {buttonText}
+                                </div>
+                              );
+                            }
+                            
                             // Check if text should spill over into next empty cells
                             const nextCellValue = row[colIndex + 1];
                             const allowSpillover = !nextCellValue || nextCellValue === '' || nextCellValue === null || nextCellValue === undefined;
@@ -1713,7 +2052,13 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                               );
                             } else {
                               return (
-                                <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                                <div style={{ 
+                          whiteSpace: 'nowrap', 
+                          overflow: isMacroButton ? 'visible' : 'hidden', 
+                          textOverflow: 'ellipsis',
+                          position: isMacroButton ? 'relative' : 'static',
+                          zIndex: isMacroButton ? 10 : 'auto'
+                        }}>
                                   {cellValue}
                                 </div>
                               );
@@ -1728,45 +2073,18 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
           </table>
         </div>
         
-        {hasMoreRows && (
-          <div className="flex-shrink-0 mt-1 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
-            📊 Showing first {maxVisibleRows} rows of {sheet.data.length} total data rows (performance limit: 500)
-            {sheet.images && sheet.images.length > 0 && (
-              <span> | <span className="font-medium text-purple-600">📸 {sheet.images.length} Image(s) Displayed</span></span>
-            )}
-            <span> | <span className={`font-medium ${sheet.showGridLines ? 'text-gray-600' : 'text-teal-600'}`}>
-              🔲 Gridlines {sheet.showGridLines ? 'ON' : 'OFF'}
-            </span></span>
-          </div>
-        )}
         
-        {!hasMoreRows && maxVisibleRows === sheet.data.length && (
-          <div className="flex-shrink-0 mt-1 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-700">
-            ✅ Showing all {sheet.data.length} data rows
-            {sheet.images && sheet.images.length > 0 && (
-              <span> | <span className="font-medium text-purple-600">📸 {sheet.images.length} Image(s) Displayed</span></span>
-            )}
-            <span> | <span className={`font-medium ${sheet.showGridLines ? 'text-gray-600' : 'text-teal-600'}`}>
-              🔲 Gridlines {sheet.showGridLines ? 'ON' : 'OFF'}
-            </span></span>
-          </div>
-        )}
       </div>
     );
   }
 
-  // Refs for scroll synchronization (only needed when freeze panes are active)
-  const topRightRef = React.useRef(null);
-  const bottomLeftRef = React.useRef(null);
-  const bottomRightRef = React.useRef(null);
-
-  // Split data into quadrants
+  // Split data into quadrants - REVERTED: Use original frozenCols since buttons are now in columns 3-8
   const topLeftData = visibleData.slice(0, frozenRows).map(row => row.slice(0, frozenCols));
   const topRightData = visibleData.slice(0, frozenRows).map(row => row.slice(frozenCols));
   const bottomLeftData = visibleData.slice(frozenRows).map(row => row.slice(0, frozenCols));
   const bottomRightData = visibleData.slice(frozenRows).map(row => row.slice(frozenCols));
 
-  // Split styles similarly
+  // Split styles similarly - REVERTED: Use original frozenCols
   const topLeftStyles = sheet.styles.slice(0, frozenRows).map(rowStyle => ({
     ...rowStyle,
     cells: rowStyle.cells.slice(0, frozenCols)
@@ -1784,7 +2102,7 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
     cells: rowStyle.cells.slice(frozenCols)
   }));
 
-  // Split column widths
+  // Split column widths - REVERTED: Use original frozenCols
   const frozenColumnWidths = sheet.columnWidths.slice(0, frozenCols);
   const scrollableColumnWidths = sheet.columnWidths.slice(frozenCols);
 
@@ -1893,11 +2211,57 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                       />
                     </div>
                   ) : (() => {
-                    // Check if text should spill over into next empty cells
+                    // Check if this is a macro button or form control
+                    const isMacroButton = cellValue && typeof cellValue === 'string' && (cellValue.startsWith('🔘') || cellValue.startsWith('🟢'));
+                    
+                    // DEBUG: Log cells in navigation area to see what's happening
+                    if ((actualRow + 1) === 4 && (actualCol + 1) >= 3 && (actualCol + 1) <= 8) {
+                      console.log(`🔍 ROW 4 DEBUG (bottom): Cell ${actualCol + 1}, value: "${cellValue}", isMacroButton: ${isMacroButton}`);
+                    }
+                    
+                    if (isMacroButton) {
+                      const isRecalculateButton = cellValue.startsWith('🟢');
+                      const buttonText = cellValue.replace(/^🔘 |^🟢 /, '');
+                      
+                      return (
+                        <div
+                          style={{
+                            display: 'flex',
+                            alignItems: 'center',
+                            justifyContent: 'center',
+                            backgroundColor: isRecalculateButton ? '#2E7D32' : '#6B7280', // Dark green for recalculate, gray for navigation
+                            color: 'white',
+                            border: `1px solid ${isRecalculateButton ? '#1B5E20' : '#4B5563'}`,
+                            borderRadius: '6px', // More rounded corners
+                            padding: '2px 8px', // Slightly smaller padding
+                            fontSize: '9px', // Slightly smaller font
+                            fontWeight: 'bold',
+                            cursor: 'pointer',
+                            minHeight: isRecalculateButton ? '20px' : '18px', // Slightly shorter
+                            width: '100%', // Fit to column width
+                            minWidth: 'auto', // Auto sizing
+                            maxWidth: 'none', // No max width restriction
+                            whiteSpace: 'nowrap',
+                            overflow: 'hidden',
+                            textAlign: 'center',
+                            textOverflow: 'ellipsis', // Ellipsis if text too long
+                            boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
+                          }}
+                          title={`${isRecalculateButton ? 'Recalculate' : 'Navigation'} Button: ${buttonText}`}
+                        >
+                          {buttonText}
+                        </div>
+                      );
+                    }
+                    
+                    // More conservative spillover: only for very long text in first few columns
                     const nextCellValue = row[colIndex + 1];
                     const allowSpillover = !nextCellValue || nextCellValue === '' || nextCellValue === null || nextCellValue === undefined;
+                    const isLongText = cellValue && String(cellValue).length > 15;
+                    const isEarlyColumn = actualCol < 3; // Only first 3 columns
+                    const isTextCell = cellValue && typeof cellValue === 'string' && !/^[\d\s,$€£%x.,-]+$/.test(String(cellValue).trim());
                     
-                    if (allowSpillover && cellValue && String(cellValue).length > 8) {
+                    if (allowSpillover && isLongText && isEarlyColumn && isTextCell) {
                       return (
                         <div
                           style={{
@@ -1914,7 +2278,13 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                       );
                     } else {
                       return (
-                        <div style={{ whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>
+                        <div style={{ 
+                          whiteSpace: 'nowrap', 
+                          overflow: isMacroButton ? 'visible' : 'hidden', 
+                          textOverflow: 'ellipsis',
+                          position: isMacroButton ? 'relative' : 'static',
+                          zIndex: isMacroButton ? 10 : 'auto'
+                        }}>
                           {cellValue}
                         </div>
                       );
@@ -2002,31 +2372,7 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
         </div>
       </div>
       
-      {hasMoreRows && (
-        <div className="flex-shrink-0 mt-1 p-2 bg-blue-50 border border-blue-200 rounded text-xs text-blue-700">
-          📊 Showing first {maxVisibleRows} rows of {sheet.data.length} total data rows (performance limit: 500) | 
-          <span className="font-medium text-teal-600"> ❄️ Freeze Panes Active</span> ({frozenCols > 0 ? `${frozenCols} column${frozenCols > 1 ? 's' : ''}` : ''}{frozenCols > 0 && frozenRows > 0 ? ' & ' : ''}{frozenRows > 0 ? `${frozenRows} row${frozenRows > 1 ? 's' : ''}` : ''} frozen)
-          {sheet.images && sheet.images.length > 0 && (
-            <span> | <span className="font-medium text-purple-600">📸 {sheet.images.length} Image(s) Displayed</span></span>
-          )}
-          <span> | <span className={`font-medium ${sheet.showGridLines ? 'text-gray-600' : 'text-teal-600'}`}>
-            🔲 Gridlines {sheet.showGridLines ? 'ON' : 'OFF'}
-          </span></span>
-        </div>
-      )}
       
-      {!hasMoreRows && maxVisibleRows === sheet.data.length && (
-        <div className="flex-shrink-0 mt-1 p-2 bg-green-50 border border-green-200 rounded text-xs text-green-700">
-          ✅ Showing all {sheet.data.length} data rows | 
-          <span className="font-medium text-teal-600"> ❄️ Freeze Panes Active</span> ({frozenCols > 0 ? `${frozenCols} column${frozenCols > 1 ? 's' : ''}` : ''}{frozenCols > 0 && frozenRows > 0 ? ' & ' : ''}{frozenRows > 0 ? `${frozenRows} row${frozenRows > 1 ? 's' : ''}` : ''} frozen)
-          {sheet.images && sheet.images.length > 0 && (
-            <span> | <span className="font-medium text-purple-600">📸 {sheet.images.length} Image(s) Displayed</span></span>
-          )}
-          <span> | <span className={`font-medium ${sheet.showGridLines ? 'text-gray-600' : 'text-teal-600'}`}>
-            🔲 Gridlines {sheet.showGridLines ? 'ON' : 'OFF'}
-          </span></span>
-        </div>
-      )}
     </div>
   );
 });
