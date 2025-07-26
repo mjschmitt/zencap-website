@@ -1,0 +1,10 @@
+warning: in the working copy of '.claude/settings.local.json', LF will be replaced by CRLF the next time Git touches it
+warning: in the working copy of 'src/pages/index.js', LF will be replaced by CRLF the next time Git touches it
+.claude/settings.local.json
+src/components/PerformanceMonitor.js
+src/components/SEO.js
+src/components/layout/Layout.js
+src/components/ui/EnhancedHero.js
+src/pages/index.js
+src/styles/globals.css
+tailwind.config.js
