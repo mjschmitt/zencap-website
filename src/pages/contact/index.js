@@ -75,7 +75,7 @@ export default function Contact() {
       
       {/* Page Header with Background Image */}
       <section 
-        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[calc(80vh-48px)] flex items-center"
         style={{ backgroundImage: 'url(/images/contact/contact-hero.jpg)' }}
       >
         {/* Gradient overlay for better text readability */}
@@ -97,7 +97,7 @@ export default function Contact() {
       </section>
       
       {/* Contact Form and Info */}
-      <section className="py-16">
+      <section className="py-24">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Contact Form */}

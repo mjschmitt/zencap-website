@@ -24,7 +24,7 @@ export default function About() {
       
       {/* Hero Section with Larger Background Image */}
       <section 
-        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[calc(80vh-48px)] flex items-center"
         style={{ backgroundImage: 'url(/images/about/about-hero.jpg)' }}
       >
         {/* Gradient overlay for better text readability */}
@@ -46,7 +46,7 @@ export default function About() {
       </section>
       
       {/* Mission Statement Section */}
-      <section className="py-12 bg-gray-50 dark:bg-navy-900/50">
+      <section className="py-16 bg-gray-50 dark:bg-navy-900/50">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <Motion animation="fade" direction="up">
             <div className="max-w-3xl mx-auto text-center">

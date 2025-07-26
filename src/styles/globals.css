@@ -2,18 +2,18 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Clean base styles without problematic viewport rules */
+/* Clean base styles - 14px font size */
 @layer base {
   :root {
-    font-size: 14px;
+    font-size: 14px !important;
   }
   
   html {
-    font-size: 14px;
+    font-size: 14px !important;
     margin: 0;
     padding: 0;
     width: 100%;
-    /* Removed problematic height and overflow rules */
+    height: 100%;
     -webkit-text-size-adjust: 100%;
     -moz-text-size-adjust: 100%;
     -ms-text-size-adjust: 100%;
@@ -21,22 +21,23 @@
   }
   
   body {
-    font-size: 1rem;
+    font-size: 1rem !important; /* This will be 14px */
     line-height: 1.5;
     margin: 0;
     padding: 0;
     width: 100%;
-    /* Removed problematic min-height rule */
+    min-height: 100vh;
     position: relative;
   }
   
   #__next {
-    /* Removed problematic min-height rule */
+    min-height: 100vh;
     position: relative;
   }
   
-  .font-sans, .font-serif {
-    font-size: inherit;
+  /* Ensure Tailwind text classes use 14px base */
+  html, body, #__next {
+    font-size: 14px !important;
   }
 }
 
@@ -50,74 +51,62 @@ html {
   scroll-behavior: smooth;
 }
 
-/* Layout improvements */
+/* Hero section layout - clean and simple */
 .hero-section {
-  margin-top: 0;
-  padding-top: 0;
   position: relative;
   overflow: hidden;
-  min-height: 100vh;
+  height: calc(100vh - 64px); /* Viewport height minus header height */
   display: flex;
-  flex-direction: column;
+  align-items: center;
   justify-content: center;
 }
 
-/* Ensure proper header spacing */
+/* Hero content container */
+.hero-section .relative.z-20 {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 4rem; /* Space for scroll arrow */
+}
+
+/* Scroll arrow positioning */
+.hero-section .absolute.bottom-8 {
+  position: absolute !important;
+  bottom: 2rem !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 30 !important;
+}
+
+/* Header positioning */
 header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
   backdrop-filter: blur(8px);
   -webkit-backdrop-filter: blur(8px);
 }
 
-/* Fix any potential z-index issues */
-.z-40 {
-  z-index: 40;
-}
-
-.z-50 {
-  z-index: 50;
-}
-
-/* Hero section specific fixes */
-.hero-section .absolute.bottom-8 {
-  bottom: 2rem !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  z-index: 30 !important;
-}
-
-/* Ensure the hero background covers the full section */
-.hero-section > div:first-child {
-  position: absolute !important;
-  top: 0 !important;
-  left: 0 !important;
-  right: 0 !important;
-  bottom: 0 !important;
-  background-size: cover !important;
-  background-position: center !important;
-  background-repeat: no-repeat !important;
-}
-
-/* Specific arrow positioning fix */
-.hero-section > div:last-child {
-  position: absolute !important;
-  bottom: 2rem !important;
-  left: 50% !important;
-  transform: translateX(-50%) !important;
-  z-index: 30 !important;
-}
-
-/* Ensure content doesn't overlap with scroll arrow */
-.hero-section .mb-16 {
-  margin-bottom: 4rem !important;
-}
-
-/* Basic styles */
+/* Basic styles - consolidated */
 body {
   font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
   color: #333;
   background-color: #f5f5f5;
+  overflow-x: hidden;
+}
+
+/* Isolate ExcelJS viewer styles from affecting global layout */
+.exceljs-viewer,
+.excel-preview-container,
+.exceljs-simple-table-container,
+.exceljs-frozen-table-container {
+  font-size: initial !important;
+  line-height: initial !important;
+  /* Prevent these components from affecting global styles */
+  contain: style layout !important;
 }
 
 a {

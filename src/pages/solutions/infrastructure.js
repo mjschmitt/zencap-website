@@ -36,7 +36,7 @@ export default function InvestmentInfrastructure() {
       
       {/* Hero Section with Background Image */}
       <section 
-        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[calc(80vh-48px)] flex items-center"
         style={{ backgroundImage: 'url(/images/solutions/infrastructure/infrastructure-hero.jpg)' }}
       >
         {/* Gradient overlay for better text readability */}

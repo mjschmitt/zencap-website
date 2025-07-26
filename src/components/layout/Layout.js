@@ -1,5 +1,6 @@
 // src/components/layout/Layout.js - With transition improvements
 import Head from 'next/head';
+import { useEffect } from 'react';
 import Header from './Header';
 import Footer from './Footer';
 import ScrollToTop from '../ui/ScrollToTop';
@@ -12,6 +13,17 @@ export default function Layout({
   description = 'Financial modeling and investment advisory services for public and private equity firms.',
   metaImage = '/images/meta-image.jpg'
 }) {
+  // Force scroll to top on page load
+  useEffect(() => {
+    if (typeof window !== 'undefined') {
+      window.scrollTo(0, 0);
+      // Also clear any scroll restoration
+      if ('scrollRestoration' in window.history) {
+        window.history.scrollRestoration = 'manual';
+      }
+    }
+  }, []);
+
   return (
     <div className="flex flex-col min-h-screen bg-white dark:bg-gray-900 transition-colors duration-200">
       <Head>

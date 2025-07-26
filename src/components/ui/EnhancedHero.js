@@ -44,15 +44,18 @@ export default function EnhancedHero() {
   // Handle scroll to Our Models section
   const handleScrollToNext = () => {
     const modelsSection = document.querySelector('#our-models-section');
-    if (modelsSection) {
-      const headerHeight = 80; // Approximate header height
-      const elementTop = modelsSection.offsetTop - headerHeight;
+    const header = document.querySelector('header');
+    if (modelsSection && header) {
+      // Get actual header height
+      const headerHeight = header.offsetHeight;
+      // Scroll to exact top of models section accounting for header, plus 43px offset for better view
+      const elementTop = modelsSection.offsetTop - headerHeight + 43;
       window.scrollTo({ top: elementTop, behavior: 'smooth' });
     }
   };
 
   return (
-    <section className="hero-section relative overflow-hidden min-h-screen">
+    <section className="hero-section relative overflow-hidden">
       {/* Background image with CSS background approach */}
       <div 
         className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
@@ -76,8 +79,8 @@ export default function EnhancedHero() {
       </div>
       
       {/* Main content container */}
-      <div className="relative z-20 h-full flex flex-col justify-center items-center px-4 sm:px-6 lg:px-8 py-16 md:py-24">
-        <div className="max-w-7xl mx-auto text-center">
+      <div className="relative z-20 flex flex-col justify-center items-center">
+        <div className="w-full max-w-7xl text-center px-4">
           <motion.div
             animate={{ opacity: isVisible ? 1 : 0, y: isVisible ? 0 : 10 }}
             transition={{ duration: 0.5 }}
@@ -102,11 +105,11 @@ export default function EnhancedHero() {
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.4, duration: 0.6 }}
-            className="flex flex-wrap justify-center gap-4 mt-8 mb-20"
+            className="flex flex-wrap justify-center items-center gap-4 mt-8 mb-16 ml-4"
           >
             <Link 
               href="/models" 
-              className="px-6 py-3 bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-md shadow-lg transform hover:-translate-y-1 transition-all duration-300 inline-flex items-center justify-center"
+              className="px-4 py-3 bg-teal-500 hover:bg-teal-600 text-white font-medium rounded-md shadow-lg transform hover:-translate-y-1 transition-all duration-300 inline-flex items-center justify-center"
             >
               See Our Models
               <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -115,7 +118,7 @@ export default function EnhancedHero() {
             </Link>
             <Link 
               href="/contact" 
-              className="px-6 py-3 bg-transparent border-2 border-white text-white font-medium rounded-md hover:bg-white/10 transform hover:-translate-y-1 transition-all duration-300 inline-flex items-center justify-center"
+              className="px-3 py-3 bg-transparent border-2 border-white text-white font-medium rounded-md hover:bg-white/10 transform hover:-translate-y-1 transition-all duration-300 inline-flex items-center justify-center whitespace-nowrap"
             >
               Schedule Consultation
             </Link>
