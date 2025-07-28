@@ -11,7 +11,8 @@
       "Bash(npm:*)",
       "Bash(git --version)",
       "Bash(git checkout:*)",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "Bash(taskkill:*)"
     ],
     "deny": []
   }
