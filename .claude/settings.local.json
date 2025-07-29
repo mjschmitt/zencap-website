@@ -12,7 +12,10 @@
       "Bash(git --version)",
       "Bash(git checkout:*)",
       "Bash(npx eslint:*)",
-      "Bash(taskkill:*)"
+      "Bash(taskkill:*)",
+      "Bash(timeout 10s npm run dev)",
+      "WebFetch(domain:github.com)",
+      "Bash(grep:*)"
     ],
     "deny": []
   }

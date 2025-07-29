@@ -315,7 +315,9 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
 
     // ENHANCED: Check for accounting format with underscore spacing
     // Format like: "_(* #,##0_);_(* (#,##0);_(* \"-\"_);_(@_)"
-    if (positiveFormat.includes('_') && (positiveFormat.includes('_(') || positiveFormat.includes('_)'))) {
+    // FIXED: Check if this is a text format (contains @) before marking as accounting
+    if (positiveFormat.includes('_') && (positiveFormat.includes('_(') || positiveFormat.includes('_)')) && 
+        !sections.some(s => s && s.includes('@'))) { // @ symbol in ANY section indicates text format
       formatInfo.isAccountingFormat = true;
       formatInfo.hasUnderscoreSpacing = true;
       
@@ -467,12 +469,21 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       // Handle formula objects
       if (cell.value.result !== undefined) {
         // Use the result of the formula
-        if (cell.value.result === null || cell.value.result === '' || cell.value.result === 0) {
+        if (cell.value.result === null || cell.value.result === '') {
           // Check if accounting format should show dash
           if (formatInfo.isAccountingFormat || formatInfo.showDashForZero) {
             return '-';
           }
           return '';
+        }
+        // CRITICAL: Don't treat 0 as empty - format it properly
+        if (cell.value.result === 0) {
+          // Check if accounting format should show dash for zero
+          if (formatInfo.showDashForZero) {
+            return '-';
+          }
+          // Otherwise format the 0 value properly
+          return formatNumberWithExcelFormat(0, formatInfo, cell);
         }
         // Recursively format the result
         return formatCellValue({ ...cell, value: cell.value.result });
@@ -487,10 +498,9 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
     // ENHANCED: Comprehensive date detection FIRST (before other logic)
     // 1. Native JavaScript Date objects
     if (cell.value instanceof Date) {
-      const month = String(cell.value.getMonth() + 1).padStart(2, '0');
-      const day = String(cell.value.getDate()).padStart(2, '0');
-      const year = cell.value.getFullYear();
-      return `${month}/${day}/${year}`;
+      // Convert to Excel serial and use Excel's formatting
+      const excelSerial = (cell.value.getTime() / 86400000) + 25569;
+      return formatNumberWithExcelFormat(excelSerial, formatInfo, cell);
     }
 
     // 2. Excel serial number dates
@@ -504,13 +514,14 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
 
     // 3. Text that looks like dates (GMT, ISO, etc.)
     if (cell.text && typeof cell.text === 'string') {
-      // Check for GMT date strings
-      if (cell.text.includes('GMT') && numFmt && numFmt.includes('mm-dd')) {
+      // Check for GMT date strings - these are raw timestamps we need to format
+      if (cell.text.includes('GMT')) {
         try {
           const parsedDate = new Date(cell.text);
           if (!isNaN(parsedDate.getTime())) {
-            // Use the original text representation from Excel
-            return cell.text;
+            // Convert to Excel serial and format using Excel's format
+            const excelSerial = (parsedDate.getTime() / 86400000) + 25569;
+            return formatNumberWithExcelFormat(excelSerial, formatInfo, cell);
           }
         } catch (e) {
           // Fall through to other logic
@@ -520,8 +531,9 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       // Check for ISO date strings in text
       const isoDate = parseISODateString(cell.text);
       if (isoDate && !isNaN(isoDate.getTime())) {
-        // Use the original text representation from Excel
-        return cell.text;
+        // Convert to Excel serial and format using Excel's format
+        const excelSerial = (isoDate.getTime() / 86400000) + 25569;
+        return formatNumberWithExcelFormat(excelSerial, formatInfo, cell);
       }
     }
 
@@ -720,6 +732,59 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       return String(value);
     }
 
+    // Check if this is a date format
+    const numFmt = cell.style?.numFmt || formatInfo.customPattern;
+    if (numFmt && (numFmt.includes('mm') || numFmt.includes('dd') || numFmt.includes('yy') || 
+                   numFmt.includes('m/') || numFmt.includes('d/'))) {
+      // This is a date - convert Excel serial to date
+      const date = convertExcelSerialDate(value);
+      if (date) {
+        // Format based on Excel's format string
+        const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+        const month = date.getMonth() + 1;
+        const monthPadded = String(month).padStart(2, '0');
+        const day = date.getDate();
+        const dayPadded = String(day).padStart(2, '0');
+        const year = date.getFullYear();
+        const yearShort = year.toString().slice(-2);
+        const monthName = monthNames[date.getMonth()];
+        
+        // First, check if Excel provided pre-formatted text that's not a raw timestamp
+        if (cell.text && !cell.text.includes('GMT') && !cell.text.match(/^\d{4}-\d{2}-\d{2}T/)) {
+          // Use Excel's pre-formatted text as it already has the correct format
+          return cell.text;
+        }
+        
+        // If no pre-formatted text, parse Excel's date format codes
+        // Common Excel date formats we need to handle:
+        // dd-mmm-yy -> 31-Jan-25
+        // mm/dd/yyyy -> 01/31/2025
+        // d-mmm -> 31-Jan
+        // mmm-yy -> Jan-25
+        
+        if (numFmt.includes('dd-mmm-yy')) {
+          return `${dayPadded}-${monthName}-${yearShort}`;
+        } else if (numFmt.includes('d-mmm-yy')) {
+          return `${day}-${monthName}-${yearShort}`;
+        } else if (numFmt.includes('dd-mmm-yyyy')) {
+          return `${dayPadded}-${monthName}-${year}`;
+        } else if (numFmt.includes('d-mmm')) {
+          return `${day}-${monthName}`;
+        } else if (numFmt.includes('mmm-yy')) {
+          return `${monthName}-${yearShort}`;
+        } else if (numFmt.includes('mm/dd/yyyy')) {
+          return `${monthPadded}/${dayPadded}/${year}`;
+        } else if (numFmt.includes('m/d/yy')) {
+          return `${month}/${day}/${yearShort}`;
+        } else if (numFmt.includes('mm-dd-yy')) {
+          return `${monthPadded}-${dayPadded}-${yearShort}`;
+        } else {
+          // Default format
+          return `${monthPadded}/${dayPadded}/${year}`;
+        }
+      }
+    }
+
     // Special handling for percentages
     if (formatInfo.isPercentage) {
       // If cell.text already has %, use it directly (Excel pre-formatted)
@@ -778,7 +843,7 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
     }
 
     return formatted;
-  }, [applyExcelCustomTextFormat]);
+  }, [applyExcelCustomTextFormat, convertExcelSerialDate]);
 
   const processCellWithStyles = useCallback((cell, rowIndex, colIndex) => {
     // Debug logging for key cells only - reduced verbosity
@@ -943,41 +1008,46 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
     // Get column information
     const columns = worksheet.columns || [];
     
-    // Calculate column widths (ExcelJS provides actual widths)
-    // ENHANCED: Better match actual Excel column widths and handle hidden columns
-    const columnWidths = columns.map((col, index) => {
-      // ENHANCED: Handle hidden columns (set them to minimal width but visible)
-      if (col.hidden) {
-        return 20; // Minimal width for hidden columns but still show them
-      }
-      
-      if (col.width) {
-        // ENHANCED: Handle very narrow columns (like spacers)
-        if (col.width < 2) {
-          return Math.max(col.width * 7, 15); // Minimum 15px for very narrow columns
-        }
-        
-        // Use a higher multiplier to better match Excel widths
-        // Excel width units are roughly 7 pixels per unit
-        const calculatedWidth = col.width * 7;
-        
-        // Don't cap the width too aggressively - let wide columns be wide
-        const minWidth = 60;
-        const maxWidth = 400; // Increased from 150 to allow wider columns
-        
-        const finalWidth = Math.max(Math.min(calculatedWidth, maxWidth), minWidth);
-        
-        return finalWidth;
-      } else {
-        // Default width for columns without explicit width
-        const excelColumnName = String.fromCharCode(65 + index);
-        return 80;
-      }
-    });
-    
     // Find actual data range (optimize performance)
     const range = findActualDataRange(worksheet);
     // Data range determined
+    
+    // Calculate column widths (ExcelJS provides actual widths)
+    // ENHANCED: Better match actual Excel column widths and handle hidden columns
+    const columnWidths = [];
+    
+    // Make sure we have width for every column in our range
+    for (let colIndex = 1; colIndex <= range.endCol; colIndex++) {
+      const col = worksheet.getColumn(colIndex);
+      
+      // Debug column J (column index 10)
+      if (colIndex === 10) {
+        console.log(`Column J (${colIndex}) width info:`, {
+          excelWidth: col.width,
+          hidden: col.hidden,
+          key: col.key,
+          letter: col.letter
+        });
+      }
+      
+      // ENHANCED: Handle hidden columns (set them to minimal width but visible)
+      if (col.hidden) {
+        columnWidths.push(20); // Minimal width for hidden columns but still show them
+      } else if (col.width) {
+        // Use Excel's exact width with standard conversion factor
+        // Excel width units are roughly 7 pixels per unit
+        const calculatedWidth = col.width * 7;
+        
+        // Return the exact calculated width without min/max constraints
+        const finalWidth = Math.round(calculatedWidth);
+        
+        columnWidths.push(finalWidth);
+      } else {
+        // Default width for columns without explicit width
+        // Excel's default column width is 8.43 units = ~59px
+        columnWidths.push(59);
+      }
+    }
     
     // FIXED: Adjust freeze pane values to account for data range offset
     // Excel freeze panes are based on absolute column/row numbers, but our viewer
@@ -1003,6 +1073,16 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
     // IMPORTANT: Adjust columnWidths array to match the data range
     // Only include widths for columns that are actually being displayed
     const adjustedColumnWidths = columnWidths.slice(range.startCol - 1, range.endCol);
+    
+    // Debug column widths
+    console.log('Column widths debug:', {
+      rangeStartCol: range.startCol,
+      rangeEndCol: range.endCol,
+      totalColumnWidths: columnWidths.length,
+      adjustedLength: adjustedColumnWidths.length,
+      columnJIndex: 10 - range.startCol,
+      columnJWidth: adjustedColumnWidths[10 - range.startCol]
+    });
     
     const data = [];
     const styles = [];
@@ -1048,13 +1128,18 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       
       // FIXED: Accurate row height calculation that respects Excel's actual row heights
       let rowHeight;
-      if (row.height !== undefined) {
+      
+      // Check if row is explicitly hidden
+      if (row.hidden === true) {
+        rowHeight = 0;
+      } else if (row.height !== undefined) {
         // CRITICAL: Use Excel's exact heights - NO MINIMUMS for collapsed rows
         // Excel row heights are in points, roughly 1.33 pixels per point
         rowHeight = row.height * 1.33;
         
-        // Debug very small row heights that might be causing issues
-        if (rowNumber >= 135 && rowNumber <= 140) {
+        // Check for very small heights that should be treated as hidden
+        if (rowHeight < 1) {
+          rowHeight = 0;
         }
       } else {
         // Default height for rows without explicit height
@@ -1832,19 +1917,11 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
   const visibleData = sheet.data.slice(0, maxVisibleRows);
   const hasMoreRows = sheet.data.length > maxVisibleRows;
 
-  // Freeze configuration from Excel file
-  const frozenRows = sheet.frozenRows || 0;
-  const frozenCols = sheet.frozenCols || 0;
+  // Freeze configuration from Excel file - DISABLED to isolate issues
+  const frozenRows = 0; // sheet.frozenRows || 0;
+  const frozenCols = 0; // sheet.frozenCols || 0;
   
-  // ENHANCED GUARD: Prevent simple view when frozen panes are detected in any render
-  // This prevents the initial render with wrong row heights when frozen panes exist
-  const hasComplexRowHeights = sheet.rowHeights && sheet.rowHeights.length > 0 && 
-    sheet.rowHeights.slice(0, 10).some(h => h !== undefined && h < 15); // Look for truly small rows like 6.78px
-  
-  // If this render shows no frozen panes but row heights suggest there should be some, wait
-  if ((frozenRows === 0 && frozenCols === 0) && hasComplexRowHeights) {
-    return <div>Loading Excel layout...</div>;
-  }
+  // REMOVED: Guard was causing "Loading Excel layout..." to show indefinitely when frozen panes are disabled
 
   // If no freeze panes are set, render a simple table
   if (frozenRows === 0 && frozenCols === 0) {
@@ -1904,13 +1981,20 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                         style={{
                           ...cellStyle,
                           position: 'relative',
-                          overflow: 'visible',
+                          overflow: 'hidden',
                           fontSize: '11px',
                           lineHeight: '1',
                           verticalAlign: imageForCell ? 'top' : 'middle',
-                          padding: '0px 2px',
+                          paddingTop: cellStyle.paddingTop || '0px',
+                          paddingBottom: cellStyle.paddingBottom || '0px',
+                          paddingLeft: cellStyle.paddingLeft || '2px',
+                          paddingRight: cellStyle.paddingRight || '2px',
                           height: '100%',
-                          boxSizing: 'border-box'
+                          boxSizing: 'border-box',
+                          // Set explicit width to match Excel's column width
+                          width: `${sheet.columnWidths[colIndex] || 59}px`,
+                          minWidth: `${sheet.columnWidths[colIndex] || 59}px`,
+                          maxWidth: `${sheet.columnWidths[colIndex] || 59}px`
                         }}
                         title={imageForCell ? `Image: ${imageForCell.name}` : cellValue}
                         rowSpan={imageForCell ? imageForCell.position.rowSpan : (cellStyle._mergeInfo ? cellStyle._mergeInfo.rowSpan : 1)}
@@ -1931,41 +2015,16 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                                 e.target.style.display = 'none';
                               }}
                             />
-                          ) : (() => {
-                            
-                            // Check if text should spill over into next empty cells
-                            const nextCellValue = row[colIndex + 1];
-                            const allowSpillover = !nextCellValue || nextCellValue === '' || nextCellValue === null || nextCellValue === undefined;
-                            
-                            if (allowSpillover && cellValue && String(cellValue).length > 8) {
-                              return (
-                                <div
-                                  style={{
-                                    position: 'absolute',
-                                    left: '4px',
-                                    top: '2px',
-                                    whiteSpace: 'nowrap',
-                                    zIndex: 10,
-                                    backgroundColor: cellStyle.backgroundColor || 'transparent'
-                                  }}
-                                >
-                                  {cellValue}
-                                </div>
-                              );
-                            } else {
-                              return (
-                                <div style={{ 
-                          whiteSpace: 'nowrap', 
-                          overflow: 'visible', 
-                          textOverflow: 'ellipsis',
-                          position: 'static',
-                          zIndex: 'auto'
-                        }}>
-                                  {cellValue}
-                                </div>
-                              );
-                            }
-                          })()}
+                          ) : (
+                            <div style={{ 
+                              whiteSpace: 'nowrap', 
+                              overflow: 'hidden',
+                              textOverflow: 'clip',
+                              width: '100%'
+                            }}>
+                              {cellValue}
+                            </div>
+                          )}
                       </td>
                     );
                   }).filter(Boolean)}
@@ -2086,9 +2145,10 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
           const originalRowHeight = sheet.rowHeights[actualRowIndex] || 20;
           
           // NORMALIZE HEIGHT: Prevent cumulative sub-pixel differences
-          // Force minimum height and round to prevent browser inconsistencies
-          const normalizedHeight = Math.max(1, Math.round(originalRowHeight * 100) / 100); // Round to 2 decimal places, min 1px
+          // Allow 0 height for hidden rows
+          const normalizedHeight = Math.round(originalRowHeight * 100) / 100; // Round to 2 decimal places
           const rowHeight = normalizedHeight;
+          const isHiddenRow = rowHeight === 0;
           
           // FIXED: Apply cumulative height offset properly for bottom sections
           if (rowIndex === 0) {
@@ -2102,13 +2162,13 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
           <div 
             key={actualRowIndex}
             style={{ 
-              height: `${rowHeight}px`,
-              maxHeight: `${rowHeight}px`,
-              minHeight: `${rowHeight}px`,
+              height: isHiddenRow ? '0px' : `${rowHeight}px`,
+              maxHeight: isHiddenRow ? '0px' : `${rowHeight}px`,
+              minHeight: '0px', // Allow collapse to 0
               lineHeight: '1',
-              overflow: 'visible',
+              overflow: 'hidden',
               boxSizing: 'border-box',
-              display: 'flex', // Use flexbox for cell layout
+              display: isHiddenRow ? 'none' : 'flex', // Hide completely if hidden row
               alignItems: 'stretch' // Ensure cells stretch to row height
             }}
           >
@@ -2141,7 +2201,7 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                     // Normalize font weight to remove unwanted bold
                     fontWeight: cellStyle.fontWeight === 'bold' ? 'normal' : cellStyle.fontWeight,
                     position: 'relative',
-                    overflow: 'visible',
+                    overflow: 'hidden',
                     fontSize: '11px',
                     lineHeight: '1',
                     backgroundColor: isFrozen ? (cellStyle.backgroundColor || '#f9fafb') : cellStyle.backgroundColor,
@@ -2176,113 +2236,15 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                         }}
                       />
                     </div>
-                  ) : (() => {
-                    
-                    // Enhanced spillover logic: check multiple adjacent empty cells (DIV version)
-                    const isTextCell = cellValue && typeof cellValue === 'string';
-                    const cellText = String(cellValue || '').trim();
-                    const shouldSpillover = isTextCell && cellText.length > 6; // More aggressive threshold
-                    
-                    if (shouldSpillover) {
-                      // Check how many adjacent cells are empty
-                      let spilloverWidth = 0;
-                      let maxSpilloverCells = Math.min(8, row.length - colIndex - 1);
-                      
-                      for (let i = 1; i <= maxSpilloverCells; i++) {
-                        const adjacentCell = row[colIndex + i];
-                        const isEmpty = !adjacentCell || adjacentCell === '' || adjacentCell === null || adjacentCell === undefined;
-                        if (isEmpty) {
-                          spilloverWidth += columnWidths[colIndex + i] || 80;
-                        } else {
-                          break;
-                        }
-                      }
-                      
-                      if (spilloverWidth > 10) {
-                        // Add to spillover registry for div layout too
-                        if (!window.excelSpilloverRegistry) {
-                          window.excelSpilloverRegistry = [];
-                        }
-                        
-                        const spilloverInfo = {
-                          text: cellValue,
-                          cellId: `${actualRowIndex}-${actualCol}`,
-                          originalWidth: columnWidths[colIndex] || 80,
-                          spilloverWidth: spilloverWidth,
-                          isFrozen: isFrozen,
-                          section: rowOffset === 0 ? (colOffset === 0 ? 'topLeft' : 'topRight') : (colOffset === 0 ? 'bottomLeft' : 'bottomRight'),
-                          cellStyle: {
-                            // Copy ALL styling properties from the original cell
-                            ...cellStyle,
-                            // Ensure critical properties are set
-                            color: cellStyle.color || 'inherit',
-                            fontWeight: cellStyle.fontWeight || 'normal',
-                            fontStyle: cellStyle.fontStyle || 'normal',
-                            fontSize: cellStyle.fontSize || '11px',
-                            fontFamily: cellStyle.fontFamily || 'inherit',
-                            textAlign: cellStyle.textAlign || (typeof cellValue === 'number' ? 'right' : 'left'),
-                            backgroundColor: cellStyle.backgroundColor || 'transparent',
-                            border: cellStyle.border || 'none',
-                            padding: cellStyle.padding || '0px 2px',
-                            lineHeight: cellStyle.lineHeight || '1',
-                            textDecoration: cellStyle.textDecoration || 'none',
-                            verticalAlign: cellStyle.verticalAlign || 'middle'
-                          }
-                        };
-                        
-                        window.excelSpilloverRegistry.push(spilloverInfo);
-                        
-                        // Return invisible placeholder - spillover will render the text
-                        return (
-                          <div
-                            id={`cell-${actualRowIndex}-${actualCol}`}
-                            style={{
-                              whiteSpace: 'nowrap',
-                              overflow: 'hidden',
-                              width: '100%',
-                              height: '100%',
-                              display: 'flex',
-                              alignItems: 'center',
-                              opacity: 0 // Hide the source text completely
-                            }}
-                          >
-                            {cellValue}
-                          </div>
-                        );
-                      }
-                    }
-                    
-                    // Debug formatting for div layout cells including columns K and P
-                    const debugText = String(cellValue || '').trim();
-                    const columnLetter = String.fromCharCode(65 + (colIndex + colOffset));
-                    const cellRef = `${columnLetter}${rowIndex + rowOffset + 1}`;
-                    
-                    // Debug P90/P91 positioning issue
-                    if (cellRef === 'P90' || cellRef === 'P91') {
-                      console.log(`🔍 POSITION [${cellRef}]: "${debugText}" | colIndex:${colIndex} | colOffset:${colOffset} | total:${colIndex + colOffset} | expectedP:${15}`);
-                    }
-                    
-                    if (debugText.includes('Total Uses') || debugText.includes('Month 14') || 
-                        debugText.includes('assumption') || debugText.includes('Assumption') ||
-                        debugText.includes('CF') || debugText.includes('Notes') ||
-                        columnLetter === 'K' || columnLetter === 'P') {
-                      console.log(`🎨 DIV [${cellRef}]: "${debugText}" | fontSize:${cellStyle.fontSize || 'undefined'} | fontWeight:${cellStyle.fontWeight || 'undefined'} | bold:${cellStyle.font?.bold || 'undefined'}`);
-                      console.log(`🎨 DIV STYLE:`, cellStyle);
-                    }
-                    
-                    // Default: truncate with ellipsis
-                    return (
-                      <div style={{ 
-                        whiteSpace: 'nowrap', 
-                        overflow: 'visible', 
-                        textOverflow: 'ellipsis',
-                        position: 'static',
-                        zIndex: 'auto'
-                      }}>
-                        {cellValue}
-                      </div>
-                    );
-                  })()}
+                  ) : (
+                    <div style={{ 
+                      whiteSpace: 'nowrap', 
+                      overflow: 'hidden', 
+                      textOverflow: 'ellipsis'
+                    }}>
+                      {cellValue}
+                    </div>
+                  )}
                 </div>
               );
             }).filter(Boolean)}
@@ -2311,9 +2273,10 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
               const originalRowHeight = sheet.rowHeights[actualRowIndex] || 20;
               
               // SYNCHRONIZED HEIGHT CALCULATION: Match the div-based method exactly
-              // Use the same normalization as the div fallback to ensure perfect alignment
-              const normalizedHeight = Math.max(1, Math.round(originalRowHeight * 100) / 100);
+              // Allow 0 height for hidden rows
+              const normalizedHeight = Math.round(originalRowHeight * 100) / 100;
               const rowHeight = normalizedHeight;
+              const isHiddenRow = rowHeight === 0;
               
               // FIXED: Apply cumulative height offset properly for bottom sections
               if (rowIndex === 0) {
@@ -2328,15 +2291,16 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                   key={actualRowIndex}
                   style={{ 
                     // Precise height control using CSS best practices
-                    height: `${rowHeight}px`,
-                    minHeight: `${rowHeight}px`,
-                    maxHeight: `${rowHeight}px`,
+                    height: isHiddenRow ? '0px' : `${rowHeight}px`,
+                    minHeight: '0px', // Allow collapse to 0
+                    maxHeight: isHiddenRow ? '0px' : `${rowHeight}px`,
                     lineHeight: '1',
-                    overflow: 'visible',
+                    overflow: 'hidden',
                     boxSizing: 'border-box',
                     verticalAlign: 'top', // Consistent vertical alignment
                     margin: '0',
-                    padding: '0'
+                    padding: '0',
+                    display: isHiddenRow ? 'none' : 'table-row' // Hide completely if hidden row
                   }}
                 >
                   {row.map((cellValue, colIndex) => {
@@ -2352,6 +2316,9 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                       img.displayInCell
                     );
                     
+                    // Get the column width for this cell
+                    const cellWidth = columnWidths[colIndex] || 59;
+                    
                     return (
                       <td
                         key={`${actualRow}-${actualCol}`}
@@ -2361,16 +2328,20 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                           // Normalize font weight to remove unwanted bold
                           fontWeight: cellStyle.fontWeight === 'bold' ? 'normal' : cellStyle.fontWeight,
                           position: 'relative',
-                          overflow: 'visible !important', // Force text spillover
-                          isolation: 'auto', // Ensure proper stacking context
-                          clipPath: 'none !important', // Prevent clipping
-                          contain: 'none !important', // Prevent containment
+                          overflow: 'hidden',
                           fontSize: '11px',
                           lineHeight: '1 !important',
                           backgroundColor: isFrozen ? (cellStyle.backgroundColor || '#f9fafb') : cellStyle.backgroundColor,
                           verticalAlign: imageForCell ? 'top' : 'middle',
                           textAlign: cellStyle.textAlign || (typeof cellValue === 'number' ? 'right' : 'left'),
-                          padding: '0px 2px',
+                          paddingTop: cellStyle.paddingTop || '0px',
+                          paddingBottom: cellStyle.paddingBottom || '0px',
+                          paddingLeft: cellStyle.paddingLeft || '2px',
+                          paddingRight: cellStyle.paddingRight || '2px',
+                          // Add explicit width settings
+                          width: `${cellWidth}px`,
+                          minWidth: `${cellWidth}px`,
+                          maxWidth: `${cellWidth}px`,
                           height: '100%',
                           maxHeight: '100%',
                           minHeight: '0',
@@ -2431,9 +2402,9 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                                     minWidth: 'auto',
                                     maxWidth: 'none',
                                     whiteSpace: 'nowrap',
-                                    overflow: 'visible',
+                                    overflow: 'hidden',
                                     textAlign: 'center',
-                                    textOverflow: 'ellipsis',
+                                    textOverflow: 'clip',
                                     boxShadow: '0 1px 2px rgba(0,0,0,0.1)'
                                   }}
                                   title={`${isRecalculateButton ? 'Recalculate' : 'Navigation'} Button: ${buttonText}`}
@@ -2441,110 +2412,6 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                                   {buttonText}
                                 </div>
                               );
-                            }
-                            
-                            // Enhanced spillover logic: check multiple adjacent empty cells
-                            const isTextCell = cellValue && typeof cellValue === 'string' && !isButtonCell;
-                            const cellText = String(cellValue || '').trim();
-                            const shouldSpillover = isTextCell && cellText.length > 6; // More aggressive threshold
-                            
-                            
-                            if (shouldSpillover) {
-                              // Check how many adjacent cells are empty
-                              let spilloverWidth = 0;
-                              let maxSpilloverCells = Math.min(8, row.length - colIndex - 1); // Check up to 8 cells or remaining cells
-                              let emptyCellsFound = 0;
-                              
-                              for (let i = 1; i <= maxSpilloverCells; i++) {
-                                const adjacentCell = row[colIndex + i];
-                                const isEmpty = !adjacentCell || adjacentCell === '' || adjacentCell === null || adjacentCell === undefined;
-                                if (isEmpty) {
-                                  spilloverWidth += columnWidths[colIndex + i] || 80;
-                                  emptyCellsFound++;
-                                } else {
-                                  break; // Stop at first non-empty cell
-                                }
-                              }
-                              
-                              // Debug comprehensive formatting for problem cells
-                              if (cellText.includes('INVESTMENT') || cellText.includes('CASH FLOWS') || cellText.includes('SOURCES') || 
-                                  cellText.includes('Total Uses') || cellText.includes('Month 14') || 
-                                  cellText.includes('assumption') || cellText.includes('Assumption')) {
-                                console.log(`🎨 FORMAT: "${cellText}" | fontSize:${cellStyle.fontSize || 'undefined'} | fontWeight:${cellStyle.fontWeight || 'undefined'} | bold:${cellStyle.font?.bold || 'undefined'}`);
-                                console.log(`🎨 FULL STYLE:`, cellStyle);
-                              }
-                              
-                              // Store spillover info for external rendering
-                              if (spilloverWidth > 10) {
-                                // Add to spillover registry instead of rendering inline
-                                if (!window.excelSpilloverRegistry) {
-                                  window.excelSpilloverRegistry = [];
-                                }
-                                
-                                const spilloverInfo = {
-                                  text: formattedValue,
-                                  cellId: `${actualRow}-${actualCol}`,
-                                  originalWidth: columnWidths[colIndex] || 80,
-                                  spilloverWidth: spilloverWidth,
-                                  isFrozen: isFrozen,
-                                  section: rowOffset === 0 ? (colOffset === 0 ? 'topLeft' : 'topRight') : (colOffset === 0 ? 'bottomLeft' : 'bottomRight'),
-                                  // Store position relative to the specific section for better scrolling
-                                  sectionContainer: rowOffset === 0 ? (colOffset === 0 ? 'topLeft' : 'topRight') : (colOffset === 0 ? 'bottomLeft' : 'bottomRight'),
-                                  cellStyle: {
-                                    // Copy ALL styling properties from the original cell
-                                    ...cellStyle,
-                                    // Ensure critical properties are set
-                                    color: cellStyle.color || 'inherit',
-                                    fontWeight: cellStyle.fontWeight || 'normal',
-                                    fontStyle: cellStyle.fontStyle || 'normal',
-                                    fontSize: cellStyle.fontSize || '11px',
-                                    fontFamily: cellStyle.fontFamily || 'inherit',
-                                    textAlign: cellStyle.textAlign || (typeof cellValue === 'number' ? 'right' : 'left'),
-                                    backgroundColor: cellStyle.backgroundColor || 'transparent',
-                                    border: cellStyle.border || 'none',
-                                    padding: cellStyle.padding || '0px 2px',
-                                    lineHeight: cellStyle.lineHeight || '1',
-                                    textDecoration: cellStyle.textDecoration || 'none',
-                                    verticalAlign: cellStyle.verticalAlign || 'middle'
-                                  }
-                                };
-                                
-                                window.excelSpilloverRegistry.push(spilloverInfo);
-                                
-                                // Return invisible placeholder - spillover will render the text
-                                return (
-                                  <span 
-                                    id={`cell-${actualRow}-${actualCol}`}
-                                    style={{
-                                      whiteSpace: 'nowrap',
-                                      overflow: 'hidden',
-                                      display: 'block',
-                                      width: '100%',
-                                      opacity: 0 // Hide the source text completely
-                                    }}
-                                  >
-                                    {formattedValue}
-                                  </span>
-                                );
-                              }
-                            }
-                            
-                            // Debug formatting for non-spillover cells including columns K and P
-                            const debugText = String(formattedValue || '').trim();
-                            const columnLetter = String.fromCharCode(65 + (colIndex + colOffset));
-                            const cellRef = `${columnLetter}${rowIndex + rowOffset + 1}`;
-                            
-                            // Debug P90/P91 positioning issue
-                            if (cellRef === 'P90' || cellRef === 'P91') {
-                              console.log(`🔍 TABLE POSITION [${cellRef}]: "${debugText}" | colIndex:${colIndex} | colOffset:${colOffset} | total:${colIndex + colOffset} | expectedP:${15}`);
-                            }
-                            
-                            if (debugText.includes('Total Uses') || debugText.includes('Month 14') || 
-                                debugText.includes('assumption') || debugText.includes('Assumption') ||
-                                debugText.includes('CF') || debugText.includes('Notes') ||
-                                columnLetter === 'K' || columnLetter === 'P') {
-                              console.log(`🎨 TABLE [${cellRef}]: "${debugText}" | fontSize:${cellStyle.fontSize || 'undefined'} | fontWeight:${cellStyle.fontWeight || 'undefined'} | bold:${cellStyle.font?.bold || 'undefined'}`);
-                              console.log(`🎨 TABLE STYLE:`, cellStyle);
                             }
                             
                             return formattedValue;
@@ -2562,105 +2429,6 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
     }
   };
 
-  // Section-specific spillover overlay component that scrolls with content
-  const SectionSpilloverOverlay = ({ sectionRef, sectionType }) => {
-    const [spillovers, setSpillovers] = React.useState([]);
-    
-    React.useEffect(() => {
-      const updateSpillovers = () => {
-        if (window.excelSpilloverRegistry && window.excelSpilloverRegistry.length > 0) {
-          // Filter spillovers for this specific section
-          const sectionSpillovers = window.excelSpilloverRegistry.filter(spillover => {
-            const sourceElement = document.getElementById(`cell-${spillover.cellId}`);
-            if (!sourceElement) return false;
-            
-            // Check if this cell belongs to this section by checking if it's a descendant
-            const sectionElement = sectionRef.current;
-            return sectionElement && sectionElement.contains(sourceElement);
-          });
-          
-          setSpillovers(sectionSpillovers);
-          
-          // Clear the registry items that belong to this section
-          if (sectionSpillovers.length > 0) {
-            window.excelSpilloverRegistry = window.excelSpilloverRegistry.filter(spillover => {
-              const sourceElement = document.getElementById(`cell-${spillover.cellId}`);
-              if (!sourceElement) return false;
-              const sectionElement = sectionRef.current;
-              return !(sectionElement && sectionElement.contains(sourceElement));
-            });
-          }
-        }
-      };
-      
-      // Update spillovers after render
-      const timer = requestAnimationFrame(() => {
-        setTimeout(updateSpillovers, 50);
-      });
-      
-      return () => cancelAnimationFrame(timer);
-    });
-    
-    if (!sectionRef.current) return null;
-    
-    return (
-      <div style={{ 
-        position: 'absolute', 
-        top: 0, 
-        left: 0, 
-        right: 0, 
-        bottom: 0, 
-        pointerEvents: 'none', 
-        zIndex: 1000,
-        overflow: 'visible'
-      }}>
-        {spillovers.map((spillover, index) => {
-          const sourceElement = document.getElementById(`cell-${spillover.cellId}`);
-          if (!sourceElement || !sectionRef.current) return null;
-          
-          const rect = sourceElement.getBoundingClientRect();
-          const sectionRect = sectionRef.current.getBoundingClientRect();
-          
-          return (
-            <div
-              key={`${spillover.cellId}-${index}`}
-              style={{
-                // Position relative to this section container
-                position: 'absolute',
-                left: rect.left - sectionRect.left + 2,
-                top: rect.top - sectionRect.top,
-                width: spillover.originalWidth + spillover.spilloverWidth - 4,
-                height: rect.height,
-                
-                // Layout
-                display: 'flex',
-                alignItems: 'center',
-                whiteSpace: 'nowrap',
-                zIndex: 1000,
-                pointerEvents: 'none',
-                backgroundColor: 'transparent',
-                
-                // Use EXACT Excel formatting with normalized font weights
-                ...spillover.cellStyle,
-                fontWeight: spillover.cellStyle?.fontWeight === 'bold' ? 'normal' : spillover.cellStyle?.fontWeight, // Remove unwanted bold
-                
-                // Override layout properties that could interfere with positioning
-                position: 'absolute',
-                display: 'flex',
-                overflow: 'visible',
-                
-                // Convert textAlign to flexbox justifyContent for proper alignment
-                justifyContent: spillover.cellStyle?.textAlign === 'right' ? 'flex-end' : 
-                               spillover.cellStyle?.textAlign === 'center' ? 'center' : 'flex-start'
-              }}
-            >
-              {spillover.text}
-            </div>
-          );
-        })}
-      </div>
-    );
-  };
 
   return (
     <div 
@@ -2695,17 +2463,16 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
           {/* Top-Left: Frozen rows & columns (A1:A2) */}
           <div 
             ref={topLeftRef}
-            className="border-r-4 border-b-4 border-red-500 sticky top-0 left-0 z-30 overflow-visible bg-blue-50"
+            className="border-r-4 border-b-4 border-red-500 sticky top-0 left-0 z-30 overflow-hidden bg-blue-50"
             style={{ position: 'relative' }}
           >
             {renderTableSection(topLeftData, topLeftStyles, frozenColumnWidths, 0, 0, true)}
-            <SectionSpilloverOverlay sectionRef={topLeftRef} sectionType="topLeft" />
           </div>
           
           {/* Top-Right: Frozen rows, scrollable columns (B1:X2) - ENHANCED for full width */}
           <div 
             ref={topRightRef}
-            className="border-b-4 border-red-500 sticky top-0 z-20 overflow-x-auto overflow-y-visible bg-green-50 hide-scrollbar"
+            className="border-b-4 border-red-500 sticky top-0 z-20 overflow-x-auto overflow-y-hidden bg-green-50 hide-scrollbar"
             style={{ 
               width: '100%',
               maxWidth: '100%',
@@ -2721,7 +2488,7 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
           {/* Bottom-Left: Frozen columns, scrollable rows (A3:A150) */}
           <div 
             ref={bottomLeftRef}
-            className="border-r-4 border-red-500 sticky left-0 z-20 overflow-y-auto overflow-x-visible bg-yellow-50 hide-scrollbar"
+            className="border-r-4 border-red-500 sticky left-0 z-20 overflow-y-auto overflow-x-hidden bg-yellow-50 hide-scrollbar"
             style={{
               height: '100%',
               lineHeight: '0',

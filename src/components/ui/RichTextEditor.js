@@ -2457,7 +2457,7 @@ export default function RichTextEditor({ initialContent = '', onChange }) {
             className={getButtonClass()}
             title="Blockquote"
           >
-            "
+            &quot;
           </button>
           <button 
             type="button" 
