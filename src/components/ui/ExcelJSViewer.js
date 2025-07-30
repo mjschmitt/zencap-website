@@ -67,6 +67,506 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
   // Memoize the file URL to prevent unnecessary re-processing
   const fileUrl = useMemo(() => file, [file]);
 
+  // Helper functions for ExcelJS styling - moved here to avoid hoisting issues
+  const convertBorderStyle = useCallback((excelStyle) => {
+    switch (excelStyle) {
+      case 'thin': return 'solid';
+      case 'medium': return 'solid';
+      case 'thick': return 'solid';
+      case 'dotted': return 'dotted';
+      case 'dashed': return 'dashed';
+      case 'double': return 'double';
+      case 'hair': return 'solid';
+      case 'mediumDashed': return 'dashed';
+      case 'dashDot': return 'dashed';
+      case 'mediumDashDot': return 'dashed';
+      case 'dashDotDot': return 'dashed';
+      case 'mediumDashDotDot': return 'dashed';
+      case 'slantDashDot': return 'dashed';
+      default: return 'solid';
+    }
+  }, []);
+
+  const applyTintToColor = useCallback((hexColor, tint) => {
+    if (!hexColor || tint === 0) return hexColor;
+    
+    // Remove # if present
+    const hex = hexColor.replace('#', '');
+    
+    // Convert to RGB
+    const r = parseInt(hex.substring(0, 2), 16);
+    const g = parseInt(hex.substring(2, 4), 16);
+    const b = parseInt(hex.substring(4, 6), 16);
+    
+    // Apply tint
+    let newR, newG, newB;
+    if (tint > 0) {
+      // Lighten
+      newR = Math.round(r + (255 - r) * tint);
+      newG = Math.round(g + (255 - g) * tint);
+      newB = Math.round(b + (255 - b) * tint);
+    } else {
+      // Darken
+      newR = Math.round(r * (1 + tint));
+      newG = Math.round(g * (1 + tint));
+      newB = Math.round(b * (1 + tint));
+    }
+    
+    // Convert back to hex
+    const toHex = (val) => Math.max(0, Math.min(255, val)).toString(16).padStart(2, '0');
+    return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
+  }, []);
+
+  const getBorderColor = useCallback((colorObj) => {
+    if (!colorObj) return '#000000';
+    if (colorObj.argb) return `#${colorObj.argb.substring(2)}`;
+    if (colorObj.rgb) return `#${colorObj.rgb}`;
+    // ENHANCED: Handle theme colors
+    if (colorObj.theme !== undefined) {
+      const themeColors = {
+        0: '#000000', // Text 1 (Black)
+        1: '#FFFFFF', // Background 1 (White)
+        2: '#1F497D', // Text 2 (Dark Blue)
+        3: '#EEECE1', // Background 2 (Light Gray)
+        4: '#4F81BD', // Accent 1 (Blue)
+        5: '#9CBB58', // Accent 2 (Green)
+        6: '#F79646', // Accent 3 (Orange)
+        7: '#8064A2', // Accent 4 (Purple)
+        8: '#4BACC6', // Accent 5 (Light Blue)
+        9: '#F15A24'  // Accent 6 (Red-Orange)
+      };
+      return themeColors[colorObj.theme] || '#000000';
+    }
+    return '#000000';
+  }, []);
+
+  // ENHANCED: Smart numeric cell detection - FIXED to handle format codes with numeric content
+  const isNumericCell = useCallback((cell) => {
+    const numFmt = cell.style?.numFmt;
+    const formatInfo = parseExcelNumberFormat(numFmt);
+
+    // PRIORITY 1: If Excel explicitly defines this as a numeric format, right-align
+    if (formatInfo.isPercentage || formatInfo.isCurrency || formatInfo.customPattern === 'multiplier') {
+      return true;
+    }
+    
+    // PRIORITY 2: Check if cell.text contains formatted values that clearly indicate numbers
+    if (cell.text) {
+      const text = cell.text.toString().trim();
+      
+      // FIXED: Be more specific about percentage patterns
+      // Only treat as percentage if it actually looks like a percentage VALUE
+      if (text.match(/^\d+(\.\d+)?%$/) || text.match(/^\(\d+(\.\d+)?%\)$/)) {
+        return true; // Like "15.5%" or "(12.3%)"
+      }
+      
+      // Currency patterns
+      if (text.match(/^\$[\d,]+(\.\d+)?$/) || text.match(/^[\d,]+(\.\d+)?\s*(USD|EUR|GBP)$/)) {
+        return true; // Like "$1,000.50" or "1000 USD"
+      }
+      
+      // Multiplier pattern like "2.5x"
+      if (text.match(/^\d+(\.\d+)?x$/)) {
+        return true;
+      }
+      
+      // Pure number patterns - ENHANCED to be more selective
+      if (text.match(/^\d+$/) || // Pure integers: "123"
+          text.match(/^\d{1,3}(,\d{3})+$/) || // Formatted integers: "1,000" 
+          text.match(/^\d+\.\d+$/) || // Pure decimals: "123.45"
+          text.match(/^\d{1,3}(,\d{3})*\.\d+$/)) { // Formatted decimals: "1,000.50"
+        return true;
+      }
+      
+      // FIXED: Don't treat text that contains words as numeric
+      // If it contains letters (except in specific patterns), it's likely text
+      if (text.match(/[a-zA-Z]/) && !text.match(/^\d+(\.\d+)?\s*(USD|EUR|GBP|x)$/)) {
+        return false; // Text like "% chg", "Revenue", "EBITDA", etc.
+      }
+    }
+
+    // PRIORITY 3: Check if the cell value is a number
+    if (typeof cell.value === 'number' && !isNaN(cell.value)) {
+      return true;
+    }
+
+    // PRIORITY 4: FIXED: Be more conservative with string-to-number conversion
+    if (typeof cell.value === 'string') {
+      const trimmed = cell.value.trim();
+      
+      // Only treat as numeric if it's clearly a number without letters
+      if (trimmed.match(/^[\d\s,$€£%x.,-]+$/) && !isNaN(parseFloat(trimmed)) && isFinite(trimmed)) {
+        // Additional check: if it contains letters other than currency symbols, it's probably text
+        if (trimmed.match(/[a-zA-Z]/) && !trimmed.match(/^[\d\s,$€£%x.,-]+$/)) {
+          return false;
+        }
+        return true;
+      }
+      
+      return false;
+    }
+
+    // PRIORITY 5: Check if the cell value is an object with a numeric result
+    if (typeof cell.value === 'object' && cell.value !== null) {
+      if (cell.value.result !== undefined && typeof cell.value.result === 'number') {
+        return true;
+      }
+      
+      // FIXED: Be more selective about object text/value conversion
+      if (cell.value.text !== undefined && typeof cell.value.text === 'string') {
+        const trimmed = cell.value.text.trim();
+        // Only numeric-looking text in objects
+        if (trimmed.match(/^[\d\s,$€£%x.,-]+$/) && !isNaN(parseFloat(trimmed)) && isFinite(trimmed)) {
+          return true;
+        }
+      }
+      
+      if (cell.value.value !== undefined && typeof cell.value.value === 'number') {
+        return true;
+      }
+    }
+
+    // PRIORITY 6: FIXED: Handle format codes more intelligently
+    // If Excel has a numeric format code, check if the content justifies it
+    if (numFmt && (numFmt.includes('0') || numFmt.includes('#') || numFmt.includes('.'))) {
+      // Check if the cell has numeric content (including 0)
+      if (cell.value && typeof cell.value === 'number') {
+        return true; // Direct number (including 0)
+      }
+      
+      // Check if cell.text contains numeric content (including formatted 0s)
+      if (cell.text) {
+        const text = cell.text.toString().trim();
+        // Accept formatted numbers, including 0 values
+        if (text.match(/^[\d\s,$€£%x.,-]+$/) || 
+            text === '0' || 
+            text === '$0.00' || 
+            text === '0.0%' ||
+            text.match(/^0\.\d+%$/) ||
+            text.match(/^\$0\.\d+$/)) {
+          return true;
+        }
+      }
+      
+      // Check if the cell value object has numeric properties
+      if (typeof cell.value === 'object' && cell.value !== null) {
+        if (cell.value.result !== undefined || 
+            cell.value.value !== undefined || 
+            cell.value.text !== undefined) {
+          // If it has any of these properties, it's likely a formatted cell
+          return true;
+        }
+      }
+      
+      // FIXED: If we have a numeric format code, treat the cell as numeric
+      // This is the key fix - if Excel says it's numeric, trust it
+      return true;
+    }
+
+    // If none of the above, it's not a numeric cell
+    return false;
+  }, []);
+
+  // Helper function to calculate luminance for contrast checking
+  const getLuminance = useCallback((hexColor) => {
+    const r = parseInt(hexColor.slice(1, 3), 16) / 255;
+    const g = parseInt(hexColor.slice(3, 5), 16) / 255;
+    const b = parseInt(hexColor.slice(5, 7), 16) / 255;
+    
+    const toLinear = (c) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
+    
+    return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+  }, []);
+
+  const extractExcelJSStyles = useCallback((cell, cellRef) => {
+    const style = {};
+    
+    if (!cell.style) return style;
+
+    // Font styles
+    if (cell.style.font) {
+      const font = cell.style.font;
+      
+      if (font.bold) style.fontWeight = 'bold';
+      if (font.italic) style.fontStyle = 'italic';
+      if (font.underline) {
+        // ENHANCED: Accounting format underlines should be sized to content, not full cell width
+        const numFmt = cell.style?.numFmt;
+        const formatInfo = parseExcelNumberFormat(numFmt);
+        
+        if (formatInfo.isAccountingFormat) {
+          // Use border-bottom for accounting format to size to content
+          style.borderBottom = '1px solid currentColor';
+          style.paddingBottom = '2px'; // Add small padding so text doesn't touch the underline
+          // Important: Do NOT use display: inline-block as it limits width to content
+          // The cell's display should remain default (table-cell) for full width
+        } else {
+          style.textDecoration = 'underline';
+        }
+      }
+      if (font.strike) style.textDecoration = 'line-through';
+      if (font.size) style.fontSize = `${font.size}pt`;
+      if (font.name) style.fontFamily = font.name;
+      
+      // Font color - ENHANCED to handle theme colors
+      if (font.color) {
+        if (font.color.argb) {
+          const argb = font.color.argb;
+          const rgb = argb.length === 8 ? argb.substring(2) : argb;
+          style.color = `#${rgb}`;
+        } else if (font.color.rgb) {
+          style.color = `#${font.color.rgb}`;
+        } else if (font.color.indexed !== undefined) {
+          // ENHANCED: Handle indexed colors (Excel's color palette)
+          const indexed = font.color.indexed;
+          if (indexed === 12) {
+            // Index 12 is Excel's blue color for input cells - use same blue as ARGB
+            style.color = '#0000FF';
+          } else {
+            // Default for other indexed colors
+            style.color = '#000000';
+          }
+        } else if (font.color.theme !== undefined) {
+          // ENHANCED: Handle theme-based colors with automatic contrast
+          const theme = font.color.theme;
+          const tint = font.color.tint || 0;
+          
+          // Get background color for contrast checking
+          let backgroundColor = null;
+          if (cell.style?.fill?.type === 'pattern' && cell.style.fill.fgColor) {
+            if (cell.style.fill.fgColor.argb) {
+              const argb = cell.style.fill.fgColor.argb;
+              const rgb = argb.length === 8 ? argb.substring(2) : argb;
+              backgroundColor = `#${rgb}`;
+            } else if (cell.style.fill.fgColor.theme !== undefined) {
+              // Handle theme-based backgrounds
+              const bgTheme = cell.style.fill.fgColor.theme;
+              const bgTint = cell.style.fill.fgColor.tint || 0;
+              const themeBackgroundColors = {
+                0: '#000000', 1: '#FFFFFF', 2: '#1F497D', 3: '#EEECE1',
+                4: '#4F81BD', 5: '#9CBB58', 6: '#F79646', 7: '#8064A2',
+                8: '#4BACC6', 9: '#F15A24'
+              };
+              let bgBaseColor = themeBackgroundColors[bgTheme] || '#FFFFFF';
+              if (bgTint !== 0) {
+                bgBaseColor = applyTintToColor(bgBaseColor, bgTint);
+              }
+              backgroundColor = bgBaseColor;
+            }
+          }
+          
+          // FIXED: Smart theme color interpretation with contrast awareness
+          let baseColor;
+          switch (theme) {
+            case 0: // Text 1 - Auto contrast: white on dark, black on light
+              if (backgroundColor && backgroundColor !== '#FFFFFF' && getLuminance(backgroundColor) < 0.5) {
+                baseColor = '#FFFFFF'; // White text on dark background
+              } else {
+                baseColor = '#000000'; // Black text on light/no background - DEFAULT TO BLACK
+              }
+              break;
+            case 1: // Background 1 - When used as TEXT: auto contrast
+              if (backgroundColor && backgroundColor !== '#FFFFFF' && getLuminance(backgroundColor) < 0.5) {
+                baseColor = '#FFFFFF'; // White text on dark background
+              } else {
+                baseColor = '#000000'; // Black text on light/no background - DEFAULT TO BLACK
+              }
+              break;
+            case 2: // Text 2 - Dark blue text
+              baseColor = '#1F497D';
+              break;
+            case 3: // Background 2 - When used as TEXT color = BLACK
+              baseColor = '#000000';
+              break;
+            case 4: // Accent 1 - Blue theme for inputs
+              baseColor = '#1F497D';
+              break;
+            case 5: // Accent 2 - Green theme
+              baseColor = '#9CBB58';
+              break;
+            case 6: // Accent 3 - Orange theme
+              baseColor = '#F79646';
+              break;
+            case 7: // Accent 4 - Purple theme
+              baseColor = '#8064A2';
+              break;
+            case 8: // Accent 5 - Light Blue theme
+              baseColor = '#4BACC6';
+              break;
+            case 9: // Accent 6 - Red-Orange theme
+              baseColor = '#F15A24';
+              break;
+            default:
+              baseColor = '#000000';
+          }
+          
+          // Apply tint for non-auto-contrast theme colors
+          if (tint !== 0 && theme !== 0 && theme !== 1) {
+            baseColor = applyTintToColor(baseColor, tint);
+          }
+          
+          // Debug logging for section headers (only for theme 0 with dark backgrounds)
+          if (theme === 0 && backgroundColor && getLuminance(backgroundColor) < 0.5) {
+            // Auto-contrast applied
+          }
+          
+          style.color = baseColor;
+        }
+      }
+    }
+
+    // Fill/Background - ENHANCED to handle theme colors
+    if (cell.style.fill && cell.style.fill.type === 'pattern') {
+      const fill = cell.style.fill;
+      if (fill.fgColor) {
+        if (fill.fgColor.argb) {
+          const argb = fill.fgColor.argb;
+          const rgb = argb.length === 8 ? argb.substring(2) : argb;
+          style.backgroundColor = `#${rgb}`;
+        } else if (fill.fgColor.rgb) {
+          style.backgroundColor = `#${fill.fgColor.rgb}`;
+        } else if (fill.fgColor.theme !== undefined) {
+          // ENHANCED: Handle theme-based background colors with tint support
+          const theme = fill.fgColor.theme;
+          const tint = fill.fgColor.tint || 0;
+          
+          // Excel's theme colors for backgrounds
+          let baseColor;
+          switch (theme) {
+            case 0: // Text 1 color used as background (black)
+              baseColor = '#000000';
+              break;
+            case 1: // Background 1 (white)
+              baseColor = '#FFFFFF';
+              break;
+            case 2: // Text 2 color used as background (dark blue)
+              baseColor = '#1F497D';
+              break;
+            case 3: // Background 2 (light gray) - FIXED to be darker
+              baseColor = '#D9D9D9'; // Darker gray to match Excel better
+              break;
+            case 4: // Accent 1 (blue)
+              baseColor = '#1F497D';
+              break;
+            case 5: // Accent 2 (green)
+              baseColor = '#9CBB58';
+              break;
+            case 6: // Accent 3 (orange)
+              baseColor = '#F79646';
+              break;
+            case 7: // Accent 4 (purple)
+              baseColor = '#8064A2';
+              break;
+            case 8: // Accent 5 (light blue)
+              baseColor = '#4BACC6';
+              break;
+            case 9: // Accent 6 (red-orange)
+              baseColor = '#F15A24';
+              break;
+            default:
+              baseColor = '#FFFFFF';
+          }
+          
+          // FIXED: Normalize grey sections - ensure consistent grey color for divider sections
+          // Both -0.25 and -0.5 tints should produce the same light grey for visual consistency
+          if (theme === 0 && tint < 0 && Math.abs(tint) > 0.2) {
+            // Use the same grey that the large sections were producing (theme 0 with ~-0.5 tint)
+            const perfectTint = 0.499984740745262; // Use the exact tint from the large sections
+            baseColor = applyTintToColor('#000000', perfectTint);
+          } else if (tint !== 0) {
+            baseColor = applyTintToColor(baseColor, tint);
+          }
+          
+          // Debug logging for rows 8-20, columns J+ (column 10+)
+          if (cellRef) {
+            const rowMatch = cellRef.match(/\d+/);
+            const colMatch = cellRef.match(/[A-Z]+/);
+            
+            if (rowMatch && colMatch) {
+              const rowNum = parseInt(rowMatch[0]);
+              const colLetter = colMatch[0];
+              const colNum = colLetter.split('').reduce((result, char) => result * 26 + char.charCodeAt(0) - 64, 0);
+              
+              if (rowNum >= 8 && rowNum <= 20 && colNum >= 10) {
+                // Background color applied
+              }
+            }
+          }
+          
+          style.backgroundColor = baseColor;
+        }
+      }
+    }
+
+    // Alignment - ENHANCED to work with new number formatting system and accounting format
+    const numFmt = cell.style?.numFmt;
+    const formatInfo = parseExcelNumberFormat(numFmt);
+    
+    if (cell.style.alignment) {
+      const alignment = cell.style.alignment;
+      if (alignment.horizontal) {
+        style.textAlign = alignment.horizontal;
+      }
+      if (alignment.vertical) {
+        style.verticalAlign = alignment.vertical === 'middle' ? 'middle' : alignment.vertical;
+      }
+      // DISABLED: Force no text wrapping to prevent row height issues
+      // if (alignment.wrapText) {
+      //   style.whiteSpace = 'pre-wrap';
+      // }
+    } else {
+      // FIXED: Explicit default alignment for cells with no Excel alignment
+      const shouldRightAlign = isNumericCell(cell);
+      if (shouldRightAlign) {
+        style.textAlign = 'right'; // Numbers, percentages, currency
+        // REMOVED: Don't automatically color numeric cells blue
+      } else {
+        style.textAlign = 'left';   // Text, descriptions, labels
+      }
+    }
+    
+    // ENHANCED: Handle Excel accounting format with underscore spacing
+    if (formatInfo.hasUnderscoreSpacing && formatInfo.isAccountingFormat) {
+      // Apply padding to simulate Excel's underscore spacing characters
+      style.paddingLeft = `${formatInfo.underscoreSpacing || 8}px`;
+      style.paddingRight = `${Math.max(formatInfo.underscoreSpacing / 2, 4)}px`;
+      style.textAlign = 'right'; // Ensure right alignment for accounting format
+      
+      // Debug logging for accounting format cells
+      if (cellRef === 'I9' || cellRef === 'I34') {
+        // Applied accounting format
+      }
+    }
+
+    // Borders
+    if (cell.style.border) {
+      const border = cell.style.border;
+      const borderParts = [];
+      
+      ['top', 'right', 'bottom', 'left'].forEach(side => {
+        if (border[side] && border[side].style) {
+          const borderStyle = convertBorderStyle(border[side].style);
+          const borderColor = border[side].color ? 
+            (border[side].color.argb ? `#${border[side].color.argb.substring(2)}` : '#000000') : '#000000';
+          borderParts.push(`${borderStyle} ${borderColor}`);
+        }
+      });
+      
+      if (borderParts.length > 0) {
+        if (border.top) style.borderTop = `1px ${convertBorderStyle(border.top.style)} ${getBorderColor(border.top.color)}`;
+        if (border.right) style.borderRight = `1px ${convertBorderStyle(border.right.style)} ${getBorderColor(border.right.color)}`;
+        if (border.bottom) style.borderBottom = `1px ${convertBorderStyle(border.bottom.style)} ${getBorderColor(border.bottom.color)}`;
+        if (border.left) style.borderLeft = `1px ${convertBorderStyle(border.left.style)} ${getBorderColor(border.left.color)}`;
+      }
+    }
+
+    // DISABLED: Remove automatic contrast adjustment - it's causing color inversions
+    // Excel's theme colors should be trusted as-is without modification
+    // The original colors from theme mapping should be preserved
+    
+    return style;
+  }, [convertBorderStyle, getBorderColor, isNumericCell, applyTintToColor, getLuminance]);
+
   useEffect(() => {
     if (!fileUrl || processingRef.current) return;
 
@@ -78,6 +578,8 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
         setLoading(true);
         setError(null);
 
+        console.log('ExcelJSViewer: Starting to load file:', fileUrl);
+
         // Dynamic import of ExcelJS with retry logic
         let ExcelJS;
         let retryCount = 0;
@@ -86,9 +588,11 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
         while (retryCount < maxRetries) {
           try {
             ExcelJS = await import('exceljs');
+            console.log('ExcelJSViewer: ExcelJS imported successfully');
             break; // Success, exit retry loop
           } catch (importError) {
             retryCount++;
+            console.error('ExcelJSViewer: ExcelJS import attempt failed:', importError);
             // ExcelJS import attempt failed
             
             if (retryCount >= maxRetries) {
@@ -101,16 +605,21 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
         }
         
         // Fetch the Excel file
+        console.log('ExcelJSViewer: Fetching file from URL:', fileUrl);
         const response = await fetch(fileUrl);
+        console.log('ExcelJSViewer: Fetch response status:', response.status, response.statusText);
+        
         if (!response.ok) {
           throw new Error(`Failed to fetch Excel file: ${response.statusText}`);
         }
         
         const arrayBuffer = await response.arrayBuffer();
+        console.log('ExcelJSViewer: File loaded, size:', arrayBuffer.byteLength, 'bytes');
         
         // Create workbook and load buffer
         const workbook = new ExcelJS.Workbook();
         await workbook.xlsx.load(arrayBuffer);
+        console.log('ExcelJSViewer: Workbook loaded successfully');
         
         // Extract images from the workbook
         const extractedImages = [];
@@ -147,6 +656,12 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
         
       } catch (err) {
         // ExcelJS Viewer Error
+        console.error('ExcelJSViewer: Error loading Excel file:', err);
+        console.error('ExcelJSViewer: Error details:', {
+          message: err.message,
+          stack: err.stack,
+          fileUrl: fileUrl
+        });
         setError(err.message);
         handleError(err);
       } finally {
@@ -162,29 +677,64 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
     let startRow = Infinity, startCol = Infinity;
     let endRow = 0, endCol = 0;
     
+    // ENHANCED: Check all rows and columns, including hidden ones
     worksheet.eachRow((row, rowNumber) => {
+      // Check if row has any data, even if hidden
+      let rowHasData = false;
       row.eachCell((cell, colNumber) => {
         if (cell.value !== null && cell.value !== undefined && cell.value !== '') {
           startRow = Math.min(startRow, rowNumber);
           startCol = Math.min(startCol, colNumber);
           endRow = Math.max(endRow, rowNumber);
           endCol = Math.max(endCol, colNumber);
+          rowHasData = true;
         }
       });
+      
+      // ENHANCED: Also check for rows that might be hidden but contain important data
+      // Some Excel files hide rows but they still contain formulas or formatting
+      if (!rowHasData && row.hidden === false) {
+        // Check if row has any styling that might indicate it's important
+        if (row.style || row.height !== undefined) {
+          startRow = Math.min(startRow, rowNumber);
+          endRow = Math.max(endRow, rowNumber);
+        }
+      }
     });
+    
+    // ENHANCED: Check all columns, including hidden ones
+    const maxCol = worksheet.columnCount || 100; // Use actual column count or reasonable default
+    for (let colNumber = 1; colNumber <= maxCol; colNumber++) {
+      const col = worksheet.getColumn(colNumber);
+      if (col) {
+        // Check if column has any data or styling, even if hidden
+        let colHasData = false;
+        worksheet.eachRow((row) => {
+          const cell = row.getCell(colNumber);
+          if (cell.value !== null && cell.value !== undefined && cell.value !== '') {
+            colHasData = true;
+          }
+        });
+        
+        if (colHasData || col.hidden === false || col.width !== undefined) {
+          startCol = Math.min(startCol, colNumber);
+          endCol = Math.max(endCol, colNumber);
+        }
+      }
+    }
     
     // Fallback to at least A1 if no data found
     if (startRow === Infinity) {
       return { startRow: 1, startCol: 1, endRow: 1, endCol: 1 };
     }
     
-    // Increased limits for financial models which often have many columns and rows
-    // Use actual range but with reasonable maximums for performance
-    const maxRows = Math.min(endRow, startRow + 1000); // Increased to capture more rows
-    const maxCols = Math.min(endCol, startCol + 100); // Increased from 50 to 100
+    // ENHANCED: Include more columns and rows for comprehensive coverage
+    // Financial models often have many hidden columns and rows that contain important data
+    const maxRows = Math.min(endRow + 50, startRow + 1500); // Increased to capture more rows
+    const maxCols = Math.min(endCol + 20, startCol + 150); // Increased to capture more columns
     
-    // Ensure we include row 138 if it exists
-    const finalEndRow = Math.max(maxRows, 138);
+    // Ensure we include specific rows if they exist (like row 138)
+    const finalEndRow = Math.max(maxRows, 150);
     
     return { startRow, startCol, endRow: finalEndRow, endCol: maxCols };
   };
@@ -862,13 +1412,13 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       }
     }
 
-    // Extract cell value with simplified ExcelJS handling
+    // ENHANCED: Extract cell value with improved handling of hidden and empty cells
     let formattedValue = '';
     
     // Check for accounting format
     const isLikelyAccounting = cell.style?.numFmt && (cell.style.numFmt.includes('_(') || cell.style.numFmt.includes('_)'));
     
-    // FIXED: Handle all cell values including 0, empty strings, and false
+    // ENHANCED: Handle all cell values including 0, empty strings, and false
     if (cell.value !== null && cell.value !== undefined) {
       // Use the optimized formatCellValue function - this handles 0, empty strings, etc.
       formattedValue = formatCellValue(cell);
@@ -878,7 +1428,7 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
         formattedValue = '-';
       }
     } else if (cell.text && cell.text !== '') {
-      // FIXED: Use cell.text as fallback when cell.value is null/undefined
+      // Use cell.text as fallback when cell.value is null/undefined
       formattedValue = cell.text;
     } else {
       // Truly empty cell - check if it should show dash for accounting format
@@ -889,23 +1439,55 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       }
     }
     
-    // SAFETY CHECK: Ensure we never display [object Object]  
+    // ENHANCED: Better safety check for object display
     if (formattedValue === '[object Object]' || formattedValue.toString() === '[object Object]') {
       // Fallback: try to get meaningful text from the cell
       if (cell.text) {
         formattedValue = cell.text;
       } else if (typeof cell.value === 'string') {
         formattedValue = cell.value;
+      } else if (typeof cell.value === 'object' && cell.value !== null) {
+        // Try to extract meaningful value from object
+        if (cell.value.result !== undefined) {
+          formattedValue = String(cell.value.result);
+        } else if (cell.value.text !== undefined) {
+          formattedValue = String(cell.value.text);
+        } else if (cell.value.value !== undefined) {
+          formattedValue = String(cell.value.value);
       } else {
-        formattedValue = 'Control Element';
+          formattedValue = '';
+        }
+      } else {
+        formattedValue = '';
       }
     }
 
-    // DISABLED: Navigation area logic was clearing valid cell values
-    // This was causing blank cells in areas that should have data
+    // ENHANCED: Check if cell should be hidden based on column/row properties
+    let shouldHide = false;
+    
+    // Check if the column this cell belongs to is hidden
+    // Convert array index back to Excel column number
+    const actualColNumber = colIndex + 1; // Excel columns are 1-based
+    const col = cell.worksheet?.getColumn(actualColNumber);
+    if (col && col.hidden === true) {
+      shouldHide = true;
+    }
+    
+    // Check if the row this cell belongs to is hidden
+    // Convert array index back to Excel row number
+    const actualRowNumber = rowIndex + 1; // Excel rows are 1-based
+    const row = cell.worksheet?.getRow(actualRowNumber);
+    if (row && row.hidden === true) {
+      shouldHide = true;
+    }
 
     // Extract ExcelJS styles and convert to CSS
     const style = extractExcelJSStyles(cell, cellAddress);
+    
+    // ENHANCED: Apply hiding if needed
+    if (shouldHide) {
+      style.display = 'none';
+    }
 
     return {
       address: cellAddress,
@@ -913,11 +1495,12 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       formattedValue,
       style,
       rowIndex,
-      colIndex
+      colIndex,
+      isHidden: shouldHide
     };
-  }, [extractDateFromObject, formatCellValue]);
+  }, [extractDateFromObject, formatCellValue, extractExcelJSStyles]);
 
-  // Helper function to check if cell is part of a merged range
+  // ENHANCED: Helper function to check if cell is part of a merged range
   const getCellMergeInfo = useCallback((worksheet, rowIndex, colIndex) => {
     // FIXED: Handle cases where _merges doesn't exist or isn't iterable
     if (!worksheet._merges || !Array.isArray(worksheet._merges) || worksheet._merges.length === 0) {
@@ -957,8 +1540,30 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
     return null;
   }, []);
 
+  // ENHANCED: Helper function to check if a column or row should be hidden
+  const isColumnOrRowHidden = useCallback((worksheet, index, isColumn = true) => {
+    try {
+      if (isColumn) {
+        const col = worksheet.getColumn(index);
+        return col && col.hidden === true;
+      } else {
+        const row = worksheet.getRow(index);
+        return row && row.hidden === true;
+      }
+    } catch (error) {
+      return false;
+    }
+  }, []);
+
   // Memoize expensive sheet processing to prevent re-computation
   const processSheet = useCallback((worksheet, extractedImages) => {
+    // Initialize data structures first to avoid hoisting issues
+    const data = [];
+    const styles = [];
+    
+    const range = findActualDataRange(worksheet);
+    const columnWidths = [];
+    const rowHeights = [];
     
     // Check for drawing objects and form controls (removed debug logging)
     
@@ -1009,44 +1614,14 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
     const columns = worksheet.columns || [];
     
     // Find actual data range (optimize performance)
-    const range = findActualDataRange(worksheet);
+    // const range = findActualDataRange(worksheet); // REMOVED: Duplicate declaration
     // Data range determined
     
-    // Calculate column widths (ExcelJS provides actual widths)
-    // ENHANCED: Better match actual Excel column widths and handle hidden columns
-    const columnWidths = [];
-    
-    // Make sure we have width for every column in our range
-    for (let colIndex = 1; colIndex <= range.endCol; colIndex++) {
-      const col = worksheet.getColumn(colIndex);
-      
-      // Debug column J (column index 10)
-      if (colIndex === 10) {
-        console.log(`Column J (${colIndex}) width info:`, {
-          excelWidth: col.width,
-          hidden: col.hidden,
-          key: col.key,
-          letter: col.letter
-        });
-      }
-      
-      // ENHANCED: Handle hidden columns (set them to minimal width but visible)
-      if (col.hidden) {
-        columnWidths.push(20); // Minimal width for hidden columns but still show them
-      } else if (col.width) {
-        // Use Excel's exact width with standard conversion factor
-        // Excel width units are roughly 7 pixels per unit
-        const calculatedWidth = col.width * 7;
-        
-        // Return the exact calculated width without min/max constraints
-        const finalWidth = Math.round(calculatedWidth);
-        
-        columnWidths.push(finalWidth);
-      } else {
-        // Default width for columns without explicit width
-        // Excel's default column width is 8.43 units = ~59px
-        columnWidths.push(59);
-      }
+    // Debug which sheet we're processing
+    if (worksheet.name === 'Underwriting') {
+      console.log('Processing Underwriting sheet, range:', range);
+      console.log('Total rows to process:', range.endRow - range.startRow + 1);
+      console.log('Data range starts at column:', range.startCol, 'ends at column:', range.endCol);
     }
     
     // FIXED: Adjust freeze pane values to account for data range offset
@@ -1070,47 +1645,186 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
     }
     
     
-    // IMPORTANT: Adjust columnWidths array to match the data range
-    // Only include widths for columns that are actually being displayed
-    const adjustedColumnWidths = columnWidths.slice(range.startCol - 1, range.endCol);
+    // IMPORTANT: Calculate column widths only for the data range
+    const adjustedColumnWidths = [];
     
-    // Debug column widths
-    console.log('Column widths debug:', {
-      rangeStartCol: range.startCol,
-      rangeEndCol: range.endCol,
-      totalColumnWidths: columnWidths.length,
-      adjustedLength: adjustedColumnWidths.length,
-      columnJIndex: 10 - range.startCol,
-      columnJWidth: adjustedColumnWidths[10 - range.startCol]
+    // Calculate widths only for the columns in our data range
+    for (let colIndex = range.startCol; colIndex <= range.endCol; colIndex++) {
+      const col = worksheet.getColumn(colIndex);
+      
+      let finalWidth;
+      
+      // ENHANCED: Handle hidden columns and very small widths
+      if (col.hidden === true) {
+        // Hidden columns should be very narrow but still visible for debugging
+        finalWidth = 8; // Very narrow for hidden columns
+      } else if (col.width !== undefined && col.width !== null) {
+        // CONVERT EXCEL WIDTH UNITS TO PIXELS
+        // Excel column width: 8.43 units = 64 pixels, so 1 unit = 7.59 pixels
+        const conversionFactor = 7.59;
+        finalWidth = Math.round(col.width * conversionFactor);
+        
+        // Apply reasonable bounds
+        if (finalWidth < 20) {
+          finalWidth = 20; // Minimum reasonable width
+        } else if (finalWidth > 400) {
+          finalWidth = 400; // Maximum reasonable width
+        }
+      } else {
+        // ENHANCED: Better default width handling
+        // Check if this column has any data to determine appropriate default
+        let hasData = false;
+        let maxContentLength = 0;
+        
+        worksheet.eachRow((row) => {
+          const cell = row.getCell(colIndex);
+          if (cell.value !== null && cell.value !== undefined && cell.value !== '') {
+            hasData = true;
+            // Calculate approximate content length for better width estimation
+            const contentLength = String(cell.value).length;
+            maxContentLength = Math.max(maxContentLength, contentLength);
+          }
+        });
+        
+        if (hasData) {
+          // Column has data but no explicit width - calculate based on content
+          if (maxContentLength <= 5) {
+            finalWidth = 40; // Short content
+          } else if (maxContentLength <= 10) {
+            finalWidth = 60; // Medium content
+          } else if (maxContentLength <= 20) {
+            finalWidth = 80; // Longer content
+          } else {
+            finalWidth = Math.min(maxContentLength * 4, 200); // Very long content, capped
+          }
+        } else {
+          // Empty column without explicit width - use minimal width
+          finalWidth = 20;
+        }
+      }
+      
+      // ENHANCED: Ensure minimum and maximum reasonable widths
+      finalWidth = Math.max(8, Math.min(finalWidth, 400)); // Between 8px and 400px
+      
+      // Debug Column A (column index 1) with detailed analysis
+      if (colIndex === 1) {
+        console.log(`Column A (${colIndex}) detailed analysis:`, {
+          excelWidth: col.width,
+          hidden: col.hidden,
+          key: col.key,
+          letter: col.letter,
+          calculatedWidth: finalWidth,
+          hasExplicitWidth: col.width !== undefined && col.width !== null,
+          conversionFactor: col.width ? (finalWidth / col.width).toFixed(2) : 'N/A'
+        });
+      }
+      
+      // Debug Column B (column index 2) with detailed analysis
+      if (colIndex === 2) {
+        console.log(`Column B (${colIndex}) detailed analysis:`, {
+          excelWidth: col.width,
+          hidden: col.hidden,
+          key: col.key,
+          letter: col.letter,
+          calculatedWidth: finalWidth,
+          hasExplicitWidth: col.width !== undefined && col.width !== null,
+          conversionFactor: col.width ? (finalWidth / col.width).toFixed(2) : 'N/A',
+          rawWidth: col.width,
+          type: typeof col.width
+        });
+      }
+      
+      // Debug column J (column index 10) with detailed analysis
+      if (colIndex === 10) {
+        // Analyze content in column J to understand width requirements
+        let maxContentLength = 0;
+        let sampleContent = [];
+        
+        worksheet.eachRow((row) => {
+          const cell = row.getCell(colIndex);
+          if (cell.value !== null && cell.value !== undefined && cell.value !== '') {
+            const contentLength = String(cell.value).length;
+            maxContentLength = Math.max(maxContentLength, contentLength);
+            if (sampleContent.length < 5) {
+              sampleContent.push(String(cell.value).substring(0, 50));
+            }
+          }
+        });
+        
+        console.log(`Column J (${colIndex}) detailed analysis:`, {
+          excelWidth: col.width,
+          hidden: col.hidden,
+          key: col.key,
+          letter: col.letter,
+          calculatedWidth: finalWidth,
+          maxContentLength: maxContentLength,
+          sampleContent: sampleContent,
+          hasExplicitWidth: col.width !== undefined && col.width !== null,
+          conversionFactor: col.width ? (finalWidth / col.width).toFixed(2) : 'N/A'
+        });
+      }
+      
+      // Debug first few columns to see width calculations
+      if (colIndex <= 5) {
+        console.log(`Column ${colIndex} (${col.letter}) width:`, {
+          excelWidth: col.width,
+          calculatedWidth: finalWidth,
+          hidden: col.hidden
+        });
+      }
+      
+      adjustedColumnWidths.push(finalWidth);
+    }
+    
+    // Summary of column width calculations
+    console.log('Column width summary:', {
+      totalColumns: adjustedColumnWidths.length,
+      averageWidth: Math.round(adjustedColumnWidths.reduce((sum, width) => sum + width, 0) / adjustedColumnWidths.length),
+      minWidth: Math.min(...adjustedColumnWidths),
+      maxWidth: Math.max(...adjustedColumnWidths),
+      hiddenColumns: adjustedColumnWidths.filter(width => width === 8).length,
+      narrowColumns: adjustedColumnWidths.filter(width => width <= 20).length
     });
     
-    const data = [];
-    const styles = [];
-    
     // Process only the actual data range
-    for (let rowNumber = range.startRow; rowNumber <= range.endRow; rowNumber++) {
-      const row = worksheet.getRow(rowNumber);
+    for (let rowIndex = 0; rowIndex <= range.endRow - range.startRow; rowIndex++) {
+      const actualRowNumber = range.startRow + rowIndex;
+      const row = worksheet.getRow(actualRowNumber);
       const rowData = [];
       const rowStyles = [];
       
-      for (let colNumber = range.startCol; colNumber <= range.endCol; colNumber++) {
-        const cell = row.getCell(colNumber);
+      for (let colIndex = 0; colIndex <= range.endCol - range.startCol; colIndex++) {
+        const actualColNumber = range.startCol + colIndex;
+        const cell = row.getCell(actualColNumber);
         
         // Check for button-like properties in cells in top area (removed debug logging)
         
-        const processedCell = processCellWithStyles(cell, rowNumber, colNumber);
+        const processedCell = processCellWithStyles(cell, rowIndex, colIndex);
         
-        // ENHANCED: Handle merged cells
-        const adjustedRowIndex = rowNumber - range.startRow;
-        const adjustedColIndex = colNumber - range.startCol;
-        const mergeInfo = getCellMergeInfo(worksheet, rowNumber, colNumber);
+        // Debug: Check for "Retail Leasing Cost Reserve" text
+        if (processedCell.formattedValue && 
+            typeof processedCell.formattedValue === 'string' && 
+            processedCell.formattedValue.includes('Retail Leasing Cost Reserve')) {
+          console.log('Found "Retail Leasing Cost Reserve" at row:', actualRowNumber, 'col:', actualColNumber, 
+                      'arrayIndex:', rowIndex);
+        }
+        
+        // ENHANCED: Handle merged cells and hidden columns/rows
+        const mergeInfo = getCellMergeInfo(worksheet, actualRowNumber, actualColNumber);
+        
+        // Check if this cell should be hidden due to column or row being hidden
+        const isColHidden = isColumnOrRowHidden(worksheet, actualColNumber, true);
+        const isRowHidden = isColumnOrRowHidden(worksheet, actualRowNumber, false);
         
         if (mergeInfo && mergeInfo.skip) {
           // Skip cells that are part of a merge but not the top-left
           rowData.push('');
           rowStyles.push({ ...processedCell.style, display: 'none' });
+        } else if (isColHidden || isRowHidden) {
+          // Hide cells that belong to hidden columns or rows
+          rowData.push('');
+          rowStyles.push({ ...processedCell.style, display: 'none', _isHidden: true });
         } else {
-          
           rowData.push(processedCell.formattedValue);
           const cellStyle = { ...processedCell.style };
           
@@ -1126,24 +1840,108 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
         }
       }
       
-      // FIXED: Accurate row height calculation that respects Excel's actual row heights
+      // ENHANCED: Accurate row height calculation with proper handling of hidden and small rows
       let rowHeight;
       
-      // Check if row is explicitly hidden
-      if (row.hidden === true) {
-        rowHeight = 0;
-      } else if (row.height !== undefined) {
-        // CRITICAL: Use Excel's exact heights - NO MINIMUMS for collapsed rows
-        // Excel row heights are in points, roughly 1.33 pixels per point
-        rowHeight = row.height * 1.33;
+      // Debug specific problem rows
+      if (actualRowNumber === 138 || actualRowNumber === 12 || actualRowNumber === 14) {
+        // Check what's in the cells of these rows
+        let cellValues = [];
+        if (actualRowNumber === 138) {
+          for (let col = range.startCol; col <= Math.min(range.startCol + 3, range.endCol); col++) {
+            const cell = row.getCell(col);
+            cellValues.push(cell.value || cell.text || '');
+          }
+        }
         
-        // Check for very small heights that should be treated as hidden
-        if (rowHeight < 1) {
+        console.log(`Row ${actualRowNumber} debug:`, {
+          hidden: row.hidden,
+          height: row.height,
+          number: row.number,
+          hasValues: row.hasValues,
+          arrayIndex: rowIndex,
+          sheetName: worksheet.name,
+          cellValues: actualRowNumber === 138 ? cellValues : undefined,
+          actualRowNumber: row.number
+        });
+      }
+      
+      // ENHANCED: Comprehensive row height calculation
+      if (row.hidden === true) {
+        // Explicitly hidden rows
+        rowHeight = 0;
+      } else if (row.height !== undefined && row.height !== null) {
+        // ENHANCED: Use Excel's exact heights with better conversion
+        // Excel row height: 15 units = 20 pixels, so 1 unit = 1.33 pixels
+        // When setting row heights, use:
+        //   rowHeight = Math.round(excelRowHeight * 1.33);
+        let calculatedHeight = row.height * 1.33;
+        
+        // ENHANCED: Handle very small heights that should be treated as hidden
+        if (calculatedHeight < 2) {
+          // Very small heights (less than 2px) are effectively hidden
           rowHeight = 0;
+          if (actualRowNumber === 138) {
+            console.log(`Row 138 being hidden: height=${row.height}, calculated=${calculatedHeight}px`);
+          }
+        } else if (calculatedHeight < 10) {
+          // Small but visible rows (2-10px)
+          rowHeight = Math.max(calculatedHeight, 8);
+          if ((actualRowNumber === 12 || actualRowNumber === 14)) {
+          console.log(`Row ${actualRowNumber} using small height: ${row.height}pt = ${rowHeight}px`);
         }
       } else {
-        // Default height for rows without explicit height
-        rowHeight = 20;
+          // Normal rows
+          rowHeight = Math.round(calculatedHeight);
+        }
+      } else {
+        // ENHANCED: Better handling of rows without explicit height
+        // Check if row has any data or styling to determine appropriate height
+        let hasData = false;
+        let hasStyling = false;
+        
+        row.eachCell((cell, colNumber) => {
+          if (cell.value !== null && cell.value !== undefined && cell.value !== '') {
+            hasData = true;
+          }
+          if (cell.style && Object.keys(cell.style).length > 0) {
+            hasStyling = true;
+          }
+        });
+        
+        if (row.hidden === false) {
+          if (hasData) {
+            // Row has data but no explicit height - use default
+          rowHeight = 20;
+          } else if (hasStyling) {
+            // Row has styling but no data - might be a header or spacer
+            rowHeight = 16;
+          } else {
+            // Empty row without explicit height - use minimal height
+            rowHeight = 12;
+          }
+        } else if (actualRowNumber === 138) {
+          // Special case for row 138 - check if it has any content
+          if (hasData || hasStyling) {
+            // Row 138 has content but might be hidden - use minimal height
+            rowHeight = 8;
+          } else {
+            // Row 138 is truly empty and hidden
+          rowHeight = 0;
+          }
+          console.log(`Row 138 final: height=${rowHeight}px, hasData=${hasData}, hasStyling=${hasStyling}`);
+        } else {
+          // Default height for rows without explicit height
+          rowHeight = 20;
+        }
+      }
+      
+      // ENHANCED: Ensure reasonable height limits
+      rowHeight = Math.max(0, Math.min(rowHeight, 200)); // Between 0px and 200px
+      
+      // Final debug check for row 138
+      if (actualRowNumber === 138) {
+        console.log(`Row 138 final: height=${rowHeight}px, hasData=${rowData.some(v => v)}`);
       }
       
       data.push(rowData);
@@ -1191,503 +1989,11 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
       frozenRows, // Add freeze pane information
       frozenCols
     };
-  }, [processCellWithStyles, getCellMergeInfo]);
+  }, [processCellWithStyles, getCellMergeInfo, isColumnOrRowHidden]);
 
-  // Helper functions for border styling - MOVED UP to fix hoisting issues
-  const convertBorderStyle = useCallback((excelStyle) => {
-    const styleMap = {
-      'thin': 'solid',
-      'medium': 'solid',
-      'thick': 'solid',
-      'dotted': 'dotted',
-      'dashed': 'dashed',
-      'double': 'double'
-    };
-    return styleMap[excelStyle] || 'solid';
-  }, []);
 
-  // Helper function to apply Excel tint/shade to colors
-  const applyTintToColor = useCallback((hexColor, tint) => {
-    // Convert hex to RGB
-    const r = parseInt(hexColor.slice(1, 3), 16);
-    const g = parseInt(hexColor.slice(3, 5), 16);
-    const b = parseInt(hexColor.slice(5, 7), 16);
-    
-    let newR, newG, newB;
-    
-    if (tint > 0) {
-      // Lighten the color (tint towards white)
-      newR = Math.round(r + (255 - r) * tint);
-      newG = Math.round(g + (255 - g) * tint);
-      newB = Math.round(b + (255 - b) * tint);
-    } else if (tint < 0) {
-      // FIXED: Negative tint in Excel actually lightens colors (towards white), not darkens
-      // Excel uses negative tints to create lighter shades like grey from black
-      const lightness = Math.abs(tint);
-      newR = Math.round(r + (255 - r) * lightness);
-      newG = Math.round(g + (255 - g) * lightness);
-      newB = Math.round(b + (255 - b) * lightness);
-    } else {
-      // tint === 0, no change
-      newR = r;
-      newG = g;
-      newB = b;
-    }
-    
-    // Convert back to hex
-    const toHex = (val) => Math.max(0, Math.min(255, val)).toString(16).padStart(2, '0');
-    return `#${toHex(newR)}${toHex(newG)}${toHex(newB)}`;
-  }, []);
 
-  const getBorderColor = useCallback((colorObj) => {
-    if (!colorObj) return '#000000';
-    if (colorObj.argb) return `#${colorObj.argb.substring(2)}`;
-    if (colorObj.rgb) return `#${colorObj.rgb}`;
-    // ENHANCED: Handle theme colors
-    if (colorObj.theme !== undefined) {
-      const themeColors = {
-        0: '#000000', // Text 1 (Black)
-        1: '#FFFFFF', // Background 1 (White)
-        2: '#1F497D', // Text 2 (Dark Blue)
-        3: '#EEECE1', // Background 2 (Light Gray)
-        4: '#4F81BD', // Accent 1 (Blue)
-        5: '#9CBB58', // Accent 2 (Green)
-        6: '#F79646', // Accent 3 (Orange)
-        7: '#8064A2', // Accent 4 (Purple)
-        8: '#4BACC6', // Accent 5 (Light Blue)
-        9: '#F15A24'  // Accent 6 (Red-Orange)
-      };
-      return themeColors[colorObj.theme] || '#000000';
-    }
-    return '#000000';
-  }, []);
 
-  // ENHANCED: Smart numeric cell detection - FIXED to handle format codes with numeric content
-  const isNumericCell = useCallback((cell) => {
-    const numFmt = cell.style?.numFmt;
-    const formatInfo = parseExcelNumberFormat(numFmt);
-
-    // PRIORITY 1: If Excel explicitly defines this as a numeric format, right-align
-    if (formatInfo.isPercentage || formatInfo.isCurrency || formatInfo.customPattern === 'multiplier') {
-      return true;
-    }
-    
-    // PRIORITY 2: Check if cell.text contains formatted values that clearly indicate numbers
-    if (cell.text) {
-      const text = cell.text.toString().trim();
-      
-      // FIXED: Be more specific about percentage patterns
-      // Only treat as percentage if it actually looks like a percentage VALUE
-      if (text.match(/^\d+(\.\d+)?%$/) || text.match(/^\(\d+(\.\d+)?%\)$/)) {
-        return true; // Like "15.5%" or "(12.3%)"
-      }
-      
-      // Currency patterns
-      if (text.match(/^\$[\d,]+(\.\d+)?$/) || text.match(/^[\d,]+(\.\d+)?\s*(USD|EUR|GBP)$/)) {
-        return true; // Like "$1,000.50" or "1000 USD"
-      }
-      
-      // Multiplier pattern like "2.5x"
-      if (text.match(/^\d+(\.\d+)?x$/)) {
-        return true;
-      }
-      
-      // Pure number patterns - ENHANCED to be more selective
-      if (text.match(/^\d+$/) || // Pure integers: "123"
-          text.match(/^\d{1,3}(,\d{3})+$/) || // Formatted integers: "1,000" 
-          text.match(/^\d+\.\d+$/) || // Pure decimals: "123.45"
-          text.match(/^\d{1,3}(,\d{3})*\.\d+$/)) { // Formatted decimals: "1,000.50"
-        return true;
-      }
-      
-      // FIXED: Don't treat text that contains words as numeric
-      // If it contains letters (except in specific patterns), it's likely text
-      if (text.match(/[a-zA-Z]/) && !text.match(/^\d+(\.\d+)?\s*(USD|EUR|GBP|x)$/)) {
-        return false; // Text like "% chg", "Revenue", "EBITDA", etc.
-      }
-    }
-
-    // PRIORITY 3: Check if the cell value is a number
-    if (typeof cell.value === 'number' && !isNaN(cell.value)) {
-      return true;
-    }
-
-    // PRIORITY 4: FIXED: Be more conservative with string-to-number conversion
-    if (typeof cell.value === 'string') {
-      const trimmed = cell.value.trim();
-      
-      // Only treat as numeric if it's clearly a number without letters
-      if (trimmed.match(/^[\d\s,$€£%x.,-]+$/) && !isNaN(parseFloat(trimmed)) && isFinite(trimmed)) {
-        // Additional check: if it contains letters other than currency symbols, it's probably text
-        if (trimmed.match(/[a-zA-Z]/) && !trimmed.match(/^[\d\s,$€£%x.,-]+$/)) {
-          return false;
-        }
-        return true;
-      }
-      
-      return false;
-    }
-
-    // PRIORITY 5: Check if the cell value is an object with a numeric result
-    if (typeof cell.value === 'object' && cell.value !== null) {
-      if (cell.value.result !== undefined && typeof cell.value.result === 'number') {
-        return true;
-      }
-      
-      // FIXED: Be more selective about object text/value conversion
-      if (cell.value.text !== undefined && typeof cell.value.text === 'string') {
-        const trimmed = cell.value.text.trim();
-        // Only numeric-looking text in objects
-        if (trimmed.match(/^[\d\s,$€£%x.,-]+$/) && !isNaN(parseFloat(trimmed)) && isFinite(trimmed)) {
-          return true;
-        }
-      }
-      
-      if (cell.value.value !== undefined && typeof cell.value.value === 'number') {
-        return true;
-      }
-    }
-
-    // PRIORITY 6: FIXED: Handle format codes more intelligently
-    // If Excel has a numeric format code, check if the content justifies it
-    if (numFmt && (numFmt.includes('0') || numFmt.includes('#') || numFmt.includes('.'))) {
-      // Check if the cell has numeric content (including 0)
-      if (cell.value && typeof cell.value === 'number') {
-        return true; // Direct number (including 0)
-      }
-      
-      // Check if cell.text contains numeric content (including formatted 0s)
-      if (cell.text) {
-        const text = cell.text.toString().trim();
-        // Accept formatted numbers, including 0 values
-        if (text.match(/^[\d\s,$€£%x.,-]+$/) || 
-            text === '0' || 
-            text === '$0.00' || 
-            text === '0.0%' ||
-            text.match(/^0\.\d+%$/) ||
-            text.match(/^\$0\.\d+$/)) {
-          return true;
-        }
-      }
-      
-      // Check if the cell value object has numeric properties
-      if (typeof cell.value === 'object' && cell.value !== null) {
-        if (cell.value.result !== undefined || 
-            cell.value.value !== undefined || 
-            cell.value.text !== undefined) {
-          // If it has any of these properties, it's likely a formatted cell
-          return true;
-        }
-      }
-      
-      // FIXED: If we have a numeric format code, treat the cell as numeric
-      // This is the key fix - if Excel says it's numeric, trust it
-      return true;
-    }
-
-    // If none of the above, it's not a numeric cell
-    return false;
-  }, [parseExcelNumberFormat]);
-
-  // Helper function to calculate luminance for contrast checking
-  const getLuminance = useCallback((hexColor) => {
-    const r = parseInt(hexColor.slice(1, 3), 16) / 255;
-    const g = parseInt(hexColor.slice(3, 5), 16) / 255;
-    const b = parseInt(hexColor.slice(5, 7), 16) / 255;
-    
-    const toLinear = (c) => c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4);
-    
-    return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
-  }, []);
-
-  const extractExcelJSStyles = useCallback((cell, cellRef) => {
-    const style = {};
-    
-    if (!cell.style) return style;
-
-    // Font styles
-    if (cell.style.font) {
-      const font = cell.style.font;
-      
-      if (font.bold) style.fontWeight = 'bold';
-      if (font.italic) style.fontStyle = 'italic';
-      if (font.underline) {
-        // ENHANCED: Accounting format underlines should be sized to content, not full cell width
-        const numFmt = cell.style?.numFmt;
-        const formatInfo = parseExcelNumberFormat(numFmt);
-        
-        if (formatInfo.isAccountingFormat) {
-          // Use border-bottom for accounting format to size to content
-          style.borderBottom = '1px solid currentColor';
-          style.paddingBottom = '2px'; // Add small padding so text doesn't touch the underline
-          // Important: Do NOT use display: inline-block as it limits width to content
-          // The cell's display should remain default (table-cell) for full width
-        } else {
-          style.textDecoration = 'underline';
-        }
-      }
-      if (font.strike) style.textDecoration = 'line-through';
-      if (font.size) style.fontSize = `${font.size}pt`;
-      if (font.name) style.fontFamily = font.name;
-      
-      // Font color - ENHANCED to handle theme colors
-      if (font.color) {
-        if (font.color.argb) {
-          const argb = font.color.argb;
-          const rgb = argb.length === 8 ? argb.substring(2) : argb;
-          style.color = `#${rgb}`;
-        } else if (font.color.rgb) {
-          style.color = `#${font.color.rgb}`;
-        } else if (font.color.indexed !== undefined) {
-          // ENHANCED: Handle indexed colors (Excel's color palette)
-          const indexed = font.color.indexed;
-          if (indexed === 12) {
-            // Index 12 is Excel's blue color for input cells - use same blue as ARGB
-            style.color = '#0000FF';
-          } else {
-            // Default for other indexed colors
-            style.color = '#000000';
-          }
-        } else if (font.color.theme !== undefined) {
-          // ENHANCED: Handle theme-based colors with automatic contrast
-          const theme = font.color.theme;
-          const tint = font.color.tint || 0;
-          
-          // Get background color for contrast checking
-          let backgroundColor = null;
-          if (cell.style?.fill?.type === 'pattern' && cell.style.fill.fgColor) {
-            if (cell.style.fill.fgColor.argb) {
-              const argb = cell.style.fill.fgColor.argb;
-              const rgb = argb.length === 8 ? argb.substring(2) : argb;
-              backgroundColor = `#${rgb}`;
-            } else if (cell.style.fill.fgColor.theme !== undefined) {
-              // Handle theme-based backgrounds
-              const bgTheme = cell.style.fill.fgColor.theme;
-              const bgTint = cell.style.fill.fgColor.tint || 0;
-              const themeBackgroundColors = {
-                0: '#000000', 1: '#FFFFFF', 2: '#1F497D', 3: '#EEECE1',
-                4: '#4F81BD', 5: '#9CBB58', 6: '#F79646', 7: '#8064A2',
-                8: '#4BACC6', 9: '#F15A24'
-              };
-              let bgBaseColor = themeBackgroundColors[bgTheme] || '#FFFFFF';
-              if (bgTint !== 0) {
-                bgBaseColor = applyTintToColor(bgBaseColor, bgTint);
-              }
-              backgroundColor = bgBaseColor;
-            }
-          }
-          
-          // FIXED: Smart theme color interpretation with contrast awareness
-          let baseColor;
-          switch (theme) {
-            case 0: // Text 1 - Auto contrast: white on dark, black on light
-              if (backgroundColor && backgroundColor !== '#FFFFFF' && getLuminance(backgroundColor) < 0.5) {
-                baseColor = '#FFFFFF'; // White text on dark background
-              } else {
-                baseColor = '#000000'; // Black text on light/no background - DEFAULT TO BLACK
-              }
-              break;
-            case 1: // Background 1 - When used as TEXT: auto contrast
-              if (backgroundColor && backgroundColor !== '#FFFFFF' && getLuminance(backgroundColor) < 0.5) {
-                baseColor = '#FFFFFF'; // White text on dark background
-              } else {
-                baseColor = '#000000'; // Black text on light/no background - DEFAULT TO BLACK
-              }
-              break;
-            case 2: // Text 2 - Dark blue text
-              baseColor = '#1F497D';
-              break;
-            case 3: // Background 2 - When used as TEXT color = BLACK
-              baseColor = '#000000';
-              break;
-            case 4: // Accent 1 - Blue theme for inputs
-              baseColor = '#1F497D';
-              break;
-            case 5: // Accent 2 - Green theme
-              baseColor = '#9CBB58';
-              break;
-            case 6: // Accent 3 - Orange theme
-              baseColor = '#F79646';
-              break;
-            case 7: // Accent 4 - Purple theme
-              baseColor = '#8064A2';
-              break;
-            case 8: // Accent 5 - Light Blue theme
-              baseColor = '#4BACC6';
-              break;
-            case 9: // Accent 6 - Red-Orange theme
-              baseColor = '#F15A24';
-              break;
-            default:
-              baseColor = '#000000';
-          }
-          
-          // Apply tint for non-auto-contrast theme colors
-          if (tint !== 0 && theme !== 0 && theme !== 1) {
-            baseColor = applyTintToColor(baseColor, tint);
-          }
-          
-          // Debug logging for section headers (only for theme 0 with dark backgrounds)
-          if (theme === 0 && backgroundColor && getLuminance(backgroundColor) < 0.5) {
-            // Auto-contrast applied
-          }
-          
-          style.color = baseColor;
-        }
-      }
-    }
-
-    // Fill/Background - ENHANCED to handle theme colors
-    if (cell.style.fill && cell.style.fill.type === 'pattern') {
-      const fill = cell.style.fill;
-      if (fill.fgColor) {
-        if (fill.fgColor.argb) {
-          const argb = fill.fgColor.argb;
-          const rgb = argb.length === 8 ? argb.substring(2) : argb;
-          style.backgroundColor = `#${rgb}`;
-        } else if (fill.fgColor.rgb) {
-          style.backgroundColor = `#${fill.fgColor.rgb}`;
-        } else if (fill.fgColor.theme !== undefined) {
-          // ENHANCED: Handle theme-based background colors with tint support
-          const theme = fill.fgColor.theme;
-          const tint = fill.fgColor.tint || 0;
-          
-          // Excel's theme colors for backgrounds
-          let baseColor;
-          switch (theme) {
-            case 0: // Text 1 color used as background (black)
-              baseColor = '#000000';
-              break;
-            case 1: // Background 1 (white)
-              baseColor = '#FFFFFF';
-              break;
-            case 2: // Text 2 color used as background (dark blue)
-              baseColor = '#1F497D';
-              break;
-            case 3: // Background 2 (light gray) - FIXED to be darker
-              baseColor = '#D9D9D9'; // Darker gray to match Excel better
-              break;
-            case 4: // Accent 1 (blue)
-              baseColor = '#1F497D';
-              break;
-            case 5: // Accent 2 (green)
-              baseColor = '#9CBB58';
-              break;
-            case 6: // Accent 3 (orange)
-              baseColor = '#F79646';
-              break;
-            case 7: // Accent 4 (purple)
-              baseColor = '#8064A2';
-              break;
-            case 8: // Accent 5 (light blue)
-              baseColor = '#4BACC6';
-              break;
-            case 9: // Accent 6 (red-orange)
-              baseColor = '#F15A24';
-              break;
-            default:
-              baseColor = '#FFFFFF';
-          }
-          
-          // FIXED: Normalize grey sections - ensure consistent grey color for divider sections
-          // Both -0.25 and -0.5 tints should produce the same light grey for visual consistency
-          if (theme === 0 && tint < 0 && Math.abs(tint) > 0.2) {
-            // Use the same grey that the large sections were producing (theme 0 with ~-0.5 tint)
-            const perfectTint = 0.499984740745262; // Use the exact tint from the large sections
-            baseColor = applyTintToColor('#000000', perfectTint);
-          } else if (tint !== 0) {
-            baseColor = applyTintToColor(baseColor, tint);
-          }
-          
-          // Debug logging for rows 8-20, columns J+ (column 10+)
-          if (cellRef) {
-            const rowMatch = cellRef.match(/\d+/);
-            const colMatch = cellRef.match(/[A-Z]+/);
-            
-            if (rowMatch && colMatch) {
-              const rowNum = parseInt(rowMatch[0]);
-              const colLetter = colMatch[0];
-              const colNum = colLetter.split('').reduce((result, char) => result * 26 + char.charCodeAt(0) - 64, 0);
-              
-              if (rowNum >= 8 && rowNum <= 20 && colNum >= 10) {
-                // Background color applied
-              }
-            }
-          }
-          
-          style.backgroundColor = baseColor;
-        }
-      }
-    }
-
-    // Alignment - ENHANCED to work with new number formatting system and accounting format
-    const numFmt = cell.style?.numFmt;
-    const formatInfo = parseExcelNumberFormat(numFmt);
-    
-    if (cell.style.alignment) {
-      const alignment = cell.style.alignment;
-      if (alignment.horizontal) {
-        style.textAlign = alignment.horizontal;
-      }
-      if (alignment.vertical) {
-        style.verticalAlign = alignment.vertical === 'middle' ? 'middle' : alignment.vertical;
-      }
-      // DISABLED: Force no text wrapping to prevent row height issues
-      // if (alignment.wrapText) {
-      //   style.whiteSpace = 'pre-wrap';
-      // }
-    } else {
-      // FIXED: Explicit default alignment for cells with no Excel alignment
-      const shouldRightAlign = isNumericCell(cell);
-      if (shouldRightAlign) {
-        style.textAlign = 'right'; // Numbers, percentages, currency
-        // REMOVED: Don't automatically color numeric cells blue
-      } else {
-        style.textAlign = 'left';   // Text, descriptions, labels
-      }
-    }
-    
-    // ENHANCED: Handle Excel accounting format with underscore spacing
-    if (formatInfo.hasUnderscoreSpacing && formatInfo.isAccountingFormat) {
-      // Apply padding to simulate Excel's underscore spacing characters
-      style.paddingLeft = `${formatInfo.underscoreSpacing || 8}px`;
-      style.paddingRight = `${Math.max(formatInfo.underscoreSpacing / 2, 4)}px`;
-      style.textAlign = 'right'; // Ensure right alignment for accounting format
-      
-      // Debug logging for accounting format cells
-      if (cellRef === 'I9' || cellRef === 'I34') {
-        // Applied accounting format
-      }
-    }
-
-    // Borders
-    if (cell.style.border) {
-      const border = cell.style.border;
-      const borderParts = [];
-      
-      ['top', 'right', 'bottom', 'left'].forEach(side => {
-        if (border[side] && border[side].style) {
-          const borderStyle = convertBorderStyle(border[side].style);
-          const borderColor = border[side].color ? 
-            (border[side].color.argb ? `#${border[side].color.argb.substring(2)}` : '#000000') : '#000000';
-          borderParts.push(`${borderStyle} ${borderColor}`);
-        }
-      });
-      
-      if (borderParts.length > 0) {
-        if (border.top) style.borderTop = `1px ${convertBorderStyle(border.top.style)} ${getBorderColor(border.top.color)}`;
-        if (border.right) style.borderRight = `1px ${convertBorderStyle(border.right.style)} ${getBorderColor(border.right.color)}`;
-        if (border.bottom) style.borderBottom = `1px ${convertBorderStyle(border.bottom.style)} ${getBorderColor(border.bottom.color)}`;
-        if (border.left) style.borderLeft = `1px ${convertBorderStyle(border.left.style)} ${getBorderColor(border.left.color)}`;
-      }
-    }
-
-    // DISABLED: Remove automatic contrast adjustment - it's causing color inversions
-    // Excel's theme colors should be trusted as-is without modification
-    // The original colors from theme mapping should be preserved
-    
-    return style;
-  }, [convertBorderStyle, getBorderColor, isNumericCell, applyTintToColor, getLuminance]);
 
 
   if (loading) {
@@ -1733,6 +2039,15 @@ const ExcelJSViewerComponent = ({ file, title = "Model Viewer", height = "600px"
   }
 
   const currentSheet = workbookData.sheets[activeSheet];
+
+  console.log('ExcelJSViewer: Current sheet data:', {
+    sheetName: currentSheet?.name,
+    dataLength: currentSheet?.data?.length,
+    columnWidthsLength: currentSheet?.columnWidths?.length,
+    rowHeightsLength: currentSheet?.rowHeights?.length,
+    stylesLength: currentSheet?.styles?.length,
+    hasImages: currentSheet?.images?.length > 0
+  });
 
   // Add CSS to hide only specific duplicate scrollbars
   const hideScrollbarCSS = `
@@ -1960,8 +2275,8 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                   {row.map((cellValue, colIndex) => {
                     const cellStyle = sheet.styles[rowIndex]?.cells[colIndex] || {};
                     
-                    // ENHANCED: Skip rendering cells that should be hidden (merged cells)
-                    if (cellStyle.display === 'none') {
+                    // ENHANCED: Skip rendering cells that should be hidden (merged cells or hidden columns/rows)
+                    if (cellStyle.display === 'none' || cellStyle._isHidden) {
                       return null;
                     }
                     
@@ -1974,6 +2289,12 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                       img.displayInCell
                     );
                     
+                    // ENHANCED: Determine cell alignment based on content type
+                    const isNumeric = typeof cellValue === 'number' || 
+                                    (typeof cellValue === 'string' && /^[\d\s,$€£%x.,-]+$/.test(cellValue) && !isNaN(parseFloat(cellValue)));
+                    
+                    const cellAlignment = cellStyle.textAlign || (isNumeric ? 'right' : 'left');
+                    
                     return (
                       <td
                         key={`${rowIndex}-${colIndex}`}
@@ -1985,16 +2306,20 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                           fontSize: '11px',
                           lineHeight: '1',
                           verticalAlign: imageForCell ? 'top' : 'middle',
+                          textAlign: cellAlignment,
                           paddingTop: cellStyle.paddingTop || '0px',
                           paddingBottom: cellStyle.paddingBottom || '0px',
                           paddingLeft: cellStyle.paddingLeft || '2px',
                           paddingRight: cellStyle.paddingRight || '2px',
                           height: '100%',
                           boxSizing: 'border-box',
-                          // Set explicit width to match Excel's column width
+                          // ENHANCED: Set explicit width to match Excel's column width with better handling
                           width: `${sheet.columnWidths[colIndex] || 59}px`,
                           minWidth: `${sheet.columnWidths[colIndex] || 59}px`,
-                          maxWidth: `${sheet.columnWidths[colIndex] || 59}px`
+                          maxWidth: `${sheet.columnWidths[colIndex] || 59}px`,
+                          // ENHANCED: Ensure proper text overflow handling
+                          whiteSpace: 'nowrap',
+                          textOverflow: 'ellipsis'
                         }}
                         title={imageForCell ? `Image: ${imageForCell.name}` : cellValue}
                         rowSpan={imageForCell ? imageForCell.position.rowSpan : (cellStyle._mergeInfo ? cellStyle._mergeInfo.rowSpan : 1)}
@@ -2019,8 +2344,9 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                             <div style={{ 
                               whiteSpace: 'nowrap', 
                               overflow: 'hidden',
-                              textOverflow: 'clip',
-                              width: '100%'
+                              textOverflow: 'ellipsis',
+                              width: '100%',
+                              textAlign: cellAlignment
                             }}>
                               {cellValue}
                             </div>
@@ -2064,9 +2390,9 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
     cells: rowStyle.cells.slice(frozenCols)
   }));
 
-  // Split column widths - REVERTED: Use original frozenCols
-  const frozenColumnWidths = sheet.columnWidths.slice(0, frozenCols);
-  const scrollableColumnWidths = sheet.columnWidths.slice(frozenCols);
+  // Split column widths - FIXED: Use adjustedColumnWidths with proper conversion
+  const frozenColumnWidths = adjustedColumnWidths.slice(0, frozenCols);
+  const scrollableColumnWidths = adjustedColumnWidths.slice(frozenCols);
 
   // Scroll synchronization handlers
   const handleHorizontalScroll = (e) => {
@@ -2142,7 +2468,7 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
       }}>
       {data.map((row, rowIndex) => {
           const actualRowIndex = rowIndex + rowOffset;
-          const originalRowHeight = sheet.rowHeights[actualRowIndex] || 20;
+          const originalRowHeight = sheet.rowHeights[rowIndex] || 20; // Use local rowIndex, not actualRowIndex
           
           // NORMALIZE HEIGHT: Prevent cumulative sub-pixel differences
           // Allow 0 height for hidden rows
@@ -2270,7 +2596,7 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
           <tbody>
             {data.map((row, rowIndex) => {
               const actualRowIndex = rowIndex + rowOffset;
-              const originalRowHeight = sheet.rowHeights[actualRowIndex] || 20;
+              const originalRowHeight = sheet.rowHeights[rowIndex] || 20; // Use local rowIndex, not actualRowIndex
               
               // SYNCHRONIZED HEIGHT CALCULATION: Match the div-based method exactly
               // Allow 0 height for hidden rows
@@ -2396,8 +2722,8 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
                                     fontSize: '9px',
                                     fontWeight: 'bold',
                                     cursor: 'pointer',
-                                    minHeight: `${Math.max((sheet.rowHeights[actualRowIndex] || 20) - 4, 14)}px`, // Use actual row height minus padding, min 14px
-                            maxHeight: `${(sheet.rowHeights[actualRowIndex] || 20) - 2}px`, // Prevent overflow beyond cell height
+                                    minHeight: `${Math.max((sheet.rowHeights[rowIndex] || 20) - 4, 14)}px`, // Use actual row height minus padding, min 14px
+                            maxHeight: `${(sheet.rowHeights[rowIndex] || 20) - 2}px`, // Prevent overflow beyond cell height
                                     width: '100%',
                                     minWidth: 'auto',
                                     maxWidth: 'none',
@@ -2482,7 +2808,6 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
             onScroll={handleHorizontalScroll}
           >
             {renderTableSection(topRightData, topRightStyles, scrollableColumnWidths, 0, frozenCols, true)}
-            <SectionSpilloverOverlay sectionRef={topRightRef} sectionType="topRight" />
           </div>
           
           {/* Bottom-Left: Frozen columns, scrollable rows (A3:A150) */}
@@ -2498,7 +2823,6 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
             onScroll={handleVerticalScroll}
           >
             {renderTableSection(bottomLeftData, bottomLeftStyles, frozenColumnWidths, frozenRows, 0, true)}
-            <SectionSpilloverOverlay sectionRef={bottomLeftRef} sectionType="bottomLeft" />
           </div>
           
           {/* Bottom-Right: Scrollable data area (B3:X500) - ENHANCED for full width */}
@@ -2517,7 +2841,6 @@ const FrozenExcelTable = React.memo(({ sheet, isFullScreen }) => {
             onScroll={handleMainScroll}
           >
             {renderTableSection(bottomRightData, bottomRightStyles, scrollableColumnWidths, frozenRows, frozenCols, false)}
-            <SectionSpilloverOverlay sectionRef={bottomRightRef} sectionType="bottomRight" />
           </div>
           
         </div>
