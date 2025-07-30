@@ -15,7 +15,15 @@
       "Bash(taskkill:*)",
       "Bash(timeout 10s npm run dev)",
       "WebFetch(domain:github.com)",
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(mkdir:*)",
+      "Bash(cp:*)",
+      "Bash(curl:*)",
+      "Bash(mv:*)",
+      "Bash(move:*)",
+      "Bash(find:*)",
+      "mcp__ide__getDiagnostics",
+      "Bash(true)"
     ],
     "deny": []
   }

@@ -1,0 +1,196 @@
+/**
+ * @fileoverview Next.js middleware for global security and request handling
+ * @module middleware
+ */
+
+import { NextResponse } from 'next/server';
+
+// Rate limiting configuration - using a simple in-memory store
+const rateLimitMap = new Map();
+
+/**
+ * Get client identifier from request
+ */
+function getClientId(request) {
+  const forwarded = request.headers.get('x-forwarded-for');
+  const ip = forwarded ? forwarded.split(',')[0] : request.ip || 'unknown';
+  return ip;
+}
+
+/**
+ * Simple rate limiting implementation
+ */
+function checkRateLimit(clientId, pathname) {
+  const key = `${clientId}:${pathname}`;
+  const now = Date.now();
+  const windowMs = 60000; // 1 minute
+  const maxRequests = pathname.startsWith('/api/') ? 100 : 200;
+
+  const data = rateLimitMap.get(key) || { count: 0, timestamp: now };
+  
+  if (now - data.timestamp > windowMs) {
+    // Reset window
+    data.count = 1;
+    data.timestamp = now;
+  } else {
+    data.count++;
+  }
+
+  rateLimitMap.set(key, data);
+  
+  // Clean up old entries if map gets too large
+  if (rateLimitMap.size > 10000) {
+    const keysToDelete = [];
+    for (const [k, v] of rateLimitMap.entries()) {
+      if (now - v.timestamp > windowMs * 2) {
+        keysToDelete.push(k);
+      }
+    }
+    keysToDelete.forEach(k => rateLimitMap.delete(k));
+  }
+  
+  return {
+    allowed: data.count <= maxRequests,
+    remaining: Math.max(0, maxRequests - data.count),
+    limit: maxRequests
+  };
+}
+
+/**
+ * Middleware function
+ */
+export function middleware(request) {
+  const response = NextResponse.next();
+  const pathname = request.nextUrl.pathname;
+
+  // Skip static assets
+  if (
+    pathname.startsWith('/_next') ||
+    pathname.includes('/static/') ||
+    pathname.match(/\.(ico|png|jpg|jpeg|svg|gif|webp|avif)$/i)
+  ) {
+    return response;
+  }
+
+  // Apply rate limiting
+  const clientId = getClientId(request);
+  const rateLimit = checkRateLimit(clientId, pathname);
+
+  if (!rateLimit.allowed) {
+    return new NextResponse(
+      JSON.stringify({
+        error: 'Too many requests',
+        message: 'Please slow down and try again later'
+      }),
+      {
+        status: 429,
+        headers: {
+          'Content-Type': 'application/json',
+          'X-RateLimit-Limit': rateLimit.limit.toString(),
+          'X-RateLimit-Remaining': '0',
+          'Retry-After': '60'
+        }
+      }
+    );
+  }
+
+  // Add rate limit headers
+  response.headers.set('X-RateLimit-Limit', rateLimit.limit.toString());
+  response.headers.set('X-RateLimit-Remaining', rateLimit.remaining.toString());
+
+  // Apply security headers for API routes
+  if (pathname.startsWith('/api/')) {
+    // CORS configuration
+    const origin = request.headers.get('origin');
+    const allowedOrigins = ['http://localhost:3000', 'http://localhost:3001'];
+    
+    if (origin && allowedOrigins.includes(origin)) {
+      response.headers.set('Access-Control-Allow-Origin', origin);
+      response.headers.set('Access-Control-Allow-Credentials', 'true');
+    }
+
+    // Handle preflight requests
+    if (request.method === 'OPTIONS') {
+      response.headers.set('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+      response.headers.set('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-Token');
+      response.headers.set('Access-Control-Max-Age', '86400');
+      return new NextResponse(null, { status: 200, headers: response.headers });
+    }
+
+    // API security headers
+    response.headers.set('X-Content-Type-Options', 'nosniff');
+    response.headers.set('X-Frame-Options', 'DENY');
+    response.headers.set('Cache-Control', 'no-store, no-cache, must-revalidate');
+  }
+
+  // Excel upload/download specific security
+  if (pathname === '/api/upload-excel' || pathname === '/api/download-excel') {
+    // Additional security checks for file operations
+    const contentType = request.headers.get('content-type');
+    
+    if (pathname === '/api/upload-excel' && request.method === 'POST') {
+      // Ensure multipart form data for uploads
+      if (!contentType?.includes('multipart/form-data')) {
+        return new NextResponse(
+          JSON.stringify({
+            error: 'Invalid content type',
+            message: 'File uploads must use multipart/form-data'
+          }),
+          {
+            status: 400,
+            headers: { 'Content-Type': 'application/json' }
+          }
+        );
+      }
+    }
+  }
+
+  // Block suspicious patterns in URL
+  const suspiciousPatterns = [
+    /\.\./g, // Directory traversal
+    /<script/i, // Script injection
+    /javascript:/i, // JavaScript protocol
+    /vbscript:/i, // VBScript protocol
+    /on\w+\s*=/i, // Event handlers
+    /union.*select/i, // SQL injection
+    /exec\s*\(/i, // Command execution
+    /cmd\.exe/i, // Windows command
+    /powershell/i, // PowerShell
+  ];
+
+  const fullUrl = request.url;
+  for (const pattern of suspiciousPatterns) {
+    if (pattern.test(fullUrl)) {
+      return new NextResponse(
+        JSON.stringify({
+          error: 'Invalid request',
+          message: 'Request contains suspicious patterns'
+        }),
+        {
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
+    }
+  }
+
+  // Add request ID for tracking using a simple timestamp-based ID
+  const requestId = `${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+  response.headers.set('X-Request-ID', requestId);
+
+  return response;
+}
+
+// Configure which paths the middleware runs on
+export const config = {
+  matcher: [
+    /*
+     * Match all request paths except:
+     * - _next/static (static files)
+     * - _next/image (image optimization files)
+     * - favicon.ico (favicon file)
+     * - public folder
+     */
+    '/((?!_next/static|_next/image|favicon.ico|public/).*)',
+  ],
+};

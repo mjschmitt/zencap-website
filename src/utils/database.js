@@ -52,7 +52,7 @@ export async function initializeDatabase() {
       );
     `;
 
-    // Create insights table
+    // Create insights table with date_published field
     await sql`
       CREATE TABLE IF NOT EXISTS insights (
         id SERIAL PRIMARY KEY,
@@ -65,11 +65,13 @@ export async function initializeDatabase() {
         published_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         status VARCHAR(50) DEFAULT 'draft',
-        tags TEXT
+        tags TEXT,
+        date_published DATE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
       );
     `;
 
-    // Create models table
+    // Create models table with excel_url field
     await sql`
       CREATE TABLE IF NOT EXISTS models (
         id SERIAL PRIMARY KEY,
@@ -83,8 +85,89 @@ export async function initializeDatabase() {
         published_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
         status VARCHAR(50) DEFAULT 'active',
-        tags TEXT
+        tags TEXT,
+        excel_url TEXT
       );
+    `;
+
+    // Create performance_metrics table for monitoring
+    await sql`
+      CREATE TABLE IF NOT EXISTS performance_metrics (
+        id SERIAL PRIMARY KEY,
+        metric_name VARCHAR(100) NOT NULL,
+        component VARCHAR(100),
+        duration NUMERIC,
+        memory_delta NUMERIC,
+        exceeds_threshold BOOLEAN DEFAULT FALSE,
+        metadata JSONB,
+        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Create error_logs table for monitoring
+    await sql`
+      CREATE TABLE IF NOT EXISTS error_logs (
+        id SERIAL PRIMARY KEY,
+        category VARCHAR(50),
+        severity VARCHAR(20),
+        message TEXT,
+        stack_trace TEXT,
+        url TEXT,
+        user_agent TEXT,
+        metadata JSONB,
+        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Create user_analytics table for monitoring
+    await sql`
+      CREATE TABLE IF NOT EXISTS user_analytics (
+        id SERIAL PRIMARY KEY,
+        event_type VARCHAR(100) NOT NULL,
+        session_id VARCHAR(128),
+        user_id INTEGER,
+        event_data JSONB,
+        ip_address VARCHAR(45),
+        user_agent TEXT,
+        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Create security_audit_logs table
+    await sql`
+      CREATE TABLE IF NOT EXISTS security_audit_logs (
+        id SERIAL PRIMARY KEY,
+        event_id VARCHAR(64) NOT NULL UNIQUE,
+        event_type VARCHAR(50) NOT NULL,
+        user_id INTEGER,
+        ip_address VARCHAR(45),
+        user_agent TEXT,
+        session_id VARCHAR(128),
+        resource_type VARCHAR(50),
+        resource_id VARCHAR(255),
+        action_type VARCHAR(50),
+        action VARCHAR(50),
+        result VARCHAR(20),
+        severity VARCHAR(20) DEFAULT 'info',
+        metadata JSONB,
+        error_details JSONB,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        retention_until TIMESTAMP WITH TIME ZONE,
+        timestamp TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Create indexes for better performance
+    await sql`
+      CREATE INDEX IF NOT EXISTS idx_event_type ON security_audit_logs(event_type);
+      CREATE INDEX IF NOT EXISTS idx_user_id ON security_audit_logs(user_id);
+      CREATE INDEX IF NOT EXISTS idx_created_at ON security_audit_logs(created_at);
+      CREATE INDEX IF NOT EXISTS idx_severity ON security_audit_logs(severity);
+      CREATE INDEX IF NOT EXISTS idx_performance_timestamp ON performance_metrics(timestamp);
+      CREATE INDEX IF NOT EXISTS idx_error_timestamp ON error_logs(timestamp);
+      CREATE INDEX IF NOT EXISTS idx_analytics_timestamp ON user_analytics(timestamp);
+      CREATE INDEX IF NOT EXISTS idx_insights_status ON insights(status);
+      CREATE INDEX IF NOT EXISTS idx_models_status ON models(status);
     `;
 
     console.log('Database tables initialized successfully');

@@ -83,7 +83,7 @@ class ErrorBoundary extends React.Component {
   }
 
   componentDidCatch(error, errorInfo) {
-    console.error('ExcelJSViewer Error Boundary caught an error:', error, errorInfo);
+    // Error logged internally, no console output needed
     this.props.onError?.(error);
   }
 

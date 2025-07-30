@@ -1,0 +1,293 @@
+name: Excel Viewer Tests
+
+on:
+  push:
+    branches: [main, develop]
+    paths:
+      - 'src/components/ui/ExcelViewer/**'
+      - 'public/excelWorker.js'
+      - 'package.json'
+      - '.github/workflows/test-excel-viewer.yml'
+  pull_request:
+    branches: [main, develop]
+    paths:
+      - 'src/components/ui/ExcelViewer/**'
+      - 'public/excelWorker.js'
+      - 'package.json'
+      
+jobs:
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run unit tests
+        run: npm run test -- --coverage --testPathPattern="ExcelViewer/__tests__" --testPathIgnorePatterns="integration|e2e"
+      
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        with:
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: excel-viewer-unit-tests
+      
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: unit-test-results-${{ matrix.node-version }}
+          path: |
+            coverage/
+            test-results/
+            
+  integration-tests:
+    name: Integration Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run integration tests
+        run: npm run test -- --testPathPattern="integration"
+      
+      - name: Archive test results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: integration-test-results
+          path: test-results/
+          
+  e2e-tests:
+    name: E2E Tests
+    runs-on: ubuntu-latest
+    
+    strategy:
+      matrix:
+        browser: [chromium, firefox, webkit]
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright browsers
+        run: npx playwright install --with-deps ${{ matrix.browser }}
+      
+      - name: Build application
+        run: npm run build
+        
+      - name: Run E2E tests
+        run: npm run test:e2e -- --project=${{ matrix.browser }}
+        
+      - name: Upload test artifacts
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: e2e-${{ matrix.browser }}-artifacts
+          path: |
+            playwright-report/
+            test-results/
+            
+  performance-tests:
+    name: Performance Benchmarks
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright
+        run: npx playwright install chromium
+      
+      - name: Build application
+        run: npm run build
+        
+      - name: Run performance benchmarks
+        run: npm run test:perf
+        
+      - name: Upload benchmark results
+        uses: actions/upload-artifact@v4
+        with:
+          name: performance-benchmark-results
+          path: test-results/performance-benchmarks.json
+          
+      - name: Comment PR with performance results
+        if: github.event_name == 'pull_request'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const results = JSON.parse(fs.readFileSync('test-results/performance-benchmarks.json', 'utf8'));
+            
+            let comment = '## 📊 Performance Benchmark Results\n\n';
+            
+            // File loading
+            comment += '### File Loading\n';
+            comment += '| Size | Avg Time | Threshold | Status |\n';
+            comment += '|------|----------|-----------|--------|\n';
+            for (const [size, metrics] of Object.entries(results.benchmarks.fileLoading)) {
+              const status = metrics.passed ? '✅' : '❌';
+              comment += `| ${size} | ${metrics.avg.toFixed(2)}ms | ${metrics.threshold}ms | ${status} |\n`;
+            }
+            
+            // Add more sections as needed
+            
+            github.rest.issues.createComment({
+              issue_number: context.issue.number,
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              body: comment
+            });
+            
+  accessibility-tests:
+    name: Accessibility Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Build application
+        run: npm run build
+        
+      - name: Run accessibility tests
+        run: |
+          npm install -D @axe-core/playwright
+          npx playwright test e2e/excel-viewer.e2e.js --grep="Accessibility"
+          
+      - name: Upload accessibility results
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: accessibility-test-results
+          path: test-results/
+          
+  visual-regression:
+    name: Visual Regression Tests
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Install Playwright
+        run: npx playwright install chromium
+        
+      - name: Build application
+        run: npm run build
+        
+      - name: Run visual tests
+        run: |
+          # Update snapshots on main branch
+          if [ "${{ github.ref }}" == "refs/heads/main" ]; then
+            npx playwright test e2e/excel-viewer.e2e.js --update-snapshots
+          else
+            npx playwright test e2e/excel-viewer.e2e.js
+          fi
+          
+      - name: Upload visual diff
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: visual-regression-diff
+          path: test-results/
+          
+  security-scan:
+    name: Security Scan
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Run npm audit
+        run: npm audit --production
+        
+      - name: Run Snyk security scan
+        uses: snyk/actions/node@master
+        env:
+          SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+        with:
+          args: --severity-threshold=high
+          
+  code-quality:
+    name: Code Quality
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Use Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20.x'
+          cache: 'npm'
+      
+      - name: Install dependencies
+        run: npm ci
+      
+      - name: Run ESLint
+        run: npm run lint -- src/components/ui/ExcelViewer
+        
+      - name: Check TypeScript types
+        run: npx tsc --noEmit --project tsconfig.json
+        
+      - name: Run SonarCloud scan
+        uses: SonarSource/sonarcloud-github-action@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
