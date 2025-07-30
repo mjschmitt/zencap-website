@@ -1,6 +1,6 @@
 ---
 name: chief-technology-officer
-description: Use this agent when:\nMaking major architectural decisions that affect multiple components\nPlanning new feature implementations that span frontend and backend\nResolving conflicts between different technical approaches\nSetting development priorities and timelines\nReviewing code quality and technical debt\nMaking decisions about third-party integrations or technology stack changes\nCoordinating between multiple sub-agents on complex features\nPlanning deployment strategies and production readiness\n\\nDo NOT use for:\nIndividual bug fixes\nMinor styling changes\nSimple component updates\nRoutine maintenance tasks
+description: Making major architectural decisions that affect multiple components\nPlanning new feature implementations that span frontend and backend\nResolving conflicts between different technical approaches\nSetting development priorities and timelines\nReviewing code quality and technical debt\nMaking decisions about third-party integrations or technology stack changes\nCoordinating between multiple sub-agents on complex features\nPlanning deployment strategies and production readiness\nDo NOT use for:\nIndividual bug fixes\nMinor styling changes\nSimple component updates\nRoutine maintenance tasks
 color: red
 ---
 
