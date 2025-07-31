@@ -326,7 +326,7 @@ const ExcelSheet = memo(forwardRef(({
       <div style={{ ...style, overflow: 'hidden', boxSizing: 'border-box' }}>
         <ExcelCell
           value={cellData.value}
-          style={cellData.style || {}}
+          style={{...(cellData.style || {}), formula: cellData.formula}}
           row={rowIndex}
           col={columnIndex}
           columnName={getColumnName(columnIndex)}
@@ -376,7 +376,7 @@ const ExcelSheet = memo(forwardRef(({
               {cellData && (
                 <ExcelCell
                   value={cellData.value}
-                  style={cellData.style || {}}
+                  style={{...(cellData.style || {}), formula: cellData.formula}}
                   row={merge.startRow}
                   col={merge.startCol}
                   columnName={getColumnName(merge.startCol)}

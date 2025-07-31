@@ -447,6 +447,23 @@ async function processSheet(data, id) {
 function getCellValue(cell) {
   if (cell.value === null || cell.value === undefined) return '';
   
+  // For formula cells, ExcelJS stores the formula in cell.formula and the result in cell.value
+  // So if a cell has a formula, cell.value already contains the calculated result
+  if (cell.formula && cell.type === 6) { // Type 6 is formula in ExcelJS
+    // The value is already the calculated result, just return it
+    if (typeof cell.value === 'object' && !(cell.value instanceof Date)) {
+      // If it's still an object, try to extract the value
+      if (cell.value.result !== undefined) {
+        return cell.value.result;
+      }
+      if (cell.value.error) {
+        return `#${cell.value.error}`;
+      }
+    }
+    // For most cases, cell.value is already the calculated result
+    return cell.value;
+  }
+  
   // Debug logging for all non-primitive values
   if (typeof cell.value === 'object' && !(cell.value instanceof Date)) {
     console.log('[Worker getCellValue] Processing object value:', {
@@ -454,20 +471,13 @@ function getCellValue(cell) {
       valueType: typeof cell.value,
       valueConstructor: cell.value.constructor?.name,
       valueKeys: Object.keys(cell.value || {}),
-      value: cell.value
+      value: cell.value,
+      formula: cell.formula,
+      type: cell.type
     });
   }
   
-  // First check if cell has a direct result property (for formula cells)
-  if (cell.result !== undefined) {
-    return cell.result;
-  }
-  
   // Handle different value types
-  if (cell.value.result !== undefined) {
-    return cell.value.result;
-  }
-  
   if (cell.value.richText) {
     return cell.value.richText.map(rt => rt.text).join('');
   }
@@ -480,7 +490,7 @@ function getCellValue(cell) {
     return `#${cell.value.error}`;
   }
   
-  // Handle formula cells
+  // Handle formula cells (legacy format)
   if (typeof cell.value === 'object' && cell.value.formula) {
     // Return the calculated result if available, otherwise show the formula
     return cell.value.result !== undefined ? cell.value.result : `=${cell.value.formula}`;
