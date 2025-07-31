@@ -449,15 +449,28 @@ function getCellValue(cell) {
   
   // Debug logging for all non-primitive values
   if (typeof cell.value === 'object' && !(cell.value instanceof Date)) {
-    console.log('[Worker getCellValue] Processing object value:', {
-      cellAddress: `${cell.fullAddress || 'unknown'}`,
-      valueType: typeof cell.value,
-      valueConstructor: cell.value.constructor?.name,
-      valueKeys: Object.keys(cell.value || {}),
-      value: cell.value,
-      formula: cell.formula,
-      type: cell.type
-    });
+    // Special logging for formula-containing objects
+    if (cell.value.formula || cell.formula) {
+      console.warn('[Worker getCellValue] Formula cell detected:', {
+        cellAddress: `${cell.fullAddress || 'unknown'}`,
+        cellFormula: cell.formula,
+        valueFormula: cell.value.formula,
+        valueResult: cell.value.result,
+        cellType: cell.type,
+        value: cell.value,
+        valueKeys: Object.keys(cell.value || {})
+      });
+    } else {
+      console.log('[Worker getCellValue] Processing object value:', {
+        cellAddress: `${cell.fullAddress || 'unknown'}`,
+        valueType: typeof cell.value,
+        valueConstructor: cell.value.constructor?.name,
+        valueKeys: Object.keys(cell.value || {}),
+        value: cell.value,
+        formula: cell.formula,
+        type: cell.type
+      });
+    }
   }
   
   // For formula cells, ExcelJS stores the formula in cell.formula and the result in cell.value
@@ -500,10 +513,18 @@ function getCellValue(cell) {
     return `#${cell.value.error}`;
   }
   
-  // Handle formula cells (legacy format)
+  // Handle formula cells (legacy format where formula is in value object)
   if (typeof cell.value === 'object' && cell.value.formula) {
-    // Return the calculated result if available, otherwise show the formula
-    return cell.value.result !== undefined ? cell.value.result : `=${cell.value.formula}`;
+    // If we have a result, return it (even if it's empty string)
+    if (cell.value.result !== undefined) {
+      return cell.value.result;
+    }
+    // If no result, this is likely an error - return empty string
+    console.warn('[Worker getCellValue] Formula cell with no result:', {
+      cellAddress: cell.fullAddress || 'unknown',
+      formula: cell.value.formula
+    });
+    return '';
   }
   
   // Handle hyperlink

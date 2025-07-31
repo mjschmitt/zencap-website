@@ -222,15 +222,14 @@ const ExcelCell = memo(({
       if (value.richText && Array.isArray(value.richText)) {
         return value.richText.map(rt => rt.text || '').join('');
       }
-      if (value.formula) {
-        return value.result !== undefined ? String(value.result) : `=${value.formula}`;
-      }
       if (value.hyperlink) {
         return value.text || value.hyperlink;
       }
       if (value.error) {
         return `#${value.error}`;
       }
+      // Note: Removed formula check here - formulas are handled in the worker
+      // and passed via style.formula, not in the value object
       
       // If it's a Date object
       if (value instanceof Date) {
