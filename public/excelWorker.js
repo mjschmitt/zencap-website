@@ -571,13 +571,22 @@ function getCellValue(cell) {
       valueOfResult: typeof cell.value.valueOf === 'function' ? cell.value.valueOf() : 'N/A'
     });
     
-    // Try JSON.stringify as last resort, but limit length
-    try {
-      const str = JSON.stringify(cell.value);
-      return str.length > 50 ? str.substring(0, 47) + '...' : str;
-    } catch (e) {
-      return '[Complex Object]';
+    // Try toString() method
+    if (typeof cell.value.toString === 'function' && cell.value.toString !== Object.prototype.toString) {
+      return cell.value.toString();
     }
+    
+    // Last resort - return empty string for unhandled objects
+    console.error('[Worker getCellValue] Unhandled object, returning empty string:', {
+      cellAddress: cell.fullAddress || 'unknown',
+      value: cell.value
+    });
+    return '';
+  }
+  
+  // Ensure we always return a primitive
+  if (typeof cell.value === 'object') {
+    console.error('[Worker getCellValue] WARNING: Returning object value:', cell.value);
   }
   
   return cell.value;

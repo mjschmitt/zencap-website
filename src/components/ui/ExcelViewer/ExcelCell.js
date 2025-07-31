@@ -212,7 +212,12 @@ const ExcelCell = memo(({
         value,
         valueType: typeof value,
         valueKeys: Object.keys(value),
-        stringified: stringified
+        stringified: stringified,
+        formula: value.formula,
+        result: value.result,
+        error: value.error,
+        text: value.text,
+        richText: value.richText
       });
       
       // Try to extract meaningful value from common object patterns
@@ -236,14 +241,19 @@ const ExcelCell = memo(({
         return value.toLocaleDateString();
       }
       
-      // Try JSON.stringify for debugging
-      try {
-        const jsonStr = JSON.stringify(value);
-        console.error('[ExcelCell] Unhandled object structure:', jsonStr);
-        return jsonStr.length > 50 ? jsonStr.substring(0, 47) + '...' : jsonStr;
-      } catch (e) {
-        return '[Complex Object]';
+      // Check for toString method
+      if (typeof value.toString === 'function' && value.toString !== Object.prototype.toString) {
+        return value.toString();
       }
+      
+      // Last resort - return empty string for formula objects with no clear value
+      if (value.formula && !value.result) {
+        return '';
+      }
+      
+      // For any other unhandled object, return empty string
+      console.error('[ExcelCell] Unhandled object, returning empty string:', value);
+      return '';
     }
     
     return String(value);
