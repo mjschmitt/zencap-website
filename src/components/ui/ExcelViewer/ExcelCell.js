@@ -223,16 +223,7 @@ const ExcelCell = memo(({
         return value.richText.map(rt => rt.text || '').join('');
       }
       if (value.formula) {
-        // If we have a result, use it; otherwise the value itself might be the result
-        if (value.result !== undefined) {
-          return String(value.result);
-        }
-        // Check if the value itself is a simple type (the calculated result)
-        if (typeof value === 'string' || typeof value === 'number') {
-          return String(value);
-        }
-        // Last resort: show the formula
-        return `=${value.formula}`;
+        return value.result !== undefined ? String(value.result) : `=${value.formula}`;
       }
       if (value.hyperlink) {
         return value.text || value.hyperlink;

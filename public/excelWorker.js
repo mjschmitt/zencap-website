@@ -447,23 +447,6 @@ async function processSheet(data, id) {
 function getCellValue(cell) {
   if (cell.value === null || cell.value === undefined) return '';
   
-  // For formula cells, ExcelJS stores the formula in cell.formula and the result in cell.value
-  // So if a cell has a formula, cell.value already contains the calculated result
-  if (cell.formula && cell.type === 6) { // Type 6 is formula in ExcelJS
-    // The value is already the calculated result, just return it
-    if (typeof cell.value === 'object' && !(cell.value instanceof Date)) {
-      // If it's still an object, try to extract the value
-      if (cell.value.result !== undefined) {
-        return cell.value.result;
-      }
-      if (cell.value.error) {
-        return `#${cell.value.error}`;
-      }
-    }
-    // For most cases, cell.value is already the calculated result
-    return cell.value;
-  }
-  
   // Debug logging for all non-primitive values
   if (typeof cell.value === 'object' && !(cell.value instanceof Date)) {
     console.log('[Worker getCellValue] Processing object value:', {
@@ -475,6 +458,28 @@ function getCellValue(cell) {
       formula: cell.formula,
       type: cell.type
     });
+  }
+  
+  // For formula cells, ExcelJS stores the formula in cell.formula and the result in cell.value
+  // Type 6 is formula in ExcelJS
+  if (cell.formula && cell.type === 6) {
+    // If value is primitive (string, number), it's already the calculated result
+    if (typeof cell.value !== 'object' || cell.value instanceof Date) {
+      return cell.value;
+    }
+    // If it's an object, try to extract the result
+    if (cell.value.result !== undefined) {
+      return cell.value.result;
+    }
+    if (cell.value.error) {
+      return `#${cell.value.error}`;
+    }
+    // Continue to object handling below if we can't extract a simple result
+  }
+  
+  // First check if cell has a direct result property (for formula cells)
+  if (cell.result !== undefined) {
+    return cell.result;
   }
   
   // Handle different value types
