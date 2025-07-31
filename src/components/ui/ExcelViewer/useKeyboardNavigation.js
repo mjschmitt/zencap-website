@@ -15,6 +15,12 @@ export const useKeyboardNavigation = ({
   const handleKeyDown = useCallback((e) => {
     if (!enabled) return;
 
+    // Don't handle keyboard shortcuts if user is typing in an input field
+    const activeElement = document.activeElement;
+    if (activeElement && (activeElement.tagName === 'INPUT' || activeElement.tagName === 'TEXTAREA')) {
+      return;
+    }
+
     // Sheet navigation
     if (e.ctrlKey && e.key === 'PageDown') {
       e.preventDefault();

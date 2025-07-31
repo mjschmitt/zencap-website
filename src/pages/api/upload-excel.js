@@ -15,6 +15,7 @@ import {
 import { createAuditLog, logFileAccess } from '../../utils/audit.js';
 import { scanFile, quarantineFile } from '../../utils/virus-scanner.js';
 import { FILE_SECURITY, SECURITY_HEADERS } from '../../config/security.js';
+import { PRODUCTION_CONFIG } from '../../config/production.js';
 import winston from 'winston';
 
 export const config = {
@@ -76,7 +77,7 @@ const handler = async (req, res) => {
     const form = formidable({
       uploadDir: uploadDir,
       keepExtensions: true,
-      maxFileSize: FILE_SECURITY.maxFileSize,
+      maxFileSize: Math.min(FILE_SECURITY.maxFileSize, PRODUCTION_CONFIG.upload.maxFileSize), // Enforce 100MB limit in production
       maxFields: 10,
       maxFieldsSize: 2 * 1024 * 1024, // 2MB for form fields
       hashAlgorithm: 'sha256',

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
 
 // Only import ExcelJSViewer since it's the only one we need now
-const ExcelJSViewer = React.lazy(() => import('./ExcelJSViewer'));
+const ExcelJSViewer = React.lazy(() => import('./ExcelViewer/ExcelJSViewer'));
 
-const ExcelPreview = ({ file, title = "Model Viewer", height = "850px" }) => {
+const ExcelPreview = ({ file, title = "Model Viewer", height = "100%" }) => {
   const [retryKey, setRetryKey] = useState(0);
   const [hasError, setHasError] = useState(false);
 
@@ -48,7 +48,19 @@ const ExcelPreview = ({ file, title = "Model Viewer", height = "850px" }) => {
   }
 
   return (
-    <div className="excel-preview-container">
+    <div 
+      className="excel-preview-container h-full flex flex-col"
+      style={{ minHeight: '500px' }}
+      onClick={(e) => {
+        // Prevent any clicks within the Excel viewer from bubbling up to parent forms
+        e.stopPropagation();
+      }}
+      onSubmit={(e) => {
+        // Prevent any form submissions from within the Excel viewer
+        e.preventDefault();
+        e.stopPropagation();
+      }}
+    >
       {/* Enhanced error boundary for chunk loading issues */}
       <React.Suspense fallback={
         <div className="flex items-center justify-center h-64">

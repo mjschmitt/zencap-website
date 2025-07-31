@@ -43,69 +43,20 @@ const ExcelToolbar = memo(({
     role="toolbar"
     aria-label="Excel viewer toolbar"
     >
-      {/* Left side - Sheet navigation */}
+      {/* Left side - File info and zoom */}
       <div className="flex items-center space-x-4">
-        {/* Sheet tabs for better UX */}
-        <div className="flex items-center space-x-1">
-          <span className={`text-sm font-medium mr-2 ${
-            darkMode ? 'text-gray-400' : 'text-gray-600'
-          }`}>Sheets:</span>
-          
-          <div className="flex items-center space-x-1">
-            {sheets.map((sheet, index) => (
-              <button
-                key={index}
-                onClick={() => onSheetChange(index)}
-                className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-all ${
-                  index === activeSheet
-                    ? darkMode
-                      ? 'bg-teal-500 text-white'
-                      : 'bg-navy-700 text-white'
-                    : darkMode
-                      ? 'bg-navy-700 text-gray-300 hover:bg-navy-600'
-                      : 'bg-gray-200 text-gray-700 hover:bg-gray-300'
-                }`}
-                aria-label={`Switch to ${sheet.name || `Sheet ${index + 1}`}`}
-                aria-current={index === activeSheet ? 'true' : 'false'}
-              >
-                {sheet.name || `Sheet ${index + 1}`}
-              </button>
-            ))}
-          </div>
-          
-          {/* Sheet navigation arrows for many sheets */}
-          {sheets.length > 5 && (
-            <div className="flex items-center space-x-1 ml-2">
-              <button
-                onClick={() => onSheetChange(Math.max(0, activeSheet - 1))}
-                disabled={activeSheet === 0}
-                className={`p-1 rounded transition-colors ${
-                  darkMode
-                    ? 'hover:bg-navy-700 disabled:opacity-50'
-                    : 'hover:bg-gray-200 disabled:opacity-50'
-                }`}
-                aria-label="Previous sheet"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
-                </svg>
-              </button>
-              <button
-                onClick={() => onSheetChange(Math.min(sheets.length - 1, activeSheet + 1))}
-                disabled={activeSheet === sheets.length - 1}
-                className={`p-1 rounded transition-colors ${
-                  darkMode
-                    ? 'hover:bg-navy-700 disabled:opacity-50'
-                    : 'hover:bg-gray-200 disabled:opacity-50'
-                }`}
-                aria-label="Next sheet"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </svg>
-              </button>
-            </div>
-          )}
+        {/* File name and sheet count */}
+        <div>
+          <h1 className={`text-sm font-medium truncate max-w-xs ${
+            darkMode ? 'text-white' : 'text-navy-800'
+          }`}>
+            {fileName}
+          </h1>
+          <p className={`text-xs ${
+            darkMode ? 'text-gray-500' : 'text-gray-500'
+          }`}>
+            {sheets.length} sheet{sheets.length !== 1 ? 's' : ''} • Sheet {activeSheet + 1}: {sheets[activeSheet]?.name || 'Untitled'}
+          </p>
         </div>
         
         {/* Enhanced zoom controls with dropdown */}
@@ -113,7 +64,11 @@ const ExcelToolbar = memo(({
           darkMode ? 'border-navy-700' : 'border-gray-300'
         }">
           <button
-            onClick={() => onZoomChange?.(Math.max(25, zoom - 25))}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onZoomChange?.(Math.max(25, zoom - 25));
+            }}
             className={`p-1.5 rounded-lg transition-colors ${
               darkMode 
                 ? 'hover:bg-navy-700 text-gray-400 hover:text-white' 
@@ -128,7 +83,11 @@ const ExcelToolbar = memo(({
           </button>
           
           <button
-            onClick={() => setShowZoomMenu(!showZoomMenu)}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowZoomMenu(!showZoomMenu);
+            }}
             className={`px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
               darkMode 
                 ? 'bg-navy-700 text-gray-300 hover:bg-navy-600' 
@@ -141,7 +100,11 @@ const ExcelToolbar = memo(({
           </button>
           
           <button
-            onClick={() => onZoomChange?.(Math.min(200, zoom + 25))}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onZoomChange?.(Math.min(200, zoom + 25));
+            }}
             className={`p-1.5 rounded-lg transition-colors ${
               darkMode 
                 ? 'hover:bg-navy-700 text-gray-400 hover:text-white' 
@@ -171,7 +134,9 @@ const ExcelToolbar = memo(({
                 {zoomLevels.map(level => (
                   <button
                     key={level}
-                    onClick={() => {
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       onZoomChange?.(level);
                       setShowZoomMenu(false);
                     }}
@@ -194,26 +159,19 @@ const ExcelToolbar = memo(({
         </div>
       </div>
 
-      {/* Center - File name and status */}
-      <div className="flex-1 text-center px-4">
-        <h1 className={`text-sm font-medium truncate ${
-          darkMode ? 'text-white' : 'text-navy-800'
-        }`}>
-          {fileName}
-        </h1>
-        <p className={`text-xs mt-0.5 ${
-          darkMode ? 'text-gray-500' : 'text-gray-500'
-        }`}>
-          {sheets.length} sheet{sheets.length !== 1 ? 's' : ''}
-        </p>
-      </div>
+      {/* Center - spacer */}
+      <div className="flex-1" />
 
       {/* Right side - Enhanced actions */}
       <div className="flex items-center space-x-2">
         {/* Search button */}
         {onSearch && (
           <button
-            onClick={onSearch}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onSearch();
+            }}
             className={`p-2 rounded-lg transition-colors ${
               darkMode 
                 ? 'hover:bg-navy-700 text-gray-400 hover:text-white' 
@@ -231,7 +189,11 @@ const ExcelToolbar = memo(({
         {/* Print button */}
         {onPrint && (
           <button
-            onClick={onPrint}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPrint();
+            }}
             className={`p-2 rounded-lg transition-colors ${
               darkMode 
                 ? 'hover:bg-navy-700 text-gray-400 hover:text-white' 
@@ -249,7 +211,11 @@ const ExcelToolbar = memo(({
         {/* Export button with dropdown */}
         <div className="relative">
           <button
-            onClick={() => setShowExportMenu(!showExportMenu)}
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              setShowExportMenu(!showExportMenu);
+            }}
             className={`flex items-center space-x-2 px-3 py-2 rounded-lg font-medium transition-colors ${
               darkMode
                 ? 'bg-teal-500 text-white hover:bg-teal-600'
@@ -284,7 +250,9 @@ const ExcelToolbar = memo(({
                 {exportFormats.map(({ format, label }) => (
                   <button
                     key={format}
-                    onClick={() => {
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
                       onExport?.(format);
                       setShowExportMenu(false);
                     }}
@@ -302,30 +270,45 @@ const ExcelToolbar = memo(({
           </AnimatePresence>
         </div>
 
-        {/* Full screen toggle */}
+        {/* Full screen toggle - more prominent */}
         <button
-          onClick={onFullScreenToggle}
-          className={`p-2 rounded-lg transition-colors ${
-            darkMode 
-              ? 'hover:bg-navy-700 text-gray-400 hover:text-white' 
-              : 'hover:bg-gray-200 text-gray-600 hover:text-navy-900'
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onFullScreenToggle();
+          }}
+          className={`flex items-center space-x-2 px-3 py-2 rounded-lg font-medium transition-all transform hover:scale-105 ${
+            isFullScreen
+              ? darkMode
+                ? 'bg-orange-500 text-white hover:bg-orange-600'
+                : 'bg-orange-500 text-white hover:bg-orange-600'
+              : darkMode
+                ? 'bg-teal-500 text-white hover:bg-teal-600'
+                : 'bg-teal-600 text-white hover:bg-teal-700'
           }`}
-          title={isFullScreen ? "Exit full screen (F11)" : "Enter full screen (F11)"}
+          title={isFullScreen ? "Exit full screen (F11 or ESC)" : "Enter full screen (F11)"}
           aria-label={isFullScreen ? "Exit full screen" : "Enter full screen"}
         >
           {isFullScreen ? (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-            </svg>
+            <>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <span className="text-sm">Exit</span>
+            </>
           ) : (
-            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
-            </svg>
+            <>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4" />
+              </svg>
+              <span className="text-sm">Full Screen</span>
+            </>
           )}
         </button>
         
         {/* Keyboard shortcuts help */}
         <button
+          type="button"
           className={`p-2 rounded-lg transition-colors ${
             darkMode 
               ? 'hover:bg-navy-700 text-gray-400 hover:text-white' 

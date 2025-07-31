@@ -3,89 +3,83 @@ import { useEffect, useRef, useCallback, useState } from 'react';
 export const useExcelProcessor = () => {
   const workerRef = useRef(null);
   const [isWorkerReady, setIsWorkerReady] = useState(false);
-  const pendingCallbacks = useRef(new Map());
-  const messageId = useRef(0);
+  const messageIdCounter = useRef(0);
+  const pendingMessages = useRef(new Map());
 
   // Initialize worker
   useEffect(() => {
-    try {
-      workerRef.current = new Worker('/excelWorker.js');
+    console.log('[useExcelProcessor] Initializing worker...');
+    
+    // Create worker
+    workerRef.current = new Worker('/excelWorker.js');
+    
+    // Set up message handler
+    workerRef.current.onmessage = (event) => {
+      const { id, type, data, error } = event.data;
       
-      workerRef.current.onmessage = (event) => {
-        const { type, data, error, id } = event.data;
-        
-        // Handle responses with callbacks
-        if (id && pendingCallbacks.current.has(id)) {
-          const callback = pendingCallbacks.current.get(id);
-          pendingCallbacks.current.delete(id);
-          
-          if (error) {
-            callback.reject(new Error(error.message));
-          } else {
-            callback.resolve({ type, data });
-          }
+      if (type === 'READY') {
+        console.log('[useExcelProcessor] Worker is ready');
+        setIsWorkerReady(true);
+        return;
+      }
+      
+      // Handle response to a pending message
+      const pending = pendingMessages.current.get(id);
+      if (pending) {
+        if (error) {
+          pending.reject(new Error(error));
+        } else {
+          pending.resolve({ type, data });
         }
-      };
+        pendingMessages.current.delete(id);
+      }
+    };
+    
+    // Set up error handler
+    workerRef.current.onerror = (error) => {
+      console.error('[useExcelProcessor] Worker error:', error);
+      // Reject all pending messages
+      pendingMessages.current.forEach(pending => {
+        pending.reject(new Error('Worker error'));
+      });
+      pendingMessages.current.clear();
+    };
 
-      workerRef.current.onerror = (error) => {
-        // Worker error - reject all pending callbacks
-        pendingCallbacks.current.forEach(callback => {
-          callback.reject(new Error('Worker error: ' + error.message));
-        });
-        pendingCallbacks.current.clear();
-      };
-
-      setIsWorkerReady(true);
-    } catch (error) {
-      setIsWorkerReady(false);
-    }
-
+    // Cleanup on unmount
     return () => {
+      console.log('[useExcelProcessor] Cleaning up worker...');
       if (workerRef.current) {
         workerRef.current.terminate();
         workerRef.current = null;
       }
-      pendingCallbacks.current.clear();
+      setIsWorkerReady(false);
+      pendingMessages.current.clear();
     };
   }, []);
 
   // Send message to worker with promise-based response
-  const sendMessage = useCallback((type, data) => {
+  const sendMessage = useCallback(async (type, data) => {
+    // Wait for worker to be ready if not yet initialized
+    if (!workerRef.current || !isWorkerReady) {
+      throw new Error('Worker not initialized');
+    }
+
     return new Promise((resolve, reject) => {
-      if (!workerRef.current || !isWorkerReady) {
-        reject(new Error('Worker not initialized'));
-        return;
-      }
-
-      const id = ++messageId.current;
-      pendingCallbacks.current.set(id, { resolve, reject });
-
-      // Set timeout for worker response
-      const timeout = setTimeout(() => {
-        if (pendingCallbacks.current.has(id)) {
-          pendingCallbacks.current.delete(id);
-          reject(new Error('Worker timeout'));
+      const id = messageIdCounter.current++;
+      
+      // Store the promise handlers
+      pendingMessages.current.set(id, { resolve, reject });
+      
+      // Send message to worker
+      workerRef.current.postMessage({ id, type, data });
+      
+      // Set timeout for response
+      setTimeout(() => {
+        if (pendingMessages.current.has(id)) {
+          pendingMessages.current.delete(id);
+          reject(new Error(`Worker timeout for message type: ${type}`));
         }
       }, 30000); // 30 second timeout
-
-      // Store timeout in callback to clear it
-      pendingCallbacks.current.get(id).timeout = timeout;
-
-      // Modify resolve/reject to clear timeout
-      const originalResolve = pendingCallbacks.current.get(id).resolve;
-      const originalReject = pendingCallbacks.current.get(id).reject;
-
-      pendingCallbacks.current.get(id).resolve = (data) => {
-        clearTimeout(timeout);
-        originalResolve(data);
-      };
-
-      pendingCallbacks.current.get(id).reject = (error) => {
-        clearTimeout(timeout);
-        originalReject(error);
-      };
-
-      workerRef.current.postMessage({ type, data, id });
     });
   }, [isWorkerReady]);
 
@@ -121,6 +115,10 @@ export const useExcelProcessor = () => {
       query,
       ...options
     });
+    // Handle different response types for search
+    if (response.type === 'SEARCH_RESULTS') {
+      return response.data;
+    }
     return response.data;
   }, [sendMessage]);
 

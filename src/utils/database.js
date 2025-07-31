@@ -157,18 +157,16 @@ export async function initializeDatabase() {
       );
     `;
 
-    // Create indexes for better performance
-    await sql`
-      CREATE INDEX IF NOT EXISTS idx_event_type ON security_audit_logs(event_type);
-      CREATE INDEX IF NOT EXISTS idx_user_id ON security_audit_logs(user_id);
-      CREATE INDEX IF NOT EXISTS idx_created_at ON security_audit_logs(created_at);
-      CREATE INDEX IF NOT EXISTS idx_severity ON security_audit_logs(severity);
-      CREATE INDEX IF NOT EXISTS idx_performance_timestamp ON performance_metrics(timestamp);
-      CREATE INDEX IF NOT EXISTS idx_error_timestamp ON error_logs(timestamp);
-      CREATE INDEX IF NOT EXISTS idx_analytics_timestamp ON user_analytics(timestamp);
-      CREATE INDEX IF NOT EXISTS idx_insights_status ON insights(status);
-      CREATE INDEX IF NOT EXISTS idx_models_status ON models(status);
-    `;
+    // Create indexes for better performance (one at a time)
+    await sql`CREATE INDEX IF NOT EXISTS idx_event_type ON security_audit_logs(event_type);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_user_id ON security_audit_logs(user_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_created_at ON security_audit_logs(created_at);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_severity ON security_audit_logs(severity);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_performance_timestamp ON performance_metrics(timestamp);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_error_timestamp ON error_logs(timestamp);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_analytics_timestamp ON user_analytics(timestamp);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_insights_status ON insights(status);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_models_status ON models(status);`;
 
     console.log('Database tables initialized successfully');
   } catch (error) {

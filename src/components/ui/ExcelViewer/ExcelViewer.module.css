@@ -1,0 +1,264 @@
+/* Excel Viewer Styles */
+
+/* Base styles */
+.excelViewer {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Inter', sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .excelToolbar {
+    flex-wrap: wrap;
+    padding: 0.5rem;
+  }
+  
+  .excelToolbar > div {
+    margin-bottom: 0.5rem;
+  }
+  
+  .excelToolbar button {
+    padding: 0.5rem;
+  }
+  
+  .excelToolbar .textSm {
+    font-size: 0.75rem;
+  }
+  
+  /* Hide less important buttons on mobile */
+  .excelToolbar button[aria-label="Keyboard shortcuts"] {
+    display: none;
+  }
+  
+  /* Sheet tabs scroll horizontally on mobile */
+  .excelToolbar .sheetTabs {
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+    max-width: 100%;
+  }
+}
+
+@media (max-width: 480px) {
+  /* Stack toolbar items vertically on very small screens */
+  .excelToolbar {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  
+  .excelToolbar > div {
+    width: 100%;
+    justify-content: center;
+    margin-bottom: 0.5rem;
+  }
+}
+
+/* Print Styles */
+@media print {
+  /* Hide interactive elements */
+  .excelToolbar,
+  .searchPanel,
+  .toastNotification,
+  button,
+  .printHidden {
+    display: none !important;
+  }
+  
+  /* Reset colors for print */
+  .excelViewer {
+    background: white !important;
+    color: black !important;
+    border: none !important;
+  }
+  
+  /* Ensure grid prints properly */
+  .excelGrid {
+    overflow: visible !important;
+    height: auto !important;
+    page-break-inside: avoid;
+  }
+  
+  .excelGrid > div {
+    overflow: visible !important;
+    height: auto !important;
+  }
+  
+  /* Cell styles for print */
+  .excelCell {
+    background: white !important;
+    color: black !important;
+    border: 1px solid #d1d5db !important;
+    page-break-inside: avoid;
+  }
+  
+  /* Headers stay visible */
+  .excelCell[role="columnheader"],
+  .excelCell[role="rowheader"] {
+    background: #f3f4f6 !important;
+    font-weight: 600 !important;
+    position: sticky;
+    top: 0;
+    left: 0;
+  }
+  
+  /* Page margins */
+  @page {
+    margin: 0.5in;
+    size: landscape;
+  }
+  
+  /* Ensure formulas print */
+  .excelCell[aria-label*="formula"] {
+    background: #f0f9ff !important;
+  }
+}
+
+/* Accessibility Styles */
+.excelCell:focus {
+  outline: 3px solid #0d9488;
+  outline-offset: -1px;
+  z-index: 10;
+}
+
+.excelCell:focus-visible {
+  outline: 3px solid #0d9488;
+  outline-offset: -1px;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .excelCell {
+    border: 2px solid;
+  }
+  
+  .excelCell:focus {
+    outline-width: 4px;
+  }
+  
+  .excelToolbar button {
+    border: 2px solid;
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .excelCell,
+  .excelToolbar button,
+  * {
+    transition: none !important;
+    animation: none !important;
+  }
+}
+
+/* Screen reader only content */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border-width: 0;
+}
+
+/* Loading skeleton animations */
+@keyframes skeletonLoading {
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
+}
+
+.skeletonLoading {
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0.05) 25%,
+    rgba(0, 0, 0, 0.1) 50%,
+    rgba(0, 0, 0, 0.05) 75%
+  );
+  background-size: 200% 100%;
+  animation: skeletonLoading 1.5s infinite;
+}
+
+/* Dark mode skeleton */
+.dark .skeletonLoading {
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0.05) 25%,
+    rgba(255, 255, 255, 0.1) 50%,
+    rgba(255, 255, 255, 0.05) 75%
+  );
+}
+
+/* Smooth scrolling for grid */
+.excelGrid {
+  scroll-behavior: smooth;
+  -webkit-overflow-scrolling: touch;
+}
+
+/* Custom scrollbar styles */
+.excelGrid::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.excelGrid::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 6px;
+}
+
+.excelGrid::-webkit-scrollbar-thumb {
+  background: #9ca3af;
+  border-radius: 6px;
+}
+
+.excelGrid::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Dark mode scrollbar */
+.dark .excelGrid::-webkit-scrollbar-track {
+  background: #1f2937;
+}
+
+.dark .excelGrid::-webkit-scrollbar-thumb {
+  background: #4b5563;
+}
+
+.dark .excelGrid::-webkit-scrollbar-thumb:hover {
+  background: #6b7280;
+}
+
+/* Formula bar styles */
+.formulaBar {
+  font-family: 'Monaco', 'Consolas', 'Courier New', monospace;
+  font-size: 13px;
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  background: #ffffff;
+  min-height: 36px;
+  display: flex;
+  align-items: center;
+}
+
+.dark .formulaBar {
+  background: #1f2937;
+  border-color: #374151;
+  color: #f3f4f6;
+}
+
+/* Touch-friendly tap targets */
+@media (pointer: coarse) {
+  .excelToolbar button {
+    min-width: 44px;
+    min-height: 44px;
+  }
+  
+  .excelCell {
+    min-height: 40px;
+  }
+}
