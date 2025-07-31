@@ -290,8 +290,8 @@ const ExcelCell = memo(({
       aria-readonly={cellType === 'readonly'}
       tabIndex={isSelected ? 0 : -1}
     >
-      {/* Formula indicator */}
-      {cellType === 'formula' && !isPrintMode && (
+      {/* Formula indicator - only show if cell has visible content */}
+      {cellType === 'formula' && !isPrintMode && displayValue && displayValue.trim() !== '' && (
         <span className={`${styles.indicator} indicator absolute top-0 left-0 text-xs ${
           darkMode ? 'text-teal-400' : 'text-teal-600'
         }`} aria-hidden="true">

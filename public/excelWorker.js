@@ -465,6 +465,7 @@ function getCellValue(cell) {
   if (cell.formula && cell.type === 6) {
     // If value is primitive (string, number), it's already the calculated result
     if (typeof cell.value !== 'object' || cell.value instanceof Date) {
+      // Return the value even if it's an empty string
       return cell.value;
     }
     // If it's an object, try to extract the result
@@ -473,6 +474,10 @@ function getCellValue(cell) {
     }
     if (cell.value.error) {
       return `#${cell.value.error}`;
+    }
+    // For formulas that return empty or have no clear result, return empty string
+    if (cell.value === null || cell.value === '') {
+      return '';
     }
     // Continue to object handling below if we can't extract a simple result
   }
