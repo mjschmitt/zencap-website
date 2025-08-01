@@ -106,14 +106,7 @@ const ExcelCell = memo(({
       userSelect: 'none',
       boxSizing: 'border-box',
       position: 'relative',
-      transition: 'all 0.15s ease-in-out',
-      // Prevent sub-pixel gaps by slightly expanding cells with fills
-      ...(style.fill?.color ? { 
-        width: 'calc(100% + 1px)',
-        height: 'calc(100% + 1px)',
-        marginRight: '-1px',
-        marginBottom: '-1px'
-      } : {})
+      transition: 'all 0.15s ease-in-out'
     };
 
     // Apply font styles with proper precedence
@@ -257,17 +250,6 @@ const ExcelCell = memo(({
       baseStyle.textAlign = computedAlignment;
     }
 
-    // Debug: Log cells with fills to see their border status
-    if (style.fill?.color && (row >= 1 && row <= 10)) {
-      console.log(`[Border Debug] Cell ${columnName}${row} with fill:`, {
-        hasFill: !!style.fill?.color,
-        fillColor: style.fill?.color,
-        hasBorder: !!(style.border && Object.keys(style.border).length > 0),
-        borderDetails: style.border,
-        showGridLines: showGridLines
-      });
-    }
-    
     // Apply borders with proper styling
     if (style.border && Object.keys(style.border).length > 0) {
       // Apply custom borders from Excel
@@ -394,17 +376,6 @@ const ExcelCell = memo(({
       delete baseStyle._underlineType;
     }
 
-    // Debug: Log final border styles for cells with fills
-    if (style.fill?.color && (row >= 1 && row <= 10)) {
-      console.log(`[Final Borders] Cell ${columnName}${row}:`, {
-        borderTop: baseStyle.borderTop,
-        borderRight: baseStyle.borderRight,
-        borderBottom: baseStyle.borderBottom,
-        borderLeft: baseStyle.borderLeft,
-        backgroundColor: baseStyle.backgroundColor
-      });
-    }
-    
     return baseStyle;
   }, [style, isSelected, isHighlighted, width, height, darkMode, isPrintMode, showGridLines, row, columnName]);
 

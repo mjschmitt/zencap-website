@@ -237,7 +237,12 @@ const ExcelSheet = memo(forwardRef(({
             ...style,
             borderRight: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
             borderBottom: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
-            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6'
+            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6',
+            // Prevent sub-pixel gaps
+            width: 'calc(100% + 1px)',
+            height: 'calc(100% + 1px)',
+            marginRight: '-1px',
+            marginBottom: '-1px'
           }}
           className={`flex items-center justify-center font-medium text-xs ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
@@ -254,7 +259,12 @@ const ExcelSheet = memo(forwardRef(({
             ...style,
             borderRight: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
             borderBottom: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
-            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6'
+            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6',
+            // Prevent sub-pixel gaps
+            width: 'calc(100% + 1px)',
+            height: 'calc(100% + 1px)',
+            marginRight: '-1px',
+            marginBottom: '-1px'
           }}
           className={`flex items-center justify-center font-medium text-xs ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
@@ -273,7 +283,12 @@ const ExcelSheet = memo(forwardRef(({
             ...style,
             borderRight: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
             borderBottom: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
-            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6'
+            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6',
+            // Prevent sub-pixel gaps by slightly expanding the cell
+            width: 'calc(100% + 1px)',
+            height: 'calc(100% + 1px)',
+            marginRight: '-1px',
+            marginBottom: '-1px'
           }}
           className={`flex items-center justify-center font-medium text-xs ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
@@ -423,7 +438,11 @@ const ExcelSheet = memo(forwardRef(({
         rowHeight={getRowHeight}
         width={width}
         onScroll={handleScroll}
-        style={{ overflowX: 'auto', overflowY: 'auto' }}
+        style={{ 
+          overflowX: 'auto', 
+          overflowY: 'auto',
+          backgroundColor: darkMode ? '#111827' : '#ffffff'
+        }}
         data-dark={darkMode}
       >
         {Cell}
