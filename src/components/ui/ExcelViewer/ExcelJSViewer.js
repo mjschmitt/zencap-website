@@ -59,6 +59,7 @@ const ExcelJSViewer = ({
   const [isPrintMode, setIsPrintMode] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
   const [sheetDimensions, setSheetDimensions] = useState({ width: 800, height: 480 });
+  const [showGridLines, setShowGridLines] = useState(true); // Default to true, will be updated from Excel
 
   // Refs
   const containerRef = useRef(null);
@@ -433,6 +434,10 @@ const ExcelJSViewer = ({
       }
       
       setSheetData(data);
+      // Update gridlines setting from Excel file (if provided)
+      if (data.showGridLines !== undefined) {
+        setShowGridLines(data.showGridLines);
+      }
       setIsInitialLoadComplete(true);
       // Don't set activeSheet here as it's already set by handleSheetChange
     } catch (err) {
@@ -488,6 +493,10 @@ const ExcelJSViewer = ({
           end: newEnd
         }).then(data => {
           setSheetData(data);
+          // Update gridlines setting from Excel file (if provided)
+          if (data.showGridLines !== undefined) {
+            setShowGridLines(data.showGridLines);
+          }
           setIsInitialLoadComplete(true);
         }).catch(err => {
           console.error('Failed to load viewport data:', err);
@@ -705,6 +714,8 @@ const ExcelJSViewer = ({
           onExport={handleExport}
           onPrint={showPrintButton ? handlePrint : null}
           onSearch={showSearch ? () => setSearchOpen(true) : null}
+          showGridLines={showGridLines}
+          onToggleGridLines={() => setShowGridLines(!showGridLines)}
           fileName={title}
           darkMode={darkMode}
           isPrintMode={isPrintMode}
@@ -741,6 +752,7 @@ const ExcelJSViewer = ({
               zoom={zoom}
               onViewportChange={handleViewportChange}
               darkMode={darkMode}
+              showGridLines={showGridLines}
               isPrintMode={isPrintMode}
               accessibilityMode={accessibilityMode}
               debugMode={debugMode}

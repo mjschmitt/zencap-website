@@ -25,7 +25,8 @@ const ExcelSheet = memo(forwardRef(({
   darkMode = false,
   isPrintMode = false,
   accessibilityMode = false,
-  debugMode = false
+  debugMode = false,
+  showGridLines = true
 }, ref) => {
   const gridRef = useRef(null);
   const [columnWidths, setColumnWidths] = useState({});
@@ -307,8 +308,8 @@ const ExcelSheet = memo(forwardRef(({
         <div 
           style={{
             ...style,
-            borderRight: darkMode && !isPrintMode ? '1px solid #4b5563' : '1px solid #d1d5db',
-            borderBottom: darkMode && !isPrintMode ? '1px solid #4b5563' : '1px solid #d1d5db',
+            borderRight: showGridLines ? (darkMode && !isPrintMode ? '1px solid #4b5563' : '1px solid #d1d5db') : 'none',
+            borderBottom: showGridLines ? (darkMode && !isPrintMode ? '1px solid #4b5563' : '1px solid #d1d5db') : 'none',
             cursor: 'cell'
           }}
           className={`${isPrintMode ? 'print:border-gray-200' : ''}`}
@@ -338,10 +339,11 @@ const ExcelSheet = memo(forwardRef(({
           darkMode={darkMode}
           isPrintMode={isPrintMode}
           accessibilityMode={accessibilityMode}
+          showGridLines={showGridLines}
         />
       </div>
     );
-  }, [getColumnWidth, getRowHeight, selectedCell, highlightedCells, onCellClick, darkMode, isPrintMode, accessibilityMode]);
+  }, [getColumnWidth, getRowHeight, selectedCell, highlightedCells, onCellClick, darkMode, isPrintMode, accessibilityMode, showGridLines]);
 
   // Handle merged cells overlay
   const MergedCellsOverlay = useMemo(() => {
@@ -386,6 +388,7 @@ const ExcelSheet = memo(forwardRef(({
                   darkMode={darkMode}
                   isPrintMode={isPrintMode}
                   isMerged={true}
+                  showGridLines={showGridLines}
                 />
               )}
             </div>

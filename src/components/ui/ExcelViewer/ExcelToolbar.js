@@ -14,7 +14,9 @@ const ExcelToolbar = memo(({
   onSearch,
   fileName = "Spreadsheet",
   darkMode = false,
-  isPrintMode = false
+  isPrintMode = false,
+  showGridLines = true,
+  onToggleGridLines
 }) => {
   const [showExportMenu, setShowExportMenu] = useState(false);
   const [showZoomMenu, setShowZoomMenu] = useState(false);
@@ -207,6 +209,31 @@ const ExcelToolbar = memo(({
             </svg>
           </button>
         )}
+        
+        {/* Gridlines toggle button */}
+        <button
+          type="button"
+          onClick={(e) => {
+            e.stopPropagation();
+            onToggleGridLines?.();
+          }}
+          className={`p-2 rounded-lg transition-colors ${
+            showGridLines
+              ? darkMode
+                ? 'bg-navy-700 text-teal-400 hover:bg-navy-600'
+                : 'bg-gray-200 text-teal-600 hover:bg-gray-300'
+              : darkMode
+                ? 'hover:bg-navy-700 text-gray-500 hover:text-gray-400'
+                : 'hover:bg-gray-200 text-gray-400 hover:text-gray-600'
+          }`}
+          title={showGridLines ? "Hide gridlines" : "Show gridlines"}
+          aria-label={showGridLines ? "Hide gridlines" : "Show gridlines"}
+          aria-pressed={showGridLines}
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16M6 4v16m6 0V4m6 0v16" />
+          </svg>
+        </button>
         
         {/* Export button with dropdown */}
         <div className="relative">

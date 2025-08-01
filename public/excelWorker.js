@@ -263,7 +263,9 @@ async function processSheet(data, id) {
     frozenRows: worksheet.views?.[0]?.ySplit || 0,
     frozenCols: worksheet.views?.[0]?.xSplit || 0,
     defaultColWidth: worksheet.properties?.defaultColWidth,
-    defaultRowHeight: worksheet.properties?.defaultRowHeight
+    defaultRowHeight: worksheet.properties?.defaultRowHeight,
+    // Extract gridline visibility setting (default is true in Excel)
+    showGridLines: worksheet.views?.[0]?.showGridLines !== false
   };
   
   // console.log('Worksheet properties:', {

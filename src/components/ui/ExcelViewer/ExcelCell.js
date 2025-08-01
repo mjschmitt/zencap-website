@@ -16,7 +16,8 @@ const ExcelCell = memo(({
   darkMode = false,
   isPrintMode = false,
   accessibilityMode = false,
-  isMerged = false
+  isMerged = false,
+  showGridLines = true
 }) => {
   const { cellTheme } = useTheme(darkMode);
   // Determine cell type
@@ -274,13 +275,19 @@ const ExcelCell = memo(({
           baseStyle[borderProp] = `${borderWidth} ${cssBorderStyle} ${borderColor}`;
         }
       });
-    } else {
-      // Default borders - use hairline for Excel-like appearance
+    } else if (showGridLines) {
+      // Default borders - use hairline for Excel-like appearance only if gridlines are enabled
       baseStyle.borderRight = darkMode && !isPrintMode ? '1px solid #4b5563' : '1px solid #d1d5db';
       baseStyle.borderBottom = darkMode && !isPrintMode ? '1px solid #4b5563' : '1px solid #d1d5db';
       // Ensure borders are contained within the cell
       baseStyle.borderLeft = '0';
       baseStyle.borderTop = '0';
+    } else {
+      // No gridlines - remove all default borders
+      baseStyle.borderRight = 'none';
+      baseStyle.borderBottom = 'none';
+      baseStyle.borderLeft = 'none';
+      baseStyle.borderTop = 'none';
     }
 
     // Apply selection style
@@ -349,7 +356,7 @@ const ExcelCell = memo(({
     }
 
     return baseStyle;
-  }, [style, isSelected, isHighlighted, width, height, darkMode, isPrintMode]);
+  }, [style, isSelected, isHighlighted, width, height, darkMode, isPrintMode, showGridLines]);
 
   // Format the display value
   const displayValue = useMemo(() => {
