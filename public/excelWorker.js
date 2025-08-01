@@ -1102,11 +1102,11 @@ function extractCellStyle(cell) {
     if (foundFormat && foundFormat.includes('"')) {
       const cellRef = typeof cell.fullAddress === 'string' ? cell.fullAddress : 
                       (cell.fullAddress?.address || cell.address || 'unknown');
-      console.log('[Worker] Custom format with text found:', { 
-        cellRef: cellRef,
-        format: foundFormat,
-        value: cell.value
-      });
+      // console.log('[Worker] Custom format with text found:', { 
+      //   cellRef: cellRef,
+      //   format: foundFormat,
+      //   value: cell.value
+      // });
     }
     // Debug D26 specifically
     if (cell.fullAddress === 'D26') {
