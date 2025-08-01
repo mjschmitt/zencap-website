@@ -257,7 +257,25 @@ const ExcelCell = memo(({
         if (style.border[side]) {
           const borderStyle = style.border[side].style || 'solid';
           const borderWidth = getBorderWidth(borderStyle);
-          const borderColor = convertARGBToHex(style.border[side].color) || '#000000';
+          const rawBorderColor = style.border[side].color;
+          const borderColor = convertARGBToHex(rawBorderColor) || '#000000';
+          
+          // Skip white/light borders on filled cells
+          // These are often artifacts from Excel that shouldn't be visible
+          const isLightBorder = (
+            borderColor === '#FFFFFF' || borderColor === '#ffffff' || 
+            borderColor === '#F2F2F2' || borderColor === '#f2f2f2' ||
+            borderColor === '#E7E6E6' || borderColor === '#e7e6e6' ||
+            borderColor === '#D3D3D3' || borderColor === '#d3d3d3' ||
+            borderColor === '#C0C0C0' || borderColor === '#c0c0c0' ||
+            borderColor === '#FAFAFA' || borderColor === '#fafafa' ||
+            borderColor === '#F5F5F5' || borderColor === '#f5f5f5'
+          );
+          
+          if (style.fill?.color && isLightBorder) {
+            // Skip this border - it's too light to be intentional on a filled cell
+            return;
+          }
           
           // Convert Excel border styles to CSS
           let cssBorderStyle = borderStyle;
@@ -275,8 +293,11 @@ const ExcelCell = memo(({
           baseStyle[borderProp] = `${borderWidth} ${cssBorderStyle} ${borderColor}`;
         }
       });
-    } else if (showGridLines) {
-      // Default borders - use hairline for Excel-like appearance only if gridlines are enabled
+    } else if (showGridLines && !style.fill?.color && !baseStyle.backgroundColor) {
+      // Default borders - use hairline for Excel-like appearance only if:
+      // 1. Gridlines are enabled
+      // 2. Cell doesn't have a background fill (Excel hides gridlines on filled cells)
+      // 3. Cell doesn't have any background color set
       baseStyle.borderRight = darkMode && !isPrintMode ? '1px solid #4b5563' : '1px solid #d1d5db';
       baseStyle.borderBottom = darkMode && !isPrintMode ? '1px solid #4b5563' : '1px solid #d1d5db';
       // Ensure borders are contained within the cell
