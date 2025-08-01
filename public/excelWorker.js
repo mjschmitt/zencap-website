@@ -424,15 +424,29 @@ async function processSheet(data, id) {
           const hasValue = cell.value !== null && cell.value !== undefined;
           
           // Debug D26 inclusion
-          // if (getColumnName(colNum) === 'D' && rowNum === 26) {
-          //   console.log('[Worker D26] Inclusion check:', {
-          //     hasValue,
-          //     hasStyle,
-          //     willInclude: hasValue || hasStyle,
-          //     cellValue: cell.value,
-          //     styleKeys: cellStyle ? Object.keys(cellStyle) : []
-          //   });
-          // }
+          if (getColumnName(colNum) === 'D' && rowNum === 26) {
+            console.log('========== CELL D26 DEBUG ==========');
+            console.log('[D26] Cell properties:', {
+              value: cell.value,
+              type: cell.type,
+              numFmt: cell.numFmt,
+              style: cell.style,
+              _style: cell._style,
+              model: cell.model,
+              formula: cell.formula,
+              result: cell.result
+            });
+            console.log('[D26] Extracted style:', cellStyle);
+            console.log('[D26] Number format:', cellStyle?.numberFormat);
+            console.log('[D26] Inclusion check:', {
+              hasValue,
+              hasStyle,
+              willInclude: hasValue || hasStyle,
+              cellValue: cell.value,
+              styleKeys: cellStyle ? Object.keys(cellStyle) : []
+            });
+            console.log('========== END D26 DEBUG ==========');
+          }
           
           // Include cell if it has a value OR if it has styling
           if (hasValue || hasStyle) {
@@ -1083,15 +1097,19 @@ function extractCellStyle(cell) {
   if (foundFormat) {
     style.numberFormat = foundFormat;
     // Debug custom formats
-    // if (foundFormat && foundFormat.includes('"')) {
-    //   const cellRef = typeof cell.fullAddress === 'string' ? cell.fullAddress : 
-    //                   (cell.fullAddress?.address || cell.address || 'unknown');
-    //   console.log('[Worker] Custom format with text found:', { 
-    //     cellRef: cellRef,
-    //     format: foundFormat,
-    //     value: cell.value
-    //   });
-    // }
+    if (foundFormat && foundFormat.includes('"')) {
+      const cellRef = typeof cell.fullAddress === 'string' ? cell.fullAddress : 
+                      (cell.fullAddress?.address || cell.address || 'unknown');
+      console.log('[Worker] Custom format with text found:', { 
+        cellRef: cellRef,
+        format: foundFormat,
+        value: cell.value
+      });
+    }
+    // Debug D26 specifically
+    if (cell.fullAddress === 'D26') {
+      console.log('[D26 Number Format] Found format:', foundFormat);
+    }
     // Debug date formats
     // if (foundFormat && foundFormat.match(/[dmyhs]/i)) {
     //   console.log('[Worker] Date format found:', { 

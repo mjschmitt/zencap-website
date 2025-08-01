@@ -23,8 +23,15 @@
       "Bash(move:*)",
       "Bash(find:*)",
       "mcp__ide__getDiagnostics",
-      "Bash(true)"
+      "Bash(true)",
+      "WebFetch(domain:localhost)",
+      "Bash(dir \"C:\\Users\\maxim\\OneDrive\\Desktop\\zencap-website\\public\\uploads\\excel\\1753393926437_111_SW_16th_Ter_debt_.xlsm\")",
+      "Bash(powershell:*)",
+      "Bash(git ls-tree:*)",
+      "Bash(git commit:*)",
+      "Bash(wmic process where:*)"
     ],
     "deny": []
-  }
+  },
+  "$schema": "https://json.schemastore.org/claude-code-settings.json"
 }

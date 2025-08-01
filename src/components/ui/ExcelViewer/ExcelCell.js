@@ -379,9 +379,6 @@ const ExcelCell = memo(({
       // console.log('[ExcelCell] About to call formatNumber:', { value, format: style.numberFormat, cell: `${columnName}${row}` });
       const formatted = formatNumber(value, style.numberFormat);
       // console.log('[ExcelCell] formatNumber returned:', { formatted, cell: `${columnName}${row}` });
-      // if (columnName === 'D' && row === 26) {
-      //   console.log('[D26] Calling formatNumber with:', value, style.numberFormat, '=> got:', formatted);
-      // }
       // Debug specific cell D26
       // if (columnName === 'D' && row === 26) {
       //   console.log(`[D26 Debug] Cell ${columnName}${row}:`, 
@@ -673,12 +670,11 @@ function formatNumber(value, format) {
   // Debug entry - log ALL calls to this function
   // console.log('[formatNumber] Called with:', { value, format, valueType: typeof value });
   
-  // Debug entry for Month format specifically
-  // if (format === '"Month" 0') {
-  //   console.log('[formatNumber] MONTH FORMAT DETECTED! value=', value, 'format=', format);
-  //   // Temporarily return hardcoded result to test
-  //   return 'Month ' + value;
-  // }
+  // Direct handling for "Month" 0 format
+  if (format === '"Month" 0') {
+    // Direct return for this specific format
+    return 'Month ' + value;
+  }
   
   // Handle Excel number format codes
   if (!format) {
@@ -775,9 +771,6 @@ function formatNumber(value, format) {
   
   // Custom formats with text
   if (format.includes('"')) {
-    // if (format === '"Month" 0') {
-    //   console.log('[Custom Format Handler] Processing Month 0:', format, 'for value:', value);
-    // }
     // Parse the format string to extract text and number patterns
     const parts = [];
     let currentPos = 0;
@@ -835,22 +828,10 @@ function formatNumber(value, format) {
       }
     }
     
-    // Log just the final result for debugging
-    // if (format === '"Month" 0') {
-    //   console.log('[Custom Format] Month 0 Result:', { 
-    //     format, 
-    //     value, 
-    //     parts,
-    //     output: result.trim() 
-    //   });
-    // }
     return result.trim();
   }
   
   // Default number formatting
-  // if (format === '"Month" 0') {
-  //   console.log('[formatNumber] Reached default formatting - THIS IS THE BUG!');
-  // }
   return value.toLocaleString();
 }
 
