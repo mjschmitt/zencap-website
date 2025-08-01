@@ -136,7 +136,17 @@ const ExcelSheet = memo(forwardRef(({
         // Note: Excel might already convert to pixels in some cases
         // If height seems too large, it's already in pixels
         const pixelHeight = height > 100 ? height : height * EXCEL_ROW_HEIGHT_TO_PIXEL;
-        heights[row] = Math.round(pixelHeight * zoomFactor);
+        
+        // Handle hidden or very small rows
+        // In Excel, rows with height 0 are hidden, very small heights (< 5 points) are meant to hide content
+        if (height === 0) {
+          heights[row] = 0; // Completely hidden
+        } else if (height < 5) {
+          // Very small height - make it 1px so row exists but content is not visible
+          heights[row] = 1;
+        } else {
+          heights[row] = Math.round(pixelHeight * zoomFactor);
+        }
       });
     }
     setRowHeights(heights);

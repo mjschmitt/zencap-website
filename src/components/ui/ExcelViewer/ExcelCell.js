@@ -108,6 +108,14 @@ const ExcelCell = memo(({
       position: 'relative',
       transition: 'all 0.15s ease-in-out'
     };
+    
+    // Hide content in very small rows (height <= 5px)
+    if (height <= 5) {
+      baseStyle.fontSize = '0px';
+      baseStyle.lineHeight = '0px';
+      baseStyle.padding = '0px';
+      baseStyle.overflow = 'hidden';
+    }
 
     // Apply font styles with proper precedence
     if (style.font) {
