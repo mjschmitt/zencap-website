@@ -386,6 +386,7 @@ const ExcelCell = memo(({
       // console.log('[ExcelCell] About to call formatNumber:', { value, format: style.numberFormat, cell: `${columnName}${row}` });
       const formatted = formatNumber(value, style.numberFormat);
       // console.log('[ExcelCell] formatNumber returned:', { formatted, cell: `${columnName}${row}` });
+      
       // Debug specific cell D26
       // if (columnName === 'D' && row === 26) {
       //   console.log(`[D26 Debug] Cell ${columnName}${row}:`, 
@@ -677,10 +678,12 @@ function formatNumber(value, format) {
   // Debug entry - log ALL calls to this function
   // console.log('[formatNumber] Called with:', { value, format, valueType: typeof value });
   
-  // Direct handling for "Month" 0 format
-  if (format === '"Month" 0') {
-    // Direct return for this specific format
-    return 'Month ' + value;
+  // Handle simple custom formats with quoted text followed by a number format
+  // Examples: "Month" 0, "Year" 0, "Quarter" 0, etc.
+  const simpleCustomMatch = format.match(/^"([^"]+)"\s*0+$/);
+  if (simpleCustomMatch) {
+    const customText = simpleCustomMatch[1];
+    return customText + ' ' + value;
   }
   
   // Handle Excel number format codes
