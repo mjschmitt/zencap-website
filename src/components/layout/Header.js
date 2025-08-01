@@ -4,6 +4,19 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import Navbar from './Navbar';
 import DarkModeToggle from '../ui/DarkModeToggle';
+import dynamic from 'next/dynamic';
+
+// Dynamically import search component for better performance
+const SearchComponent = dynamic(() => import('../ui/SearchComponent'), {
+  loading: () => (
+    <div className="w-full max-w-md">
+      <div className="animate-pulse">
+        <div className="h-10 bg-gray-200 rounded-lg"></div>
+      </div>
+    </div>
+  ),
+  ssr: false
+});
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -40,7 +53,7 @@ export default function Header() {
   }, [mobileMenuOpen]);
   
   return (
-    <header className="bg-white dark:bg-navy-900 shadow-sm dark:shadow-navy-800 transition-colors duration-200">
+    <header className="sticky top-0 z-40 bg-white dark:bg-navy-900 shadow-sm dark:shadow-navy-800 transition-colors duration-200">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center py-4">
           {/* Logo */}
@@ -52,6 +65,11 @@ export default function Header() {
               <span className="text-navy-700 dark:text-white font-serif text-2xl font-bold">Zenith</span>
               <span className="text-navy-600 dark:text-gray-300 font-sans text-lg ml-1">Capital Advisors</span>
             </Link>
+          </div>
+          
+          {/* Desktop Search */}
+          <div className="hidden md:flex flex-1 max-w-lg mx-8">
+            <SearchComponent />
           </div>
           
           {/* Desktop Navigation and Dark Mode Toggle */}
@@ -122,6 +140,11 @@ export default function Header() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
                 </svg>
               </button>
+            </div>
+            
+            {/* Mobile Search */}
+            <div className="mb-6">
+              <SearchComponent />
             </div>
             
             <nav className="flex-1 mt-4 space-y-2">

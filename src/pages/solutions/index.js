@@ -6,6 +6,7 @@ import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getImageWithVersion } from '@/utils/imageUtils';
 
 export default function Solutions() {
   // Structured data for rich search results
@@ -34,7 +35,7 @@ export default function Solutions() {
       
       {/* Hero Section with Background Image */}
       <section 
-        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[calc(80vh-48px)] flex items-center"
         style={{ backgroundImage: 'url(/images/solutions/solutions-hero.jpg)' }}
       >
         {/* Gradient overlay for better text readability */}
@@ -78,158 +79,155 @@ export default function Solutions() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {/* Financial Modeling */}
             <Motion animation="fade" direction="up" delay={200} className="h-full">
-              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                <div className="h-52 relative">
-                  <Image 
-                    src="/images/solutions/financial-modeling-service.jpg"
-                    alt="Investment professionals analyzing complex financial models and DCF valuations on multiple screens in luxury advisory office"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2">
-                    Financial Modeling
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Custom financial models designed to meet your specific analytical needs, from DCF valuations to complex real estate development models.
-                  </p>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 mb-6 space-y-2">
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <Link href="/solutions/financial-modeling">
+                <Card className="h-full overflow-hidden hover:shadow-xl transition-all duration-300 bg-white dark:bg-navy-800 cursor-pointer group" padding={false}>
+                  <div className="h-52 relative overflow-hidden">
+                    <Image 
+                      src={getImageWithVersion('/images/solutions/financial-modeling-service.jpg', 'v2')}
+                      alt="Investment professionals analyzing complex financial models and DCF valuations on multiple screens in luxury advisory office"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      Financial Modeling
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      Custom financial models designed to meet your specific analytical needs, from DCF valuations to complex real estate development models.
+                    </p>
+                    <ul className="text-sm text-gray-600 dark:text-gray-300 mb-6 space-y-2">
+                      <li className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Custom DCF and valuation models
+                      </li>
+                      <li className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Real estate acquisition and development models
+                      </li>
+                      <li className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Portfolio and performance attribution analysis
+                      </li>
+                    </ul>
+                    <div className="inline-flex items-center text-teal-500 group-hover:text-teal-600 font-medium">
+                      Learn more
+                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
-                      Custom DCF and valuation models
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Real estate acquisition and development models
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Portfolio and performance attribution analysis
-                    </li>
-                  </ul>
-                  <Link 
-                    href="/solutions/financial-modeling" 
-                    className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
-                  >
-                    Learn more
-                    <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </Link>
-                </div>
-              </Card>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
             </Motion>
             
             {/* Investment Infrastructure */}
             <Motion animation="fade" direction="up" delay={300} className="h-full">
-              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                <div className="h-52 relative">
-                  <Image 
-                    src="/images/solutions/investment-infrastructure-service.jpg"
-                    alt="Cutting-edge investment infrastructure and technology with integrated data and real-time analytics in modern tropical office setting"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2">
-                    Investment Infrastructure
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    End-to-end systems to streamline your investment operations, improve data management, and enhance decision-making capabilities.
-                  </p>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 mb-6 space-y-2">
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <Link href="/solutions/infrastructure">
+                <Card className="h-full overflow-hidden hover:shadow-xl transition-all duration-300 bg-white dark:bg-navy-800 cursor-pointer group" padding={false}>
+                  <div className="h-52 relative overflow-hidden">
+                    <Image 
+                      src="/images/solutions/investment-infrastructure-service.jpg"
+                      alt="Cutting-edge investment infrastructure and technology with integrated data and real-time analytics in modern tropical office setting"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      Investment Infrastructure
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      End-to-end systems to streamline your investment operations, improve data management, and enhance decision-making capabilities.
+                    </p>
+                    <ul className="text-sm text-gray-600 dark:text-gray-300 mb-6 space-y-2">
+                      <li className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Deal management platforms
+                      </li>
+                      <li className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Portfolio monitoring dashboards
+                      </li>
+                      <li className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Automated reporting systems
+                      </li>
+                    </ul>
+                    <div className="inline-flex items-center text-teal-500 group-hover:text-teal-600 font-medium">
+                      Learn more
+                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
-                      Deal management platforms
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Portfolio monitoring dashboards
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Automated reporting systems
-                    </li>
-                  </ul>
-                  <Link 
-                    href="/solutions/infrastructure" 
-                    className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
-                  >
-                    Learn more
-                    <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </Link>
-                </div>
-              </Card>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
             </Motion>
             
             {/* Industry Research */}
             <Motion animation="fade" direction="up" delay={400} className="h-full">
-              <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                <div className="h-52 relative">
-                  <Image 
-                    src="/images/solutions/industry-research-service.jpg"
-                    alt="Investment research analysts conducting market analysis with advanced data visualization tools overlooking mountainous coastline from luxury investment office"
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, 33vw"
-                  />
-                </div>
-                <div className="p-6">
-                  <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2">
-                    Industry Research
-                  </h3>
-                  <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Specialized research to inform your investment strategy, identify opportunities, and navigate market complexities.
-                  </p>
-                  <ul className="text-sm text-gray-600 dark:text-gray-300 mb-6 space-y-2">
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+              <Link href="/solutions/research">
+                <Card className="h-full overflow-hidden hover:shadow-xl transition-all duration-300 bg-white dark:bg-navy-800 cursor-pointer group" padding={false}>
+                  <div className="h-52 relative overflow-hidden">
+                    <Image 
+                      src="/images/solutions/industry-research-service.jpg"
+                      alt="Investment research analysts conducting market analysis with advanced data visualization tools overlooking mountainous coastline from luxury investment office"
+                      fill
+                      className="object-cover group-hover:scale-105 transition-transform duration-300"
+                      sizes="(max-width: 768px) 100vw, 33vw"
+                    />
+                  </div>
+                  <div className="p-6">
+                    <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-2 group-hover:text-teal-600 dark:group-hover:text-teal-400 transition-colors">
+                      Industry Research
+                    </h3>
+                    <p className="text-gray-600 dark:text-gray-300 mb-4">
+                      Specialized research to inform your investment strategy, identify opportunities, and navigate market complexities.
+                    </p>
+                    <ul className="text-sm text-gray-600 dark:text-gray-300 mb-6 space-y-2">
+                      <li className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Market trend analysis
+                      </li>
+                      <li className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Competitive landscape studies
+                      </li>
+                      <li className="flex items-center">
+                        <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                        Due diligence support
+                      </li>
+                    </ul>
+                    <div className="inline-flex items-center text-teal-500 group-hover:text-teal-600 font-medium">
+                      Learn more
+                      <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
                       </svg>
-                      Market trend analysis
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Competitive landscape studies
-                    </li>
-                    <li className="flex items-center">
-                      <svg className="h-4 w-4 text-teal-500 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                      </svg>
-                      Due diligence support
-                    </li>
-                  </ul>
-                  <Link 
-                    href="/solutions/research" 
-                    className="inline-flex items-center text-teal-500 hover:text-teal-600 font-medium"
-                  >
-                    Learn more
-                    <svg className="ml-2 h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </Link>
-                </div>
-              </Card>
+                    </div>
+                  </div>
+                </Card>
+              </Link>
             </Motion>
           </div>
         </div>

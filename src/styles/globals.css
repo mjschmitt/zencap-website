@@ -2,17 +2,111 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Basic styles without Tailwind for now */
-body {
-  font-family: Arial, sans-serif;
-  margin: 0;
-  padding: 0;
-  color: #333;
-  background-color: #f5f5f5;
+/* Clean base styles - 14px font size */
+@layer base {
+  :root {
+    font-size: 14px !important;
+  }
+  
+  html {
+    font-size: 14px !important;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    height: 100%;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    -ms-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  
+  body {
+    font-size: 1rem !important; /* This will be 14px */
+    line-height: 1.5;
+    margin: 0;
+    padding: 0;
+    width: 100%;
+    min-height: 100vh;
+    position: relative;
+  }
+  
+  #__next {
+    min-height: 100vh;
+    position: relative;
+  }
+  
+  /* Ensure Tailwind text classes use 14px base */
+  html, body, #__next {
+    font-size: 14px !important;
+  }
 }
 
-h1, h2, h3, h4, h5, h6 {
-  color: #1a3a5f;
+/* Global box-sizing reset */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Hero section layout - clean and simple */
+.hero-section {
+  position: relative;
+  overflow: hidden;
+  height: calc(100vh - 64px); /* Viewport height minus header height */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+/* Hero content container */
+.hero-section .relative.z-20 {
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-bottom: 4rem; /* Space for scroll arrow */
+}
+
+/* Scroll arrow positioning */
+.hero-section .absolute.bottom-8 {
+  position: absolute !important;
+  bottom: 2rem !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  z-index: 30 !important;
+}
+
+/* Header positioning */
+header {
+  position: sticky;
+  top: 0;
+  z-index: 50;
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+}
+
+/* Basic styles - consolidated */
+body {
+  font-family: Arial, sans-serif;
+  color: #333;
+  background-color: #f5f5f5;
+  overflow-x: hidden;
+}
+
+/* Isolate ExcelJS viewer styles from affecting global layout */
+.exceljs-viewer,
+.excel-preview-container,
+.exceljs-simple-table-container,
+.exceljs-frozen-table-container {
+  font-size: initial !important;
+  line-height: initial !important;
+  /* Prevent these components from affecting global styles */
+  contain: style layout !important;
 }
 
 a {
@@ -25,7 +119,6 @@ a:hover {
 }
 
 button, .button {
-  background-color: #ffd700;
   color: #1a3a5f;
   border: none;
   padding: 0.5rem 1rem;
@@ -37,4 +130,197 @@ button, .button {
   max-width: 1200px;
   margin: 0 auto;
   padding: 0 1rem;
+}
+
+/* Enhanced Article Content Styling */
+.article-content {
+  line-height: 1.5;
+  max-width: none;
+  overflow-wrap: break-word;
+}
+
+/* Fix any potential layout issues */
+.article-content * {
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+/* Reset any problematic spacing */
+.article-content div {
+  margin: 0;
+  padding: 0;
+}
+
+/* Specifically target and hide problematic elements */
+.article-content div:empty,
+.article-content p:empty,
+.article-content span:empty {
+  display: none !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: none !important;
+}
+
+.article-content div.metrics,
+.article-content div.callout {
+  margin: 1rem 0;
+  padding: 0.75rem;
+}
+
+/* Ensure no excessive heights */
+.article-content > * {
+  min-height: auto;
+  height: auto;
+}
+
+/* Hide empty elements that might be causing border issues */
+.article-content *:empty {
+  display: none;
+}
+
+/* Hide elements that only contain whitespace */
+.article-content br + br {
+  display: none;
+}
+
+/* Prevent multiple consecutive borders */
+.article-content h1 + h1,
+.article-content h2 + h2,
+.article-content h3 + h3 {
+  margin-top: 0;
+}
+
+/* Force inline color styles to take precedence over any parent styles */
+span[data-custom-color="true"],
+.custom-text-color,
+h1 span[data-custom-color="true"],
+h2 span[data-custom-color="true"], 
+h3 span[data-custom-color="true"],
+h4 span[data-custom-color="true"],
+h5 span[data-custom-color="true"],
+h6 span[data-custom-color="true"],
+.article-content h1 span[data-custom-color="true"],
+.article-content h2 span[data-custom-color="true"],
+.article-content h3 span[data-custom-color="true"] {
+  /* Reset any inherited colors and let inline styles work */
+  color: revert !important;
+}
+
+/* Additional specificity to override Tailwind classes */
+.article-content h1:not(:empty) span[data-custom-color="true"],
+.article-content h2:not(:empty) span[data-custom-color="true"],
+.article-content h3:not(:empty) span[data-custom-color="true"] {
+  color: revert !important;
+  border: none !important;
+  background: transparent !important;
+}
+
+.article-content h1:not(:empty) {
+  @apply text-sm md:text-base font-normal text-gray-800 dark:text-gray-200 mb-3 leading-normal;
+}
+
+.article-content h2:not(:empty) {
+  @apply text-sm md:text-base font-normal text-gray-800 dark:text-gray-200 mb-3 leading-normal;
+}
+
+.article-content h3:not(:empty) {
+  @apply text-sm md:text-base font-normal text-gray-800 dark:text-gray-200 mb-3 leading-normal;
+}
+
+.article-content p {
+  @apply text-gray-800 dark:text-gray-200 mb-3 text-sm md:text-base leading-normal;
+}
+
+.article-content ul, .article-content ol {
+  @apply text-gray-700 dark:text-gray-300 mb-4 ml-6;
+}
+
+.article-content li {
+  @apply mb-2 text-base md:text-lg leading-relaxed;
+}
+
+.article-content strong {
+  @apply font-semibold text-gray-900 dark:text-white;
+}
+
+.article-content em {
+  @apply italic text-gray-800 dark:text-gray-200;
+}
+
+/* Section Headers with better spacing */
+.article-content .section-header {
+  @apply text-xl md:text-2xl font-bold text-teal-600 dark:text-teal-400 mb-4 mt-8 pb-2;
+  border-bottom: 2px solid #046B4E;
+}
+
+/* Key metrics and performance data styling */
+.article-content .metrics {
+  @apply bg-gradient-to-r from-teal-50 to-blue-50 dark:from-navy-800 dark:to-navy-700 p-3 rounded-lg mb-4 border-l-4 border-teal-500 shadow-sm;
+}
+
+.article-content .metrics h3 {
+  @apply text-base md:text-lg font-bold text-teal-700 dark:text-teal-300 mb-2 mt-0;
+  border-bottom: none;
+  padding-bottom: 0;
+}
+
+.article-content .metrics p {
+  @apply mb-1 font-semibold text-sm text-gray-800 dark:text-gray-200;
+}
+
+.article-content .metrics strong {
+  @apply text-teal-700 dark:text-teal-300;
+}
+
+/* Quote/callout styling */
+.article-content .callout {
+  @apply bg-gradient-to-r from-teal-50 to-emerald-50 dark:from-teal-900/30 dark:to-emerald-900/30 border-l-4 border-teal-500 p-3 mb-4 rounded-r-lg shadow-sm;
+}
+
+.article-content .callout p {
+  @apply text-teal-800 dark:text-teal-200 mb-0 font-semibold text-sm italic;
+}
+
+/* Better list styling */
+.article-content ul, .article-content ol {
+  @apply text-gray-800 dark:text-gray-200 mb-3 ml-6;
+}
+
+.article-content li {
+  @apply mb-1 text-sm md:text-base leading-normal;
+}
+
+/* Improved strong and emphasis */
+.article-content strong {
+  @apply font-bold text-gray-900 dark:text-white;
+}
+
+.article-content em {
+  @apply italic text-gray-900 dark:text-gray-100;
+}
+
+/* Excel Viewer specific overrides to prevent yellow colors */
+.exceljs-viewer button,
+.excel-preview-container button {
+  background-color: transparent !important;
+  color: inherit !important;
+}
+
+.exceljs-viewer button:hover,
+.excel-preview-container button:hover {
+  background-color: rgba(75, 85, 99, 0.1) !important; /* gray-600 with opacity */
+  color: rgb(55, 65, 81) !important; /* gray-700 */
+}
+
+/* Ensure sheet tabs use darker grey colors */
+.exceljs-viewer button[class*="bg-gray-700"] {
+  background-color: rgb(55, 65, 81) !important; /* gray-700 */
+  color: white !important;
+}
+
+/* Override any default focus styles */
+.exceljs-viewer button:focus,
+.excel-preview-container button:focus {
+  outline: 2px solid rgb(55, 65, 81) !important; /* gray-700 */
+  outline-offset: 2px !important;
 }

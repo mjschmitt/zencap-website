@@ -6,6 +6,7 @@ import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
 import Image from 'next/image';
 import Link from 'next/link';
+import { getImageWithVersion } from '@/utils/imageUtils';
 
 export default function FinancialModeling() {
   // Structured data for rich search results
@@ -36,8 +37,8 @@ export default function FinancialModeling() {
       
       {/* Hero Section with Background Image */}
       <section 
-        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[60vh] md:min-h-[70vh] flex items-center"
-        style={{ backgroundImage: 'url(/images/solutions/financial-modeling/financial-modeling-hero.jpg)' }}
+        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[calc(80vh-48px)] flex items-center"
+        style={{ backgroundImage: `url(${getImageWithVersion('/images/solutions/financial-modeling/financial-modeling-hero.jpg', 'v2')})` }}
       >
         {/* Gradient overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
@@ -94,7 +95,7 @@ export default function FinancialModeling() {
             <Motion animation="fade" direction="left">
               <div className="relative h-96 rounded-lg overflow-hidden">
                 <Image 
-                  src="/images/solutions/financial-modeling-overview.jpg" 
+                  src={getImageWithVersion('/images/solutions/financial-modeling/financial-modeling-overview.jpg', 'v2')}
                   alt="Financial modeling and analysis"
                   fill
                   className="object-cover"
@@ -310,7 +311,7 @@ export default function FinancialModeling() {
             <Motion animation="fade" direction="right">
               <div className="relative h-96 rounded-lg overflow-hidden">
                 <Image 
-                  src="/images/solutions/model-features.jpg" 
+                  src={getImageWithVersion('/images/solutions/financial-modeling/model-features-and-capabilities.jpg', 'v2')}
                   alt="Financial model features and capabilities"
                   fill
                   className="object-cover"

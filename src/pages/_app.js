@@ -3,6 +3,9 @@ import "@/styles/globals.css";
 import { AnimatePresence } from 'framer-motion';
 import { Inter, Playfair_Display } from 'next/font/google';
 import PageTransition from '@/components/PageTransitions';
+import { useEffect } from 'react';
+import { initializeProduction, cleanupProduction } from '@/utils/initProduction';
+import { ErrorBoundary } from '@/utils/errorTracking';
 
 // Load fonts
 const inter = Inter({
@@ -18,6 +21,27 @@ const playfair = Playfair_Display({
 });
 
 export default function App({ Component, pageProps, router }) {
+  // Initialize production features
+  useEffect(() => {
+    if (process.env.NODE_ENV === 'production') {
+      initializeProduction({
+        errorTracking: true,
+        memoryMonitoring: true,
+        performanceMonitoring: true,
+        config: {
+          // Override any default configs here if needed
+        }
+      });
+    }
+    
+    // Cleanup on unmount
+    return () => {
+      if (process.env.NODE_ENV === 'production') {
+        cleanupProduction();
+      }
+    };
+  }, []);
+
   // Define different transitions for different sections
   let variant = 'default';
   let transitionPreset = 'default';
@@ -39,15 +63,37 @@ export default function App({ Component, pageProps, router }) {
 
   return (
     <main className={`${inter.variable} ${playfair.variable}`}>
-      <AnimatePresence mode="wait">
-        <PageTransition 
-          key={router.route} 
-          variant={variant}
-          transitionPreset={transitionPreset}
-        >
-          <Component {...pageProps} />
-        </PageTransition>
-      </AnimatePresence>
+      <ErrorBoundary
+        fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                Something went wrong
+              </h1>
+              <p className="text-gray-600 mb-6">
+                We apologize for the inconvenience. Please refresh the page or try again later.
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Refresh Page
+              </button>
+            </div>
+          </div>
+        }
+        errorContext={{ route: router.route }}
+      >
+        <AnimatePresence mode="wait">
+          <PageTransition 
+            key={router.route} 
+            variant={variant}
+            transitionPreset={transitionPreset}
+          >
+            <Component {...pageProps} />
+          </PageTransition>
+        </AnimatePresence>
+      </ErrorBoundary>
     </main>
   );
 }

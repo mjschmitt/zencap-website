@@ -1,0 +1,157 @@
+/* Excel Viewer Styles */
+
+/* Ensure consistent grid lines across all cells */
+.excel-viewer {
+  font-feature-settings: 'tnum' 1; /* Tabular numbers for better alignment */
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  width: 100%;
+}
+
+/* Ensure the sheet container takes up available space */
+.excel-viewer > div:nth-child(2) {
+  flex: 1;
+  min-height: 0; /* Important for flexbox */
+}
+
+/* Excel-like grid appearance */
+.excel-grid {
+  background-color: #ffffff;
+  position: relative;
+}
+
+.excel-grid[data-dark="true"] {
+  background-color: #111827;
+}
+
+/* Ensure grid cells don't overflow */
+.excel-grid > div > div {
+  overflow: hidden;
+  contain: paint;
+}
+
+/* Cell base styles */
+.excel-cell {
+  box-sizing: border-box;
+  position: relative;
+  display: flex;
+  align-items: center;
+  line-height: 1.2;
+  contain: paint;
+  isolation: isolate;
+}
+
+/* Remove focus outline on cells for cleaner look */
+.excel-cell:focus {
+  outline: none;
+}
+
+/* Sheet tabs styling */
+.excel-sheet-tabs {
+  user-select: none;
+  background: linear-gradient(to bottom, #f9fafb, #f3f4f6);
+}
+
+.excel-sheet-tabs[data-dark="true"] {
+  background: linear-gradient(to bottom, #1f2937, #111827);
+}
+
+/* Hide scrollbar but keep functionality */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* Print styles */
+@media print {
+  .excel-toolbar,
+  .excel-sheet-tabs {
+    display: none !important;
+  }
+  
+  .excel-viewer {
+    border: none !important;
+    box-shadow: none !important;
+  }
+  
+  .excel-grid {
+    background-color: white !important;
+  }
+  
+  .excel-cell {
+    border-color: #d1d5db !important;
+    color: black !important;
+    background-color: white !important;
+  }
+}
+
+/* Smooth transitions for theme changes */
+.excel-viewer * {
+  transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease;
+}
+
+/* Disable transitions during print */
+@media print {
+  .excel-viewer * {
+    transition: none !important;
+  }
+}
+
+/* Ensure proper font rendering */
+.excel-cell {
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+}
+
+/* Handle overflow text gracefully */
+.excel-cell span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  width: 100%;
+}
+
+/* Wrapped text cells */
+.excel-cell[data-wrap="true"] span {
+  white-space: pre-wrap;
+  word-wrap: break-word;
+  overflow-wrap: break-word;
+}
+
+/* Selected cell highlight */
+.excel-cell[data-selected="true"] {
+  position: relative;
+  z-index: 10;
+}
+
+/* Search highlight */
+.excel-cell[data-highlighted="true"] {
+  position: relative;
+  z-index: 5;
+}
+
+/* Formula and error indicators */
+.excel-cell .indicator {
+  position: absolute;
+  font-size: 10px;
+  line-height: 1;
+  pointer-events: none;
+}
+
+/* Improve number alignment */
+.excel-cell[data-type="number"] {
+  justify-content: flex-end;
+  padding-right: 8px;
+}
+
+/* Center alignment */
+.excel-cell[data-align="center"] {
+  justify-content: center;
+  text-align: center;
+}

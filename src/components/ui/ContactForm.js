@@ -1,6 +1,7 @@
-// src/components/ui/ContactForm.js - Fixed unescaped entities
+// src/components/ui/ContactForm.js - Integrated with formHandlers utility
 import { useState } from 'react';
 import Button from './Button';
+import { submitContactForm, trackFormEvent, sanitizeFormData } from '@/utils/formHandlers';
 
 export default function ContactForm({ onSubmit }) {
   const [formData, setFormData] = useState({
@@ -59,17 +60,15 @@ export default function ContactForm({ onSubmit }) {
       setIsSubmitting(true);
       
       try {
-        // This would be an API call in a real application
-        // await fetch('/api/contact', {
-        //   method: 'POST',
-        //   headers: { 'Content-Type': 'application/json' },
-        //   body: JSON.stringify(formData)
-        // });
+        // Sanitize form data
+        const sanitizedData = sanitizeFormData(formData);
         
-        // Simulate API delay
-        await new Promise(resolve => setTimeout(resolve, 1000));
+        // Submit form using utility function
+        const result = await submitContactForm(sanitizedData);
         
+        if (result.success) {
         setSubmitSuccess(true);
+          
         // Reset form after successful submission
         setFormData({
           name: '',
@@ -80,11 +79,31 @@ export default function ContactForm({ onSubmit }) {
         });
         
         if (onSubmit) {
-          onSubmit(formData);
+            onSubmit(sanitizedData);
         }
+          
+          // Track successful submission
+          trackFormEvent('form_submit', {
+            form_name: 'contact_form',
+            form_id: 'contact',
+            interest: sanitizedData.interest,
+            method: result.method
+          });
+          
+        } else {
+          throw new Error('Form submission failed');
+        }
+        
       } catch (err) {
         console.error('Error submitting form:', err);
         setErrors({ submit: 'Failed to send message. Please try again.' });
+        
+        // Track form error
+        trackFormEvent('form_error', {
+          form_name: 'contact_form',
+          form_id: 'contact',
+          error_message: err.message
+        });
       } finally {
         setIsSubmitting(false);
       }
@@ -115,7 +134,7 @@ export default function ContactForm({ onSubmit }) {
         <form onSubmit={handleSubmit}>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label htmlFor="name" className="block text-sm font-medium text-navy-600 mb-1">
+              <label htmlFor="name" className="block text-sm font-medium text-navy-600 dark:text-gray-200 mb-1">
                 Full Name*
               </label>
               <input 
@@ -124,9 +143,11 @@ export default function ContactForm({ onSubmit }) {
                 name="name" 
                 value={formData.name}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 ${
-                  errors.name ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 transition-colors
+                  ${errors.name ? 'border-red-500' : 'border-gray-300 dark:border-navy-600'}
+                  bg-white text-gray-900 placeholder-gray-500
+                  dark:bg-navy-900 dark:text-white dark:placeholder-gray-400`
+                }
               />
               {errors.name && (
                 <p className="mt-1 text-sm text-red-600">{errors.name}</p>
@@ -134,7 +155,7 @@ export default function ContactForm({ onSubmit }) {
             </div>
             
             <div>
-              <label htmlFor="email" className="block text-sm font-medium text-navy-600 mb-1">
+              <label htmlFor="email" className="block text-sm font-medium text-navy-600 dark:text-gray-200 mb-1">
                 Email Address*
               </label>
               <input 
@@ -143,9 +164,11 @@ export default function ContactForm({ onSubmit }) {
                 name="email" 
                 value={formData.email}
                 onChange={handleChange}
-                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 ${
-                  errors.email ? 'border-red-500' : 'border-gray-300'
-                }`}
+                className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 transition-colors
+                  ${errors.email ? 'border-red-500' : 'border-gray-300 dark:border-navy-600'}
+                  bg-white text-gray-900 placeholder-gray-500
+                  dark:bg-navy-900 dark:text-white dark:placeholder-gray-400`
+                }
               />
               {errors.email && (
                 <p className="mt-1 text-sm text-red-600">{errors.email}</p>
@@ -155,7 +178,7 @@ export default function ContactForm({ onSubmit }) {
           
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
             <div>
-              <label htmlFor="company" className="block text-sm font-medium text-navy-600 mb-1">
+              <label htmlFor="company" className="block text-sm font-medium text-navy-600 dark:text-gray-200 mb-1">
                 Company
               </label>
               <input 
@@ -164,12 +187,12 @@ export default function ContactForm({ onSubmit }) {
                 name="company" 
                 value={formData.company}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
               />
             </div>
             
             <div>
-              <label htmlFor="interest" className="block text-sm font-medium text-navy-600 mb-1">
+              <label htmlFor="interest" className="block text-sm font-medium text-navy-600 dark:text-gray-200 mb-1">
                 I&apos;m interested in
               </label>
               <select 
@@ -177,7 +200,7 @@ export default function ContactForm({ onSubmit }) {
                 name="interest" 
                 value={formData.interest}
                 onChange={handleChange}
-                className="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 bg-white"
+                className="w-full px-4 py-2 border border-gray-300 dark:border-navy-600 rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 bg-white dark:bg-navy-900 text-gray-900 dark:text-white placeholder-gray-500 dark:placeholder-gray-400 transition-colors"
               >
                 <option value="general">General Inquiry</option>
                 <option value="products">Financial Models</option>
@@ -188,7 +211,7 @@ export default function ContactForm({ onSubmit }) {
           </div>
           
           <div className="mb-6">
-            <label htmlFor="message" className="block text-sm font-medium text-navy-600 mb-1">
+            <label htmlFor="message" className="block text-sm font-medium text-navy-600 dark:text-gray-200 mb-1">
               Message*
             </label>
             <textarea 
@@ -197,26 +220,33 @@ export default function ContactForm({ onSubmit }) {
               rows="5" 
               value={formData.message}
               onChange={handleChange}
-              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 ${
-                errors.message ? 'border-red-500' : 'border-gray-300'
-              }`}
-            ></textarea>
+              className={`w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-navy-500 focus:border-navy-500 transition-colors
+                ${errors.message ? 'border-red-500' : 'border-gray-300 dark:border-navy-600'}
+                bg-white text-gray-900 placeholder-gray-500
+                dark:bg-navy-900 dark:text-white dark:placeholder-gray-400`
+              }
+              placeholder="Tell us about your project or how we can help..."
+            />
             {errors.message && (
               <p className="mt-1 text-sm text-red-600">{errors.message}</p>
             )}
           </div>
           
           {errors.submit && (
-            <div className="mb-4 p-3 bg-red-50 text-red-700 rounded-md text-sm">
-              {errors.submit}
+            <div className="mb-6 bg-red-50 border border-red-200 text-red-800 rounded-md p-4">
+              <div className="flex">
+                <svg className="h-5 w-5 text-red-600 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+                <p>{errors.submit}</p>
+              </div>
             </div>
           )}
           
           <Button
             type="submit"
-            variant="accent"
+            variant="primary"
             fullWidth={true}
-            className="relative"
             disabled={isSubmitting}
           >
             {isSubmitting ? (
@@ -227,9 +257,7 @@ export default function ContactForm({ onSubmit }) {
                 </svg>
                 Sending...
               </>
-            ) : (
-              'Send Message'
-            )}
+            ) : 'Send Message'}
           </Button>
         </form>
       )}
