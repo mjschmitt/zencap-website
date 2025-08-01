@@ -105,7 +105,7 @@ self.onmessage = async function(e) {
 async function loadWorkbook(data, id) {
   try {
     const { arrayBuffer } = data;
-    console.log('loadWorkbook called with ArrayBuffer size:', arrayBuffer.byteLength);
+    // console.log('loadWorkbook called with ArrayBuffer size:', arrayBuffer.byteLength);
     
     // Check if ExcelJS is available
     if (typeof self.ExcelJS === 'undefined' || !self.ExcelJS.Workbook) {
@@ -113,33 +113,33 @@ async function loadWorkbook(data, id) {
     }
     
     // Initialize ExcelJS
-    console.log('Creating new ExcelJS.Workbook...');
+    // console.log('Creating new ExcelJS.Workbook...');
     const workbook = new self.ExcelJS.Workbook();
     
     // Special handling for .xlsm files (macro-enabled workbooks)
     try {
-      console.log('Attempting standard load...');
+      // console.log('Attempting standard load...');
       await workbook.xlsx.load(arrayBuffer);
-      console.log('Standard load successful');
+      // console.log('Standard load successful');
     } catch (xlsxError) {
       console.warn('Standard load failed:', xlsxError.message);
       // If standard load fails, try with options
       try {
-        console.log('Attempting load with options...');
+        // console.log('Attempting load with options...');
         await workbook.xlsx.load(arrayBuffer, {
           ignoreVBA: true,
           cellDates: true,
           cellNF: false,
           cellStyles: true
         });
-        console.log('Load with options successful');
+        // console.log('Load with options successful');
       } catch (secondError) {
         console.warn('Load with options failed:', secondError.message);
         // Final fallback - try to parse as buffer
-        console.log('Attempting buffer load...');
+        // console.log('Attempting buffer load...');
         const buffer = new Uint8Array(arrayBuffer);
         await workbook.xlsx.load(buffer);
-        console.log('Buffer load successful');
+        // console.log('Buffer load successful');
       }
     }
     
@@ -147,7 +147,7 @@ async function loadWorkbook(data, id) {
     const worksheets = workbook.worksheets.map((sheet, index) => {
       // ExcelJS stores visibility in sheet.state
       // Possible values: 'visible', 'hidden', 'veryHidden'
-      console.log(`Sheet ${index} "${sheet.name}" state:`, sheet.state);
+      // console.log(`Sheet ${index} "${sheet.name}" state:`, sheet.state);
       
       return {
         id: sheet.id,
@@ -164,12 +164,28 @@ async function loadWorkbook(data, id) {
     // This ensures indices match the original workbook
     const finalWorksheets = worksheets;
     
-    console.log('All worksheets loaded:', finalWorksheets.map(s => ({
-      index: s.originalIndex,
-      name: s.name,
-      state: s.state,
-      isHidden: s.isHidden
-    })));
+    // console.log('All worksheets loaded:', finalWorksheets.map(s => ({
+    //   index: s.originalIndex,
+    //   name: s.name,
+    //   state: s.state,
+    //   isHidden: s.isHidden
+    // })));
+    
+    // Debug: Check workbook for custom number formats
+    // if (workbook.model && workbook.model.styles) {
+    //   console.log('[Workbook] Has styles model:', {
+    //     numFmts: workbook.model.styles.numFmts,
+    //     numFmtCount: workbook.model.styles.numFmts ? Object.keys(workbook.model.styles.numFmts).length : 0
+    //   });
+    // }
+    // if (workbook._themes) {
+    //   console.log('[Workbook] Has themes');
+    // }
+    // if (workbook._styles) {
+    //   console.log('[Workbook] Has _styles:', {
+    //     numFmts: workbook._styles.numFmts
+    //   });
+    // }
     
     self.postMessage({
       type: 'WORKBOOK_LOADED',
@@ -191,7 +207,7 @@ async function loadWorkbook(data, id) {
 async function processSheet(data, id) {
   const { sheetIndex, viewportStart, viewportEnd } = data;
   
-  console.log('processSheet called:', { sheetIndex, viewportStart, viewportEnd });
+  // console.log('processSheet called:', { sheetIndex, viewportStart, viewportEnd });
   
   // Debug flag for style debugging
   const debugStyles = self.location?.search?.includes('debug=styles');
@@ -213,7 +229,12 @@ async function processSheet(data, id) {
     console.warn(`Sheet "${worksheet.name}" at index ${sheetIndex} is hidden`);
   }
   
-  console.log(`Processing sheet "${worksheet.name}" (index: ${sheetIndex}, state: ${worksheet.state || 'visible'})`);
+  // console.log(`Processing sheet "${worksheet.name}" (index: ${sheetIndex}, state: ${worksheet.state || 'visible'})`);
+  
+  // Debug: Check worksheet model for number formats
+  // if (worksheet.model && worksheet.model.cols) {
+  //   console.log('[Worker] Worksheet has column definitions with potential formats');
+  // }
   
   // Process only the visible viewport for performance
   const startRow = viewportStart?.row || 1;
@@ -221,7 +242,18 @@ async function processSheet(data, id) {
   const startCol = viewportStart?.col || 1;
   const endCol = Math.min(viewportEnd?.col || 200, worksheet.columnCount || 200);
   
-  console.log(`Processing range: rows ${startRow}-${endRow}, cols ${startCol}-${endCol}`);
+  // console.log(`Processing range: rows ${startRow}-${endRow}, cols ${startCol}-${endCol}`);
+  
+  // Debug: Check if D26 is in the viewport
+  // const colD = 4; // Column D is the 4th column
+  // if (startRow <= 26 && endRow >= 26 && startCol <= colD && endCol >= colD) {
+  //   console.log('[Viewport] D26 is in viewport range');
+  // } else {
+  //   console.log('[Viewport] D26 is NOT in viewport range', {
+  //     rowInRange: startRow <= 26 && endRow >= 26,
+  //     colInRange: startCol <= colD && endCol >= colD
+  //   });
+  // }
   
   const processedData = {
     cells: [],
@@ -234,15 +266,15 @@ async function processSheet(data, id) {
     defaultRowHeight: worksheet.properties?.defaultRowHeight
   };
   
-  console.log('Worksheet properties:', {
-    defaultColWidth: worksheet.properties?.defaultColWidth,
-    defaultRowHeight: worksheet.properties?.defaultRowHeight,
-    outlineProperties: worksheet.properties?.outlineProperties
-  });
+  // console.log('Worksheet properties:', {
+  //   defaultColWidth: worksheet.properties?.defaultColWidth,
+  //   defaultRowHeight: worksheet.properties?.defaultRowHeight,
+  //   outlineProperties: worksheet.properties?.outlineProperties
+  // });
   
   // Process column widths
   if (worksheet.columns && worksheet.columns.length > 0) {
-    console.log('Processing worksheet.columns:', worksheet.columns.length);
+    // console.log('Processing worksheet.columns:', worksheet.columns.length);
     worksheet.columns.forEach((col, index) => {
       if (col && col.width !== undefined && col.width !== null) {
         // Store column widths with 1-based indexing to match Excel
@@ -250,9 +282,9 @@ async function processSheet(data, id) {
         if (col.width !== worksheet.properties?.defaultColWidth) {
           processedData.columnWidths[index + 1] = col.width;
           
-          if (index < 10) { // Log first few columns for debugging
-            console.log(`Column ${index + 1} width:`, col.width);
-          }
+          // if (index < 10) { // Log first few columns for debugging
+          //   console.log(`Column ${index + 1} width:`, col.width);
+          // }
         }
       }
     });
@@ -260,7 +292,7 @@ async function processSheet(data, id) {
   
   // Also check for column info in the worksheet model (different storage format)
   if (worksheet.model && worksheet.model.cols && worksheet.model.cols.length > 0) {
-    console.log('Found worksheet.model.cols:', worksheet.model.cols.length);
+    // console.log('Found worksheet.model.cols:', worksheet.model.cols.length);
     worksheet.model.cols.forEach((colDef) => {
       if (colDef && colDef.width !== undefined) {
         // Only process columns within reasonable range (up to column 100)
@@ -271,19 +303,19 @@ async function processSheet(data, id) {
           }
         }
         
-        if (colDef.min <= 10) {
-          console.log(`Column range ${colDef.min}-${maxCol} width:`, colDef.width);
-        }
+        // if (colDef.min <= 10) {
+        //   console.log(`Column range ${colDef.min}-${maxCol} width:`, colDef.width);
+        // }
       }
     });
   }
   
   // Log actual column widths found
-  const columnCount = Object.keys(processedData.columnWidths).length;
-  console.log(`Actual column widths set: ${columnCount}`);
-  if (columnCount > 0 && columnCount < 50) {
-    console.log('Column widths:', processedData.columnWidths);
-  }
+  // const columnCount = Object.keys(processedData.columnWidths).length;
+  // console.log(`Actual column widths set: ${columnCount}`);
+  // if (columnCount > 0 && columnCount < 50) {
+  //   console.log('Column widths:', processedData.columnWidths);
+  // }
   
   // Process rows and cells
   let cellCount = 0;
@@ -294,10 +326,21 @@ async function processSheet(data, id) {
         // ExcelJS provides row height in points (not pixels)
         processedData.rowHeights[rowNum] = row.height;
         
-        if (rowNum <= 5) { // Log first few rows for debugging
-          console.log(`Row ${rowNum} height:`, row.height, 'points');
-        }
+        // if (rowNum <= 5) { // Log first few rows for debugging
+        //   console.log(`Row ${rowNum} height:`, row.height, 'points');
+        // }
       }
+      
+      // Debug: Check row model for styles
+      // if (rowNum <= 5 && row.model && row.model.cells) {
+      //   const cellsWithFormats = row.model.cells.filter(c => c && c.style && c.style.numFmt);
+      //   if (cellsWithFormats.length > 0) {
+      //     console.log(`[Row ${rowNum}] Cells with numFmt in model:`, cellsWithFormats.map(c => ({
+      //       address: c.address,
+      //       numFmt: c.style.numFmt
+      //     })));
+      //   }
+      // }
       
       for (let colNum = startCol; colNum <= endCol; colNum++) {
         const cell = row.getCell(colNum);
@@ -305,28 +348,151 @@ async function processSheet(data, id) {
           // Add cell address for debugging
           cell.fullAddress = cell.address || `${getColumnName(colNum)}${rowNum}`;
           
+          // Debug blue font colors that might not be showing
+          if (colNum === 9 && rowNum === 26) { // Cell I26 specifically
+            console.log(`========== CELL I26 DEBUG ==========`);
+            console.log(`[Font Color Debug] Cell I26:`, {
+              hasFont: !!cell.font,
+              color: cell.font?.color,
+              colorType: typeof cell.font?.color,
+              fullFont: cell.font,
+              style: cell.style,
+              _style: cell._style,
+              model: cell.model,
+              value: cell.value,
+              type: cell.type,
+              worksheet: worksheet.name
+            });
+            
+            if (cell.font && cell.font.color) {
+              console.log('[I26 Color Details]:', {
+                isThemeColor: cell.font.color?.theme !== undefined,
+                theme: cell.font.color?.theme,
+                tint: cell.font.color?.tint,
+                argb: cell.font.color?.argb,
+                rgb: cell.font.color?.rgb,
+                rawColor: cell.font.color
+              });
+              console.log('[I26 Raw Color Object]:', JSON.stringify(cell.font.color, null, 2));
+              
+              // If it's a theme color, we need to resolve it
+              if (cell.font.color?.theme !== undefined) {
+                console.log('[I26 Theme Color] Need to resolve theme:', cell.font.color.theme, 'with tint:', cell.font.color.tint);
+                const resolvedColor = resolveThemeColor(cell.font.color);
+                console.log('[I26 Resolved Color]:', resolvedColor);
+              }
+              
+              // If it's an indexed color, resolve it
+              if (cell.font.color?.indexed !== undefined) {
+                console.log('[I26 Indexed Color] Index:', cell.font.color.indexed);
+                const resolvedColor = resolveThemeColor(cell.font.color);
+                console.log('[I26 Resolved Indexed Color]:', resolvedColor);
+              }
+            }
+            console.log(`========== END CELL I26 DEBUG ==========`);
+          }
+          
+          // Deep inspection for custom formats
+          // if (rowNum <= 10 && colNum <= 10) {
+          //   const deepInspect = {
+          //     address: cell.fullAddress,
+          //     value: cell.value,
+          //     type: cell.type,
+          //     numFmt: cell.numFmt,
+          //     style: cell.style,
+          //     _style: cell._style,
+          //     model: cell.model,
+          //     master: cell.master,
+          //     $: cell.$,
+          //     _value: cell._value,
+          //     _numFmt: cell._numFmt
+          //   };
+          //   
+          //   // Check if any property contains quotes (custom format indicator)
+          //   const hasCustomFormat = Object.values(deepInspect).some(v => 
+          //     typeof v === 'string' && v.includes('"')
+          //   );
+          //   
+          //   if (hasCustomFormat) {
+          //     console.log('[Deep Format Inspection] Found custom format:', deepInspect);
+          //   }
+          // }
+          
           // Check if cell has any formatting even if no value
           const cellStyle = extractCellStyle(cell);
           const hasStyle = cellStyle && Object.keys(cellStyle).length > 0;
           const hasValue = cell.value !== null && cell.value !== undefined;
           
+          // Debug D26 inclusion
+          // if (getColumnName(colNum) === 'D' && rowNum === 26) {
+          //   console.log('[Worker D26] Inclusion check:', {
+          //     hasValue,
+          //     hasStyle,
+          //     willInclude: hasValue || hasStyle,
+          //     cellValue: cell.value,
+          //     styleKeys: cellStyle ? Object.keys(cellStyle) : []
+          //   });
+          // }
+          
           // Include cell if it has a value OR if it has styling
           if (hasValue || hasStyle) {
+            const cellValue = getCellValue(cell);
             const cellData = {
               row: rowNum,
               col: colNum,
-              value: getCellValue(cell),
+              value: cellValue,
               style: cellStyle,
               formula: cell.formula,
               type: cell.type
             };
+            
+            // Debug log for cells that might display as accounting zeros
+            // if (cellValue === 0 && cellStyle.numberFormat && cellStyle.numberFormat.includes('_')) {
+            //   console.log(`[Accounting Zero] Cell ${getColumnName(colNum)}${rowNum}:`, {
+            //     value: cellValue,
+            //     format: cellStyle.numberFormat
+            //   });
+            // }
+            
+            // Debug cell D26 specifically
+            // if (getColumnName(colNum) === 'D' && rowNum === 26) {
+            //   console.log(`[Worker D26] Cell D26 found:`, {
+            //     value: cellValue,
+            //     format: cellStyle.numberFormat,
+            //     hasFormat: !!cellStyle.numberFormat,
+            //     cellType: cell.type,
+            //     formula: cell.formula,
+            //     rawCell: {
+            //       value: cell.value,
+            //       type: cell.type,
+            //       numFmt: cell.numFmt,
+            //       style: cell.style
+            //     }
+            //   });
+            // }
+            
+            // Debug log for format extraction - disabled for performance
+            // if (cellStyle.numberFormat && rowNum <= 50 && colNum <= 20) {
+            //   console.log(`[Format Debug] Cell ${getColumnName(colNum)}${rowNum}:`, {
+            //     format: cellStyle.numberFormat,
+            //     value: cellValue,
+            //     type: typeof cellValue,
+            //     cellNumFmt: cell.numFmt,
+            //     cellStyle: cell.style,
+            //     cell_style: cell._style,
+            //     cellModel: cell.model,
+            //     cellDataValidation: cell.dataValidation,
+            //     actualNumFmt: cell.actualNumFmt
+            //   });
+            // }
+            
             processedData.cells.push(cellData);
             cellCount++;
             
             // Log first few cells for debugging
-            if (cellCount <= 5) {
-              console.log(`Cell [${rowNum},${colNum}]:`, cellData.value || '(empty with style)');
-            }
+            // if (cellCount <= 5) {
+            //   console.log(`Cell [${rowNum},${colNum}]:`, cellData.value || '(empty with style)');
+            // }
             
             // Special logging for cells showing [object Object]
             if (String(cellData.value) === '[object Object]') {
@@ -348,12 +514,12 @@ async function processSheet(data, id) {
             }
             
             // Special logging for cells with background fill but no value (only when debugging)
-            if (debugStyles && !hasValue && cellStyle.fill) {
-              console.log(`[Background Fill] Empty cell with background at [${rowNum},${colNum}]:`, {
-                fill: cellStyle.fill,
-                allStyles: cellStyle
-              });
-            }
+            // if (debugStyles && !hasValue && cellStyle.fill) {
+            //   console.log(`[Background Fill] Empty cell with background at [${rowNum},${colNum}]:`, {
+            //     fill: cellStyle.fill,
+            //     allStyles: cellStyle
+            //   });
+            // }
           }
         }
       }
@@ -368,51 +534,51 @@ async function processSheet(data, id) {
   const cellsWithOnlyStyle = processedData.cells.filter(c => (!c.value || c.value === '') && c.style && Object.keys(c.style).length > 0).length;
   const cellsWithBgOnly = processedData.cells.filter(c => (!c.value || c.value === '') && c.style?.fill).length;
   
-  console.log(`Processed ${cellCount} total cells:`);
-  console.log(`  - ${cellsWithValues} cells with values`);
-  console.log(`  - ${cellsWithOnlyStyle} empty cells with formatting`);
-  console.log(`  - ${cellsWithBgOnly} empty cells with background fill`);
-  console.log('Column widths extracted:', Object.keys(processedData.columnWidths).length);
-  console.log('Row heights extracted:', Object.keys(processedData.rowHeights).length);
+  // console.log(`Processed ${cellCount} total cells:`);
+  // console.log(`  - ${cellsWithValues} cells with values`);
+  // console.log(`  - ${cellsWithOnlyStyle} empty cells with formatting`);
+  // console.log(`  - ${cellsWithBgOnly} empty cells with background fill`);
+  // console.log('Column widths extracted:', Object.keys(processedData.columnWidths).length);
+  // console.log('Row heights extracted:', Object.keys(processedData.rowHeights).length);
   
   // Log sample empty cells with background
-  if (cellsWithBgOnly > 0) {
-    const sampleBgCells = processedData.cells
-      .filter(c => (!c.value || c.value === '') && c.style?.fill)
-      .slice(0, 3)
-      .map(c => ({
-        position: `[${c.row},${c.col}]`,
-        fill: c.style.fill
-      }));
-    console.log('Sample empty cells with background:', sampleBgCells);
-  }
+  // if (cellsWithBgOnly > 0) {
+  //   const sampleBgCells = processedData.cells
+  //     .filter(c => (!c.value || c.value === '') && c.style?.fill)
+  //     .slice(0, 3)
+  //     .map(c => ({
+  //       position: `[${c.row},${c.col}]`,
+  //       fill: c.style.fill
+  //     }));
+  //   console.log('Sample empty cells with background:', sampleBgCells);
+  // }
   
   // Log sample of actual dimensions for debugging
-  const sampleCols = Object.entries(processedData.columnWidths).slice(0, 5);
-  const sampleRows = Object.entries(processedData.rowHeights).slice(0, 5);
-  console.log('Sample column widths:', sampleCols);
-  console.log('Sample row heights:', sampleRows);
+  // const sampleCols = Object.entries(processedData.columnWidths).slice(0, 5);
+  // const sampleRows = Object.entries(processedData.rowHeights).slice(0, 5);
+  // console.log('Sample column widths:', sampleCols);
+  // console.log('Sample row heights:', sampleRows);
   
   // Debug: Log style statistics
-  if (debugStyles) {
-    const cellsWithStyles = processedData.cells.filter(c => c.style && Object.keys(c.style).length > 0);
-    console.log('[Worker Style Debug] Transmission stats:', {
-      totalCells: processedData.cells.length,
-      cellsWithStyles: cellsWithStyles.length,
-      styleTypes: {
-        font: cellsWithStyles.filter(c => c.style.font).length,
-        fill: cellsWithStyles.filter(c => c.style.fill).length,
-        border: cellsWithStyles.filter(c => c.style.border).length,
-        alignment: cellsWithStyles.filter(c => c.style.alignment).length,
-        numberFormat: cellsWithStyles.filter(c => c.style.numberFormat).length
-      },
-      sampleCellsWithStyles: cellsWithStyles.slice(0, 3).map(c => ({
-        cell: `${c.row}-${c.col}`,
-        value: c.value,
-        style: c.style
-      }))
-    });
-  }
+  // if (debugStyles) {
+  //   const cellsWithStyles = processedData.cells.filter(c => c.style && Object.keys(c.style).length > 0);
+  //   console.log('[Worker Style Debug] Transmission stats:', {
+  //     totalCells: processedData.cells.length,
+  //     cellsWithStyles: cellsWithStyles.length,
+  //     styleTypes: {
+  //       font: cellsWithStyles.filter(c => c.style.font).length,
+  //       fill: cellsWithStyles.filter(c => c.style.fill).length,
+  //       border: cellsWithStyles.filter(c => c.style.border).length,
+  //       alignment: cellsWithStyles.filter(c => c.style.alignment).length,
+  //       numberFormat: cellsWithStyles.filter(c => c.style.numberFormat).length
+  //     },
+  //     sampleCellsWithStyles: cellsWithStyles.slice(0, 3).map(c => ({
+  //       cell: `${c.row}-${c.col}`,
+  //       value: c.value,
+  //       style: c.style
+  //     }))
+  //   });
+  // }
   
   // Process merged cells in viewport
   if (worksheet.model && worksheet.model.merges) {
@@ -447,52 +613,52 @@ async function processSheet(data, id) {
 function getCellValue(cell) {
   if (cell.value === null || cell.value === undefined) return '';
   
-  // Debug logging for all non-primitive values
-  if (typeof cell.value === 'object' && !(cell.value instanceof Date)) {
-    // Special logging for formula-containing objects
-    if (cell.value.formula || cell.formula) {
-      console.warn('[Worker getCellValue] Formula cell detected:', {
-        cellAddress: `${cell.fullAddress || 'unknown'}`,
-        cellFormula: cell.formula,
-        valueFormula: cell.value.formula,
-        valueResult: cell.value.result,
-        cellType: cell.type,
-        value: cell.value,
-        valueKeys: Object.keys(cell.value || {})
-      });
-    } else {
-      console.log('[Worker getCellValue] Processing object value:', {
-        cellAddress: `${cell.fullAddress || 'unknown'}`,
-        valueType: typeof cell.value,
-        valueConstructor: cell.value.constructor?.name,
-        valueKeys: Object.keys(cell.value || {}),
-        value: cell.value,
-        formula: cell.formula,
-        type: cell.type
-      });
-    }
-  }
   
   // For formula cells, ExcelJS stores the formula in cell.formula and the result in cell.value
   // Type 6 is formula in ExcelJS
   if (cell.formula && cell.type === 6) {
-    // If value is primitive (string, number), it's already the calculated result
+    // If value is primitive (string, number, boolean), it's already the calculated result
     if (typeof cell.value !== 'object' || cell.value instanceof Date) {
-      // Return the value even if it's an empty string
+      // Return the value - this includes 0, false, empty string, etc.
+      // Make sure we preserve numeric 0
       return cell.value;
     }
+    
+    // Handle shared formula case
+    if (cell.value && cell.value.sharedFormula) {
+      // Check if there's also a result property
+      if (cell.value.result !== undefined) {
+        // Check if the result is an error object
+        if (typeof cell.value.result === 'object' && cell.value.result.error) {
+          return cell.value.result.error;
+        }
+        return cell.value.result;
+      }
+      // For shared formulas without results, the value might be stored directly
+      // Continue to regular object handling instead of returning empty
+    }
+    
     // If it's an object, try to extract the result
-    if (cell.value.result !== undefined) {
+    if (cell.value && cell.value.result !== undefined) {
+      // Check if the result itself is an error object
+      if (typeof cell.value.result === 'object' && cell.value.result.error) {
+        return cell.value.result.error;
+      }
+      // Debug formula results
+      // if (cell.numFmt && cell.numFmt.includes('"')) {
+      //   console.log('[getCellValue] Formula cell with custom format:', {
+      //     address: cell.fullAddress,
+      //     formula: cell.value.formula,
+      //     result: cell.value.result,
+      //     numFmt: cell.numFmt
+      //   });
+      // }
       return cell.value.result;
     }
-    if (cell.value.error) {
+    if (cell.value && cell.value.error) {
       return `#${cell.value.error}`;
     }
-    // For formulas that return empty or have no clear result, return empty string
-    if (cell.value === null || cell.value === '') {
-      return '';
-    }
-    // Continue to object handling below if we can't extract a simple result
+    // Continue to object handling below
   }
   
   // First check if cell has a direct result property (for formula cells)
@@ -506,7 +672,12 @@ function getCellValue(cell) {
   }
   
   if (cell.value instanceof Date) {
-    return cell.value.toLocaleDateString();
+    // Convert Date to Excel serial number for proper formatting
+    // Excel dates start from Jan 1, 1900 (with leap year bug)
+    const excelEpoch = new Date(1899, 11, 30); // Dec 30, 1899
+    const msPerDay = 24 * 60 * 60 * 1000;
+    const excelSerial = (cell.value.getTime() - excelEpoch.getTime()) / msPerDay;
+    return excelSerial;
   }
   
   if (typeof cell.value === 'object' && cell.value.error) {
@@ -517,13 +688,13 @@ function getCellValue(cell) {
   if (typeof cell.value === 'object' && cell.value.formula) {
     // If we have a result, return it (even if it's empty string)
     if (cell.value.result !== undefined) {
+      // Check if the result is an error object
+      if (typeof cell.value.result === 'object' && cell.value.result.error) {
+        return cell.value.result.error;
+      }
       return cell.value.result;
     }
-    // If no result, this is likely an error - return empty string
-    console.warn('[Worker getCellValue] Formula cell with no result:', {
-      cellAddress: cell.fullAddress || 'unknown',
-      formula: cell.value.formula
-    });
+    // If no result, return empty string
     return '';
   }
   
@@ -548,6 +719,15 @@ function getCellValue(cell) {
     // Check for common object patterns
     if (cell.value.text !== undefined) return cell.value.text;
     if (cell.value.value !== undefined) return cell.value.value;
+    
+    // Check if it's a shared formula with a numeric result in the reference
+    if (cell.value.sharedFormula !== undefined) {
+      // Only return empty for shared formulas with no other properties
+      if (Object.keys(cell.value).length === 1) {
+        return '';
+      }
+      // Otherwise continue trying to extract the value
+    }
     
     // Check if it's a wrapped primitive
     if (cell.value.valueOf && typeof cell.value.valueOf === 'function') {
@@ -592,6 +772,150 @@ function getCellValue(cell) {
   return cell.value;
 }
 
+// Theme colors mapping for Excel - these are standard Excel theme colors
+const THEME_COLORS = {
+  0: '#FFFFFF', // Background 1
+  1: '#000000', // Text 1
+  2: '#E7E6E6', // Background 2
+  3: '#44546A', // Text 2
+  4: '#5B9BD5', // Accent 1 (Blue)
+  5: '#ED7D31', // Accent 2
+  6: '#A5A5A5', // Accent 3
+  7: '#FFC000', // Accent 4
+  8: '#4472C4', // Accent 5
+  9: '#70AD47'  // Accent 6
+};
+
+// Excel indexed colors (legacy palette)
+const INDEXED_COLORS = {
+  0: '#000000',
+  1: '#FFFFFF',
+  2: '#FF0000',
+  3: '#00FF00',
+  4: '#0000FF',
+  5: '#FFFF00',
+  6: '#FF00FF',
+  7: '#00FFFF',
+  8: '#000000',
+  9: '#FFFFFF',
+  10: '#FF0000',
+  11: '#00FF00',
+  12: '#0000FF', // Blue
+  13: '#FFFF00',
+  14: '#FF00FF',
+  15: '#00FFFF',
+  16: '#800000',
+  17: '#008000',
+  18: '#000080',
+  19: '#808000',
+  20: '#800080',
+  21: '#008080',
+  22: '#C0C0C0',
+  23: '#808080',
+  24: '#9999FF',
+  25: '#993366',
+  26: '#FFFFCC',
+  27: '#CCFFFF',
+  28: '#660066',
+  29: '#FF8080',
+  30: '#0066CC',
+  31: '#CCCCFF',
+  32: '#000080',
+  33: '#FF00FF',
+  34: '#FFFF00',
+  35: '#00FFFF',
+  36: '#800080',
+  37: '#800000',
+  38: '#008080',
+  39: '#0000FF',
+  40: '#00CCFF',
+  41: '#CCFFFF',
+  42: '#CCFFCC',
+  43: '#FFFF99',
+  44: '#99CCFF',
+  45: '#FF99CC',
+  46: '#CC99FF',
+  47: '#FFCC99',
+  48: '#3366FF',
+  49: '#33CCCC',
+  50: '#99CC00',
+  51: '#FFCC00',
+  52: '#FF9900',
+  53: '#FF6600',
+  54: '#666699',
+  55: '#969696',
+  56: '#003366',
+  57: '#339966',
+  58: '#003300',
+  59: '#333300',
+  60: '#993300',
+  61: '#993366',
+  62: '#333399',
+  63: '#333333'
+};
+
+// Apply tint to a hex color
+function applyTint(hexColor, tint) {
+  if (!tint || tint === 0) return hexColor;
+  
+  // Convert hex to RGB
+  const r = parseInt(hexColor.substr(1, 2), 16);
+  const g = parseInt(hexColor.substr(3, 2), 16);
+  const b = parseInt(hexColor.substr(5, 2), 16);
+  
+  let newR, newG, newB;
+  
+  if (tint < 0) {
+    // Darken the color
+    const factor = 1 + tint;
+    newR = Math.round(r * factor);
+    newG = Math.round(g * factor);
+    newB = Math.round(b * factor);
+  } else {
+    // Lighten the color
+    newR = Math.round(r + (255 - r) * tint);
+    newG = Math.round(g + (255 - g) * tint);
+    newB = Math.round(b + (255 - b) * tint);
+  }
+  
+  // Convert back to hex
+  const toHex = (n) => {
+    const hex = Math.max(0, Math.min(255, n)).toString(16);
+    return hex.length === 1 ? '0' + hex : hex;
+  };
+  
+  return '#' + toHex(newR) + toHex(newG) + toHex(newB);
+}
+
+// Resolve theme color to actual color
+function resolveThemeColor(colorObj) {
+  if (!colorObj || typeof colorObj !== 'object') return colorObj;
+  
+  // If it has argb, return that directly
+  if (colorObj.argb) {
+    return '#' + colorObj.argb.substr(2); // Remove alpha channel
+  }
+  
+  // If it has rgb, return that
+  if (colorObj.rgb) {
+    return '#' + colorObj.rgb;
+  }
+  
+  // If it's an indexed color, resolve it
+  if (colorObj.indexed !== undefined && INDEXED_COLORS[colorObj.indexed]) {
+    return INDEXED_COLORS[colorObj.indexed];
+  }
+  
+  // If it's a theme color, resolve it
+  if (colorObj.theme !== undefined && THEME_COLORS[colorObj.theme]) {
+    const baseColor = THEME_COLORS[colorObj.theme];
+    return applyTint(baseColor, colorObj.tint || 0);
+  }
+  
+  // Return the object as-is if we can't resolve it
+  return colorObj;
+}
+
 function extractCellStyle(cell) {
   const style = {};
   
@@ -600,23 +924,42 @@ function extractCellStyle(cell) {
   
   // Font styles - extract all properties
   if (cell.font) {
+    const resolvedColor = resolveThemeColor(cell.font.color);
+    
+    // Debug I26 color resolution
+    if (cell.fullAddress === 'I26') {
+      console.log('[I26 Style Extraction] Original color:', cell.font.color);
+      console.log('[I26 Style Extraction] Resolved color:', resolvedColor);
+    }
+    
     style.font = {
       bold: cell.font.bold || false,
       italic: cell.font.italic || false,
       underline: cell.font.underline || false,
       strike: cell.font.strike || false,
       size: cell.font.size || 11, // Excel default is 11pt
-      color: cell.font.color?.argb || cell.font.color,
+      color: resolvedColor,
       name: cell.font.name || 'Calibri'
     };
     
-    if (debugStyles) {
-      console.log('[Worker Style Debug] Font extracted:', {
-        cell: `${cell.row}-${cell.col}`,
-        font: style.font,
-        original: cell.font
-      });
-    }
+    // Debug underline values to understand what ExcelJS provides
+    // if (cell.font.underline && cell.font.underline !== true && cell.font.underline !== false) {
+    //   console.log('[Font Underline] Non-boolean underline value found:', {
+    //     cellAddress: cell.fullAddress || cell.address || 'unknown',
+    //     underlineValue: cell.font.underline,
+    //     underlineType: typeof cell.font.underline,
+    //     rawFont: cell.font
+    //   });
+    // }
+    
+    
+    // if (debugStyles) {
+    //   console.log('[Worker Style Debug] Font extracted:', {
+    //     cell: `${cell.row}-${cell.col}`,
+    //     font: style.font,
+    //     original: cell.font
+    //   });
+    // }
   }
   
   // Fill/background - handle patterns and gradients
@@ -629,15 +972,15 @@ function extractCellStyle(cell) {
     let pattern = 'solid';
     
     // Log what we have (only for debugging specific issues)
-    const debugFills = false; // Set to true when debugging fill issues
-    if (debugFills && (cell.fill.type || cell.fill.fgColor || cell.fill.bgColor)) {
-      console.log(`[Fill Debug] Cell ${cellRef} fill:`, {
-        type: cell.fill.type,
-        pattern: cell.fill.pattern,
-        fgColor: cell.fill.fgColor,
-        bgColor: cell.fill.bgColor
-      });
-    }
+    // const debugFills = false; // Set to true when debugging fill issues
+    // if (debugFills && (cell.fill.type || cell.fill.fgColor || cell.fill.bgColor)) {
+    //   console.log(`[Fill Debug] Cell ${cellRef} fill:`, {
+    //     type: cell.fill.type,
+    //     pattern: cell.fill.pattern,
+    //     fgColor: cell.fill.fgColor,
+    //     bgColor: cell.fill.bgColor
+    //   });
+    // }
     
     // Try all possible color locations
     if (cell.fill.type === 'pattern') {
@@ -686,9 +1029,9 @@ function extractCellStyle(cell) {
       };
       
       // Log successful fill extraction (only when debugging)
-      if (debugFills && (!cell.value || cell.value === '')) {
-        console.log(`[Fill Success] Empty cell ${cellRef} has background:`, fillColor);
-      }
+      // if (debugFills && (!cell.value || cell.value === '')) {
+      //   console.log(`[Fill Success] Empty cell ${cellRef} has background:`, fillColor);
+      // }
     }
   }
   
@@ -722,8 +1065,40 @@ function extractCellStyle(cell) {
   }
   
   // Number format - extract the actual format string
+  // Check all possible locations where ExcelJS might store format
+  let foundFormat = null;
+  
   if (cell.numFmt) {
-    style.numberFormat = cell.numFmt;
+    foundFormat = cell.numFmt;
+  } else if (cell.style && cell.style.numFmt) {
+    foundFormat = cell.style.numFmt;
+  } else if (cell._style && cell._style.numFmt) {
+    foundFormat = cell._style.numFmt;
+  } else if (cell.model && cell.model.style && cell.model.style.numFmt) {
+    foundFormat = cell.model.style.numFmt;
+  } else if (cell.model && cell.model.numFmt) {
+    foundFormat = cell.model.numFmt;
+  }
+  
+  if (foundFormat) {
+    style.numberFormat = foundFormat;
+    // Debug custom formats
+    // if (foundFormat && foundFormat.includes('"')) {
+    //   const cellRef = typeof cell.fullAddress === 'string' ? cell.fullAddress : 
+    //                   (cell.fullAddress?.address || cell.address || 'unknown');
+    //   console.log('[Worker] Custom format with text found:', { 
+    //     cellRef: cellRef,
+    //     format: foundFormat,
+    //     value: cell.value
+    //   });
+    // }
+    // Debug date formats
+    // if (foundFormat && foundFormat.match(/[dmyhs]/i)) {
+    //   console.log('[Worker] Date format found:', { 
+    //     cellRef: `${cell.fullAddress || 'unknown'}`,
+    //     numFmt: foundFormat 
+    //   });
+    // }
   } else if (cell.style && typeof cell.style === 'number') {
     // Handle built-in format IDs
     const builtInFormats = {
@@ -757,6 +1132,15 @@ function extractCellStyle(cell) {
       49: '@'
     };
     style.numberFormat = builtInFormats[cell.style] || null;
+    // Debug built-in format
+    // if (cell.style === 14 || cell.style === 15 || cell.style === 16 || cell.style === 17 || cell.style === 22) {
+    //   console.log('[Worker] Built-in date format ID used:', { 
+    //     cellRef: `${cell.fullAddress || 'unknown'}`,
+    //     formatId: cell.style,
+    //     mappedFormat: builtInFormats[cell.style],
+    //     cellModel: cell.model
+    //   });
+    // }
   }
   
   // Protection
@@ -768,13 +1152,13 @@ function extractCellStyle(cell) {
   }
   
   // Debug: Log complete extracted style
-  if (debugStyles && Object.keys(style).length > 0) {
-    console.log('[Worker Style Debug] Complete style extracted:', {
-      cell: `${cell.row || 0}-${cell.col || 0}`,
-      styleProperties: Object.keys(style),
-      fullStyle: style
-    });
-  }
+  // if (debugStyles && Object.keys(style).length > 0) {
+  //   console.log('[Worker Style Debug] Complete style extracted:', {
+  //     cell: `${cell.row || 0}-${cell.col || 0}`,
+  //     styleProperties: Object.keys(style),
+  //     fullStyle: style
+  //   });
+  // }
   
   return style;
 }
