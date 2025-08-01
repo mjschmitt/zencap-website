@@ -17,7 +17,10 @@ const ExcelCell = memo(({
   isPrintMode = false,
   accessibilityMode = false,
   isMerged = false,
-  showGridLines = true
+  showGridLines = true,
+  isSpilloverCell = false,
+  spilloverData = null,
+  isSpilloverSource = false
 }) => {
   const { cellTheme } = useTheme(darkMode);
   // Determine cell type
@@ -98,9 +101,9 @@ const ExcelCell = memo(({
     const baseStyle = {
       width: '100%',
       height: '100%',
-      overflow: 'hidden',
+      overflow: isSpilloverCell ? 'visible' : 'hidden', // Allow spillover cells to show overflow
       whiteSpace: 'nowrap',
-      textOverflow: 'ellipsis',
+      textOverflow: isSpilloverCell ? 'clip' : 'ellipsis', // Don't ellipsis spillover text
       padding: '3px 6px', // More generous padding like Excel
       cursor: 'cell',
       userSelect: 'none',
@@ -385,10 +388,15 @@ const ExcelCell = memo(({
     }
 
     return baseStyle;
-  }, [style, isSelected, isHighlighted, width, height, darkMode, isPrintMode, showGridLines, row, columnName]);
+  }, [style, isSelected, isHighlighted, width, height, darkMode, isPrintMode, showGridLines, row, columnName, isSpilloverCell]);
 
   // Format the display value
   const displayValue = useMemo(() => {
+    // Handle spillover cells - they should show empty content since the visual text will be rendered by CSS
+    if (isSpilloverCell) {
+      return '';
+    }
+    
     if (value === null || value === undefined) return '';
     
     // Debug D26 at the start

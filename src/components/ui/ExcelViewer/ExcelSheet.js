@@ -33,6 +33,7 @@ const ExcelSheet = memo(forwardRef(({
   const [rowHeights, setRowHeights] = useState({});
   const [dimensionsReady, setDimensionsReady] = useState(false);
   const cellDataMap = useRef(new Map());
+  const spilloverMap = useRef(new Map()); // Map to track spillover data
 
   // Zoom factor
   const zoomFactor = zoom / 100;
@@ -53,13 +54,34 @@ const ExcelSheet = memo(forwardRef(({
   // Process data into a Map for O(1) lookups
   useEffect(() => {
     const newMap = new Map();
+    const newSpilloverMap = new Map();
+    
     if (data.cells) {
       data.cells.forEach(cell => {
         const key = `${cell.row}-${cell.col}`;
         newMap.set(key, cell);
       });
     }
+    
+    // Process spillover ranges
+    if (data.spilloverRanges) {
+      data.spilloverRanges.forEach(spillRange => {
+        // For each cell in the spillover range, mark it as a spillover cell
+        for (let col = spillRange.startCol; col <= spillRange.endCol; col++) {
+          const spillKey = `${spillRange.sourceRow}-${col}`;
+          newSpilloverMap.set(spillKey, {
+            sourceRow: spillRange.sourceRow,
+            sourceCol: spillRange.sourceCol,
+            text: spillRange.text,
+            isSpillover: true,
+            spilloverIndex: col - spillRange.startCol // Position in spillover sequence
+          });
+        }
+      });
+    }
+    
     cellDataMap.current = newMap;
+    spilloverMap.current = newSpilloverMap;
     
     // Debug logging
     const cellsWithStyles = Array.from(newMap.values()).filter(cell => 
@@ -73,9 +95,12 @@ const ExcelSheet = memo(forwardRef(({
       console.log('[ExcelSheet Debug] Cell data map updated:', {
         cellCount: data.cells?.length || 0,
         mapSize: newMap.size,
+        spilloverCount: newSpilloverMap.size,
+        spilloverRanges: data.spilloverRanges?.length || 0,
         cellsWithStyles: cellsWithStyles.length,
         cellsWithBackgroundOnly: cellsWithBackgroundOnly.length,
         sampleKeys: Array.from(newMap.keys()).slice(0, 5),
+        sampleSpilloverKeys: Array.from(newSpilloverMap.keys()).slice(0, 5),
         sampleCellsWithStyles: cellsWithStyles.slice(0, 3).map(cell => ({
           key: `${cell.row}-${cell.col}`,
           value: cell.value,
@@ -90,11 +115,13 @@ const ExcelSheet = memo(forwardRef(({
       console.log('Cell data map updated:', {
         cellCount: data.cells?.length || 0,
         mapSize: newMap.size,
+        spilloverCount: newSpilloverMap.size,
+        spilloverRanges: data.spilloverRanges?.length || 0,
         cellsWithBackgroundOnly: cellsWithBackgroundOnly.length,
         sampleKeys: Array.from(newMap.keys()).slice(0, 5)
       });
     }
-  }, [data.cells]);
+  }, [data.cells, data.spilloverRanges]);
 
   // Calculate column widths with zoom
   useEffect(() => {
@@ -301,6 +328,7 @@ const ExcelSheet = memo(forwardRef(({
     // we can use the indices directly as they already map to Excel's 1-based system
     const cellKey = `${rowIndex}-${columnIndex}`;
     const cellData = cellDataMap.current.get(cellKey);
+    const spilloverData = spilloverMap.current.get(cellKey);
     
     // Debug log for object values
     if (cellData && typeof cellData.value === 'object' && cellData.value !== null && !(cellData.value instanceof Date)) {
@@ -312,7 +340,36 @@ const ExcelSheet = memo(forwardRef(({
       });
     }
     
-    if (!cellData) {
+    // Handle spillover cells - these should show part of another cell's text
+    if (!cellData && spilloverData) {
+      const sourceCell = cellDataMap.current.get(`${spilloverData.sourceRow}-${spilloverData.sourceCol}`);
+      if (sourceCell) {
+        return (
+          <div style={{ ...style, overflow: 'hidden', boxSizing: 'border-box' }}>
+            <ExcelCell
+              value="" // Don't show value in spillover cells - this will be handled by visual spillover
+              style={sourceCell.style || {}}
+              row={rowIndex}
+              col={columnIndex}
+              columnName={getColumnName(columnIndex)}
+              isSelected={isSelected} // Allow spillover cells to be selected but they remain empty
+              isHighlighted={false}
+              onClick={onCellClick}
+              width={getColumnWidth(columnIndex)}
+              height={getRowHeight(rowIndex)}
+              darkMode={darkMode}
+              isPrintMode={isPrintMode}
+              accessibilityMode={accessibilityMode}
+              showGridLines={showGridLines}
+              isSpilloverCell={true}
+              spilloverData={spilloverData}
+            />
+          </div>
+        );
+      }
+    }
+    
+    if (!cellData && !spilloverData) {
       // Empty cell with Excel-like grid lines
       return (
         <div 
@@ -333,10 +390,15 @@ const ExcelSheet = memo(forwardRef(({
     const isSelected = selectedCell?.row === rowIndex && selectedCell?.col === columnIndex;
     const isHighlighted = highlightedCells.some(cell => cell.row === rowIndex && cell.col === columnIndex);
 
+    // Check if this cell is a source cell for spillover
+    const isSpilloverSource = data.spilloverRanges?.some(range => 
+      range.sourceRow === rowIndex && range.sourceCol === columnIndex
+    );
+
     return (
       <div style={{ ...style, overflow: 'hidden', boxSizing: 'border-box' }}>
         <ExcelCell
-          value={cellData.value}
+          value={cellData.value} // Show actual value in source cells
           style={cellData.style || {}}
           row={rowIndex}
           col={columnIndex}
@@ -350,10 +412,11 @@ const ExcelSheet = memo(forwardRef(({
           isPrintMode={isPrintMode}
           accessibilityMode={accessibilityMode}
           showGridLines={showGridLines}
+          isSpilloverSource={isSpilloverSource}
         />
       </div>
     );
-  }, [getColumnWidth, getRowHeight, selectedCell, highlightedCells, onCellClick, darkMode, isPrintMode, accessibilityMode, showGridLines]);
+  }, [getColumnWidth, getRowHeight, selectedCell, highlightedCells, onCellClick, darkMode, isPrintMode, accessibilityMode, showGridLines, data.spilloverRanges]);
 
   // Handle merged cells overlay
   const MergedCellsOverlay = useMemo(() => {
@@ -407,6 +470,71 @@ const ExcelSheet = memo(forwardRef(({
       </div>
     );
   }, [data.mergedCells, getColumnWidth, getRowHeight, onCellClick, darkMode, isPrintMode]);
+
+  // Handle text spillover overlay
+  const SpilloverOverlay = useMemo(() => {
+    if (!data.spilloverRanges?.length) return null;
+
+    return (
+      <div className="absolute top-0 left-0 pointer-events-none" style={{ zIndex: 5 }}>
+        {data.spilloverRanges.map((spillRange, index) => {
+          // Calculate position and dimensions for the spillover text
+          const sourceLeft = Array.from({ length: spillRange.sourceCol }, (_, i) => getColumnWidth(i)).reduce((a, b) => a + b, 0);
+          const sourceTop = Array.from({ length: spillRange.sourceRow }, (_, i) => getRowHeight(i)).reduce((a, b) => a + b, 0);
+          const sourceWidth = getColumnWidth(spillRange.sourceCol);
+          const sourceHeight = getRowHeight(spillRange.sourceRow);
+          
+          // Calculate total width including spillover columns
+          const totalWidth = Array.from({ length: spillRange.endCol - spillRange.sourceCol + 1 }, (_, i) => 
+            getColumnWidth(spillRange.sourceCol + i)
+          ).reduce((a, b) => a + b, 0);
+
+          const sourceCell = cellDataMap.current.get(`${spillRange.sourceRow}-${spillRange.sourceCol}`);
+          if (!sourceCell) return null;
+
+          return (
+            <div
+              key={`spillover-${index}`}
+              className="absolute pointer-events-none"
+              style={{
+                left: `${sourceLeft}px`,
+                top: `${sourceTop}px`,
+                width: `${totalWidth}px`,
+                height: `${sourceHeight}px`,
+                zIndex: 2
+              }}
+            >
+              <div
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  padding: '3px 6px',
+                  boxSizing: 'border-box',
+                  overflow: 'hidden',
+                  whiteSpace: 'nowrap',
+                  fontSize: sourceCell.style?.font?.size ? `${Math.round(sourceCell.style.font.size * 1.333)}px` : '15px',
+                  fontFamily: sourceCell.style?.font?.name ? `"${sourceCell.style.font.name}", sans-serif` : 'Calibri, "Segoe UI", Arial, sans-serif',
+                  fontWeight: sourceCell.style?.font?.bold ? '700' : '400',
+                  fontStyle: sourceCell.style?.font?.italic ? 'italic' : 'normal',
+                  textDecoration: sourceCell.style?.font?.underline ? 'underline' : 'none',
+                  color: convertColorForCSS(sourceCell.style?.font?.color) || (darkMode ? '#e5e7eb' : '#000000'),
+                  textAlign: sourceCell.style?.alignment?.horizontal || 'left',
+                  verticalAlign: sourceCell.style?.alignment?.vertical || 'middle',
+                  display: 'flex',
+                  alignItems: sourceCell.style?.alignment?.vertical === 'top' ? 'flex-start' : 
+                            sourceCell.style?.alignment?.vertical === 'bottom' ? 'flex-end' : 'center',
+                  backgroundColor: 'transparent', // Ensure spillover doesn't have background
+                  textShadow: isPrintMode ? 'none' : undefined
+                }}
+              >
+                {spillRange.text}
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    );
+  }, [data.spilloverRanges, getColumnWidth, getRowHeight, darkMode, isPrintMode]);
 
   // Don't render Grid until dimensions are ready to prevent misalignment
   if (!dimensionsReady && data.columnWidths) {
@@ -467,6 +595,7 @@ const ExcelSheet = memo(forwardRef(({
       >
         {Cell}
       </Grid>
+      {SpilloverOverlay}
       {MergedCellsOverlay}
     </div>
   );
@@ -483,6 +612,38 @@ function getColumnName(index) {
     index = Math.floor(index / 26);
   }
   return name;
+}
+
+// Helper function to convert Excel color objects to CSS color strings
+function convertColorForCSS(colorObj) {
+  if (!colorObj) return null;
+  
+  // If it's already a string (hex color), return as-is
+  if (typeof colorObj === 'string') {
+    return colorObj.startsWith('#') ? colorObj : `#${colorObj}`;
+  }
+  
+  // If it's an object with argb property
+  if (colorObj.argb) {
+    return colorObj.argb.length === 8 ? `#${colorObj.argb.slice(2)}` : `#${colorObj.argb}`;
+  }
+  
+  // If it's an object with rgb property
+  if (colorObj.rgb) {
+    return `#${colorObj.rgb}`;
+  }
+  
+  // Handle theme colors (simplified)
+  if (colorObj.theme !== undefined) {
+    const themeColors = {
+      0: '#FFFFFF', 1: '#000000', 2: '#E7E6E6', 3: '#44546A',
+      4: '#5B9BD5', 5: '#ED7D31', 6: '#A5A5A5', 7: '#FFC000',
+      8: '#4472C4', 9: '#70AD47'
+    };
+    return themeColors[colorObj.theme] || '#000000';
+  }
+  
+  return null;
 }
 
 export default ExcelSheet;

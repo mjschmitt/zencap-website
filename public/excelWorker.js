@@ -321,6 +321,8 @@ async function processSheet(data, id) {
   
   // Process rows and cells
   let cellCount = 0;
+  const spilloverRanges = []; // Track text spillover ranges
+  
   for (let rowNum = startRow; rowNum <= endRow; rowNum++) {
     try {
       const row = worksheet.getRow(rowNum);
@@ -505,6 +507,14 @@ async function processSheet(data, id) {
             processedData.cells.push(cellData);
             cellCount++;
             
+            // Calculate text spillover if text content exists
+            if (cellValue && typeof cellValue === 'string' && cellValue.length > 0) {
+              const spillRange = calculateSpilloverRange(cellValue, rowNum, colNum, processedData.columnWidths, worksheet);
+              if (spillRange.endCol > colNum) {
+                spilloverRanges.push(spillRange);
+              }
+            }
+            
             // Log first few cells for debugging
             // if (cellCount <= 5) {
             //   console.log(`Cell [${rowNum},${colNum}]:`, cellData.value || '(empty with style)');
@@ -618,6 +628,13 @@ async function processSheet(data, id) {
       }
     });
   }
+  
+  // Add spillover ranges to processed data
+  processedData.spilloverRanges = spilloverRanges;
+  
+  console.log(`[Spillover] Found ${spilloverRanges.length} spillover ranges:`, 
+    spilloverRanges.map(r => `${getColumnName(r.sourceCol)}${r.sourceRow} → ${getColumnName(r.startCol)}-${getColumnName(r.endCol)}`)
+  );
   
   self.postMessage({
     type: 'SHEET_PROCESSED',
@@ -1207,6 +1224,85 @@ function getColumnName(index) {
     index = Math.floor(index / 26);
   }
   return name;
+}
+
+// Calculate text spillover range for a cell
+function calculateSpilloverRange(text, row, col, columnWidths, worksheet) {
+  const EXCEL_COLUMN_WIDTH_TO_PIXEL = 8.0;
+  const DEFAULT_COLUMN_WIDTH = 67;
+  const AVG_CHAR_WIDTH = 8; // Average character width in pixels for Calibri 11pt
+  const MAX_SPILLOVER_COLS = 15; // Reasonable limit to prevent performance issues
+  
+  // Skip if text is empty or very short
+  if (!text || typeof text !== 'string' || text.length < 3) {
+    return {
+      sourceRow: row,
+      sourceCol: col,
+      startCol: col,
+      endCol: col,
+      text: text,
+      needsSpillover: false
+    };
+  }
+  
+  // Get source cell width
+  const sourceWidth = columnWidths[col] 
+    ? columnWidths[col] * EXCEL_COLUMN_WIDTH_TO_PIXEL 
+    : DEFAULT_COLUMN_WIDTH;
+  
+  // Estimate text width (this is a rough approximation)
+  // Account for padding in cells (6px on each side = 12px total)
+  const availableSourceWidth = Math.max(sourceWidth - 12, 20);
+  const textWidth = text.length * AVG_CHAR_WIDTH;
+  
+  // If text fits in source cell, no spillover needed
+  if (textWidth <= availableSourceWidth) {
+    return {
+      sourceRow: row,
+      sourceCol: col,
+      startCol: col,
+      endCol: col,
+      text: text,
+      needsSpillover: false
+    };
+  }
+  
+  // Calculate how many additional columns we need
+  let remainingWidth = textWidth - availableSourceWidth;
+  let endCol = col;
+  
+  // Check adjacent cells to the right for spillover space
+  for (let checkCol = col + 1; checkCol <= col + MAX_SPILLOVER_COLS && remainingWidth > 0; checkCol++) {
+    try {
+      // Check if this cell has content (would block spillover)
+      const blockingCell = worksheet.getCell(row, checkCol);
+      if (blockingCell && blockingCell.value !== null && blockingCell.value !== undefined && blockingCell.value !== '') {
+        break; // Stop spillover at non-empty cell
+      }
+      
+      // Get width of this column
+      const colWidth = columnWidths[checkCol] 
+        ? columnWidths[checkCol] * EXCEL_COLUMN_WIDTH_TO_PIXEL 
+        : DEFAULT_COLUMN_WIDTH;
+      
+      const availableColWidth = Math.max(colWidth - 12, 20); // Account for padding
+      endCol = checkCol;
+      remainingWidth -= availableColWidth;
+    } catch (error) {
+      // If we can't access the cell, stop spillover here
+      console.warn(`[Spillover] Cannot check cell ${getColumnName(checkCol)}${row}:`, error);
+      break;
+    }
+  }
+  
+  return {
+    sourceRow: row,
+    sourceCol: col,
+    startCol: col + 1, // Spillover starts from next column
+    endCol: endCol,
+    text: text,
+    needsSpillover: endCol > col
+  };
 }
 
 async function getCellRange(data, id) {

@@ -1,0 +1,537 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excel Spillover QA Testing Tool</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .header {
+            border-bottom: 2px solid #0d9488;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+        }
+        .header h1 {
+            color: #1e3a8a;
+            margin: 0 0 10px 0;
+        }
+        .test-section {
+            margin-bottom: 30px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 15px;
+        }
+        .test-section h2 {
+            color: #374151;
+            margin-top: 0;
+            border-bottom: 1px solid #e5e7eb;
+            padding-bottom: 10px;
+        }
+        .test-case {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 4px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .test-case h3 {
+            margin: 0 0 8px 0;
+            color: #1f2937;
+            font-size: 14px;
+        }
+        .test-case p {
+            margin: 0 0 8px 0;
+            color: #6b7280;
+            font-size: 13px;
+        }
+        .test-status {
+            display: inline-block;
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 12px;
+            font-weight: bold;
+        }
+        .status-pending {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        .status-pass {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        .status-fail {
+            background: #fee2e2;
+            color: #991b1b;
+        }
+        .test-button {
+            background: #0d9488;
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 8px;
+        }
+        .test-button:hover {
+            background: #0f766e;
+        }
+        .test-button:disabled {
+            background: #9ca3af;
+            cursor: not-allowed;
+        }
+        .results-area {
+            background: #f3f4f6;
+            border: 1px solid #d1d5db;
+            border-radius: 4px;
+            padding: 10px;
+            margin-top: 10px;
+            font-family: 'Courier New', monospace;
+            font-size: 12px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .summary {
+            background: #1e3a8a;
+            color: white;
+            padding: 15px;
+            border-radius: 6px;
+            margin-bottom: 20px;
+        }
+        .summary h2 {
+            margin: 0 0 10px 0;
+        }
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 10px;
+        }
+        .stat-card {
+            background: rgba(255,255,255,0.1);
+            padding: 10px;
+            border-radius: 4px;
+            text-align: center;
+        }
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+        }
+        .instructions {
+            background: #eff6ff;
+            border: 1px solid #bfdbfe;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .instructions h3 {
+            color: #1e40af;
+            margin: 0 0 10px 0;
+        }
+        .critical-tests {
+            background: #fef2f2;
+            border: 2px solid #fca5a5;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .critical-tests h3 {
+            color: #dc2626;
+            margin: 0 0 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>Excel Spillover QA Testing Tool</h1>
+            <p>Comprehensive testing for text spillover functionality before frozen panes implementation</p>
+        </div>
+
+        <div class="summary">
+            <h2>Test Results Summary</h2>
+            <div class="summary-stats">
+                <div class="stat-card">
+                    <div class="stat-value" id="total-tests">0</div>
+                    <div class="stat-label">Total Tests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="passed-tests">0</div>
+                    <div class="stat-label">Passed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="failed-tests">0</div>
+                    <div class="stat-label">Failed</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-value" id="pending-tests">0</div>
+                    <div class="stat-label">Pending</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="critical-tests">
+            <h3>🚨 Critical Regression Tests</h3>
+            <p>These tests MUST pass before proceeding to frozen panes implementation:</p>
+            <ul>
+                <li>Text should NOT appear in all cells (previous critical bug)</li>
+                <li>Only source cells should contain actual data values</li>
+                <li>Spillover cells should remain empty when clicked</li>
+                <li>Spillover should stop at non-empty cells</li>
+            </ul>
+        </div>
+
+        <div class="instructions">
+            <h3>📋 Testing Instructions</h3>
+            <ol>
+                <li>Open the Excel Viewer at <strong>localhost:3004</strong></li>
+                <li>Load a test Excel file or use the built-in test data</li>
+                <li>Run each test case below systematically</li>
+                <li>Mark results as Pass/Fail using the buttons</li>
+                <li>Document any issues in the results area</li>
+            </ol>
+        </div>
+
+        <div class="test-section">
+            <h2>1. Basic Spillover Functionality</h2>
+            
+            <div class="test-case">
+                <h3>Test 1.1: Left-aligned text spillover</h3>
+                <p><strong>Test:</strong> Enter "This is a very long text that should spill over to the right" in cell A1</p>
+                <p><strong>Expected:</strong> Text starts in A1 and continues visually into B1, C1, etc.</p>
+                <span class="test-status status-pending" id="test-1-1-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('1-1', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('1-1', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('1-1', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-1-1-results" style="display:none;"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test 1.2: Right-aligned text spillover</h3>
+                <p><strong>Test:</strong> Enter "This text should spill left" in cell D1 with right alignment</p>
+                <p><strong>Expected:</strong> Text ends in D1 and continues visually into C1, B1, etc.</p>
+                <span class="test-status status-pending" id="test-1-2-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('1-2', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('1-2', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('1-2', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-1-2-results" style="display:none;"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test 1.3: Center-aligned text spillover</h3>
+                <p><strong>Test:</strong> Enter "Center aligned spillover text" in cell F1 with center alignment</p>
+                <p><strong>Expected:</strong> Text centers on F1 and spills both left and right</p>
+                <span class="test-status status-pending" id="test-1-3-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('1-3', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('1-3', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('1-3', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-1-3-results" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>2. Critical Regression Tests</h2>
+            
+            <div class="test-case">
+                <h3>Test 2.1: 🚨 No text bleeding to all cells</h3>
+                <p><strong>Test:</strong> Verify text does NOT appear in random cells across the sheet</p>
+                <p><strong>Expected:</strong> Only spillover ranges show text, rest of sheet remains clean</p>
+                <span class="test-status status-pending" id="test-2-1-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('2-1', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('2-1', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('2-1', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-2-1-results" style="display:none;"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test 2.2: 🚨 Spillover cells remain empty</h3>
+                <p><strong>Test:</strong> Click on spillover cells (B1, C1 if A1 has spillover)</p>
+                <p><strong>Expected:</strong> Spillover cells show empty value, no data entered</p>
+                <span class="test-status status-pending" id="test-2-2-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('2-2', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('2-2', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('2-2', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-2-2-results" style="display:none;"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test 2.3: 🚨 Spillover stops at blocking cells</h3>
+                <p><strong>Test:</strong> A1="Long text", B1="", C1="BLOCK" - spillover should stop at C1</p>
+                <p><strong>Expected:</strong> Text visible in A1-B1, stops at C1, no text in D1+</p>
+                <span class="test-status status-pending" id="test-2-3-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('2-3', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('2-3', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('2-3', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-2-3-results" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>3. Zoom and Visual Quality</h2>
+            
+            <div class="test-case">
+                <h3>Test 3.1: Spillover at 50% zoom</h3>
+                <p><strong>Test:</strong> Set zoom to 50%, verify spillover alignment</p>
+                <p><strong>Expected:</strong> Text scales properly, spillover maintains alignment</p>
+                <span class="test-status status-pending" id="test-3-1-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('3-1', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('3-1', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('3-1', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-3-1-results" style="display:none;"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test 3.2: Spillover at 150% zoom</h3>
+                <p><strong>Test:</strong> Set zoom to 150%, verify spillover alignment</p>
+                <p><strong>Expected:</strong> Text scales properly, spillover maintains alignment</p>
+                <span class="test-status status-pending" id="test-3-2-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('3-2', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('3-2', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('3-2', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-3-2-results" style="display:none;"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test 3.3: Spillover at 200% zoom</h3>
+                <p><strong>Test:</strong> Set zoom to 200%, verify spillover alignment</p>
+                <p><strong>Expected:</strong> Text scales properly, spillover maintains alignment</p>
+                <span class="test-status status-pending" id="test-3-3-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('3-3', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('3-3', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('3-3', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-3-3-results" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>4. Edge Cases and Special Content</h2>
+            
+            <div class="test-case">
+                <h3>Test 4.1: Unicode and special characters</h3>
+                <p><strong>Test:</strong> "测试中文字符溢出效果 🎉😀★☆"</p>
+                <p><strong>Expected:</strong> Unicode and emoji characters spillover correctly</p>
+                <span class="test-status status-pending" id="test-4-1-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('4-1', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('4-1', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('4-1', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-4-1-results" style="display:none;"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test 4.2: Very long text (max spillover test)</h3>
+                <p><strong>Test:</strong> Enter extremely long text (100+ characters)</p>
+                <p><strong>Expected:</strong> Spillover limited to MAX_SPILLOVER_COLS (15), no performance issues</p>
+                <span class="test-status status-pending" id="test-4-2-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('4-2', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('4-2', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('4-2', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-4-2-results" style="display:none;"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test 4.3: Numbers spillover</h3>
+                <p><strong>Test:</strong> Enter very long number: 123456789012345678901234567890</p>
+                <p><strong>Expected:</strong> Number displays with spillover if needed</p>
+                <span class="test-status status-pending" id="test-4-3-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('4-3', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('4-3', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('4-3', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-4-3-results" style="display:none;"></div>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h2>5. Performance and Stress Tests</h2>
+            
+            <div class="test-case">
+                <h3>Test 5.1: Multiple spillover ranges</h3>
+                <p><strong>Test:</strong> Create 20+ cells with spillover text</p>
+                <p><strong>Expected:</strong> Performance remains smooth, no lag</p>
+                <span class="test-status status-pending" id="test-5-1-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('5-1', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('5-1', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('5-1', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-5-1-results" style="display:none;"></div>
+            </div>
+
+            <div class="test-case">
+                <h3>Test 5.2: Scrolling with spillover</h3>
+                <p><strong>Test:</strong> Scroll through sheet with multiple spillover ranges</p>
+                <p><strong>Expected:</strong> Smooth scrolling, spillover appears/disappears correctly</p>
+                <span class="test-status status-pending" id="test-5-2-status">PENDING</span>
+                <div>
+                    <button class="test-button" onclick="markTest('5-2', 'pass')">Pass</button>
+                    <button class="test-button" onclick="markTest('5-2', 'fail')">Fail</button>
+                    <button class="test-button" onclick="markTest('5-2', 'pending')">Reset</button>
+                </div>
+                <div class="results-area" id="test-5-2-results" style="display:none;"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Test results storage
+        const testResults = {};
+        let totalTests = 0;
+
+        // Initialize test counting
+        function initializeTests() {
+            const testCases = document.querySelectorAll('.test-case');
+            totalTests = testCases.length;
+            updateSummary();
+        }
+
+        // Mark test result
+        function markTest(testId, result) {
+            testResults[testId] = {
+                result: result,
+                timestamp: new Date().toISOString(),
+                notes: ''
+            };
+
+            // Update status display
+            const statusElement = document.getElementById(`test-${testId}-status`);
+            const resultsElement = document.getElementById(`test-${testId}-results`);
+            
+            statusElement.className = `test-status status-${result}`;
+            statusElement.textContent = result.toUpperCase();
+            
+            if (result !== 'pending') {
+                resultsElement.style.display = 'block';
+                resultsElement.innerHTML = `
+                    <strong>Result:</strong> ${result.toUpperCase()}<br>
+                    <strong>Time:</strong> ${new Date().toLocaleString()}<br>
+                    <textarea placeholder="Add notes about this test..." onchange="updateTestNotes('${testId}', this.value)" style="width:100%; height:60px; margin-top:8px; font-size:12px;"></textarea>
+                `;
+            } else {
+                resultsElement.style.display = 'none';
+            }
+
+            updateSummary();
+            saveResults();
+        }
+
+        // Update test notes
+        function updateTestNotes(testId, notes) {
+            if (testResults[testId]) {
+                testResults[testId].notes = notes;
+                saveResults();
+            }
+        }
+
+        // Update summary statistics
+        function updateSummary() {
+            const passed = Object.values(testResults).filter(r => r.result === 'pass').length;
+            const failed = Object.values(testResults).filter(r => r.result === 'fail').length;
+            const pending = totalTests - passed - failed;
+
+            document.getElementById('total-tests').textContent = totalTests;
+            document.getElementById('passed-tests').textContent = passed;
+            document.getElementById('failed-tests').textContent = failed;
+            document.getElementById('pending-tests').textContent = pending;
+        }
+
+        // Save results to localStorage
+        function saveResults() {
+            localStorage.setItem('spilloverTestResults', JSON.stringify(testResults));
+        }
+
+        // Load results from localStorage
+        function loadResults() {
+            const saved = localStorage.getItem('spilloverTestResults');
+            if (saved) {
+                const savedResults = JSON.parse(saved);
+                Object.keys(savedResults).forEach(testId => {
+                    testResults[testId] = savedResults[testId];
+                    markTest(testId, savedResults[testId].result);
+                });
+            }
+        }
+
+        // Generate test report
+        function generateReport() {
+            const report = {
+                timestamp: new Date().toISOString(),
+                summary: {
+                    total: totalTests,
+                    passed: Object.values(testResults).filter(r => r.result === 'pass').length,
+                    failed: Object.values(testResults).filter(r => r.result === 'fail').length,
+                    pending: totalTests - Object.values(testResults).filter(r => r.result === 'pass').length - Object.values(testResults).filter(r => r.result === 'fail').length
+                },
+                results: testResults
+            };
+
+            // Create downloadable report
+            const blob = new Blob([JSON.stringify(report, null, 2)], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `spillover-test-report-${new Date().toISOString().slice(0,10)}.json`;
+            a.click();
+            URL.revokeObjectURL(url);
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initializeTests();
+            loadResults();
+            
+            // Add report generation button
+            const header = document.querySelector('.header');
+            const reportButton = document.createElement('button');
+            reportButton.textContent = 'Generate Report';
+            reportButton.className = 'test-button';
+            reportButton.style.marginTop = '10px';
+            reportButton.onclick = generateReport;
+            header.appendChild(reportButton);
+        });
+
+        // Auto-save every 30 seconds
+        setInterval(saveResults, 30000);
+    </script>
+</body>
+</html>
