@@ -478,7 +478,7 @@ function ModelsAdmin() {
       formData.append('file', file);
 
       console.log('Sending upload request to /api/upload-excel');
-      const response = await fetch('/api/upload-excel', {
+      const response = await fetch('/api/upload-excel-simple', {
         method: 'POST',
         body: formData,
       });
@@ -488,11 +488,11 @@ function ModelsAdmin() {
       console.log('Upload result:', result);
 
       if (result.success) {
-        setForm(f => ({ ...f, excel_url: result.file.url }));
+        setForm(f => ({ ...f, excel_url: result.file.path }));
         setNewlyUploadedFile(true); // Mark as newly uploaded
         setShowExcelPreview(true); // Automatically show preview for new uploads
         setError('');
-        console.log('Excel upload successful, file URL:', result.file.url);
+        console.log('Excel upload successful, file path:', result.file.path);
       } else {
         console.error('Upload failed:', result.error);
         setError(result.error || 'Failed to upload Excel file');
