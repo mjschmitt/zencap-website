@@ -699,11 +699,6 @@ async function processSheet(data, id) {
     spilloverRanges.map(r => `${getColumnName(r.sourceCol)}${r.sourceRow} (${r.alignment}) → ${getColumnName(r.startCol)}-${getColumnName(r.endCol)}`)
   );
   
-  // Log center-aligned spillovers specifically
-  const centerSpillovers = spilloverRanges.filter(r => r.alignment === 'center');
-  if (centerSpillovers.length > 0) {
-    console.log('[Spillover] Center-aligned spillovers:', centerSpillovers);
-  }
   
   self.postMessage({
     type: 'SHEET_PROCESSED',
@@ -1479,11 +1474,51 @@ function calculateSpilloverRange(text, row, col, columnWidths, worksheet, cellSt
       }
     }
   } else if (isCenterAligned) {
-    // For center-aligned text, spillover goes both directions
+    // For center-aligned text, first check if BOTH adjacent cells are empty
+    // This is unique to center alignment - we need space on both sides
+    let leftCellEmpty = true;
+    let rightCellEmpty = true;
+    
+    // Check immediate left cell
+    if (col > 1) {
+      try {
+        const leftCell = worksheet.getCell(row, col - 1);
+        if (leftCell && leftCell.value !== null && leftCell.value !== undefined && leftCell.value !== '') {
+          leftCellEmpty = false;
+        }
+      } catch (error) {
+        leftCellEmpty = false; // Assume blocked if we can't check
+      }
+    }
+    
+    // Check immediate right cell
+    try {
+      const rightCell = worksheet.getCell(row, col + 1);
+      if (rightCell && rightCell.value !== null && rightCell.value !== undefined && rightCell.value !== '') {
+        rightCellEmpty = false;
+      }
+    } catch (error) {
+      rightCellEmpty = false; // Assume blocked if we can't check
+    }
+    
+    // If either adjacent cell has content, don't spillover for center-aligned text
+    if (!leftCellEmpty || !rightCellEmpty) {
+      return {
+        sourceRow: row,
+        sourceCol: col,
+        startCol: col,
+        endCol: col,
+        text: text,
+        alignment: alignment,
+        needsSpillover: false
+      };
+    }
+    
+    // If both adjacent cells are empty, proceed with spillover calculation
     let leftRemainingWidth = remainingWidth / 2;
     let rightRemainingWidth = remainingWidth / 2;
     
-    // Check left side
+    // Check left side for additional spillover space
     for (let checkCol = col - 1; checkCol >= Math.max(1, col - MAX_SPILLOVER_COLS/2) && leftRemainingWidth > 0; checkCol--) {
       try {
         const blockingCell = worksheet.getCell(row, checkCol);
@@ -1505,7 +1540,7 @@ function calculateSpilloverRange(text, row, col, columnWidths, worksheet, cellSt
       }
     }
     
-    // Check right side
+    // Check right side for additional spillover space
     for (let checkCol = col + 1; checkCol <= col + MAX_SPILLOVER_COLS/2 && rightRemainingWidth > 0; checkCol++) {
       try {
         const blockingCell = worksheet.getCell(row, checkCol);

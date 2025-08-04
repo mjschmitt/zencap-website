@@ -580,7 +580,7 @@ const ExcelSheet = memo(forwardRef(({
                 paddingLeft: `${paddingLeft}px`,
                 paddingRight: `${paddingRight}px`,
                 boxSizing: 'border-box',
-                overflow: textAlign === 'center' ? 'visible' : 'hidden',
+                overflow: 'hidden',
                 whiteSpace: alignment.wrapText ? 'normal' : 'nowrap',
                 wordWrap: alignment.wrapText ? 'break-word' : 'normal',
                 fontSize: `${fontSize}px`,
