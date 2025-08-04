@@ -533,6 +533,11 @@ const ExcelSheet = memo(forwardRef(({
         let paddingLeft = 6 * zoomFactor; // Default padding scaled by zoom
         let paddingRight = 6 * zoomFactor;
         
+        // Use spillover alignment if available (from worker calculation)
+        if (spillRange.alignment) {
+          textAlign = spillRange.alignment;
+        }
+        
         // Handle indentation
         if (alignment.indent) {
           paddingLeft += alignment.indent * 8 * zoomFactor; // Each indent level is roughly 8px, scaled
@@ -575,7 +580,7 @@ const ExcelSheet = memo(forwardRef(({
                 paddingLeft: `${paddingLeft}px`,
                 paddingRight: `${paddingRight}px`,
                 boxSizing: 'border-box',
-                overflow: 'hidden',
+                overflow: textAlign === 'center' ? 'visible' : 'hidden',
                 whiteSpace: alignment.wrapText ? 'normal' : 'nowrap',
                 wordWrap: alignment.wrapText ? 'break-word' : 'normal',
                 fontSize: `${fontSize}px`,

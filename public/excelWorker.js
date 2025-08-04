@@ -457,6 +457,8 @@ async function processSheet(data, id) {
           // Include cell if it has a value OR if it has styling
           if (hasValue || hasStyle) {
             const cellValue = getCellValue(cell);
+            
+            
             const cellData = {
               row: rowNum,
               col: colNum,
@@ -696,6 +698,12 @@ async function processSheet(data, id) {
   console.log(`[Spillover] Found ${spilloverRanges.length} spillover ranges:`, 
     spilloverRanges.map(r => `${getColumnName(r.sourceCol)}${r.sourceRow} (${r.alignment}) → ${getColumnName(r.startCol)}-${getColumnName(r.endCol)}`)
   );
+  
+  // Log center-aligned spillovers specifically
+  const centerSpillovers = spilloverRanges.filter(r => r.alignment === 'center');
+  if (centerSpillovers.length > 0) {
+    console.log('[Spillover] Center-aligned spillovers:', centerSpillovers);
+  }
   
   self.postMessage({
     type: 'SHEET_PROCESSED',
