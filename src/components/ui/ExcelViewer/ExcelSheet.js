@@ -330,6 +330,10 @@ const ExcelSheet = memo(forwardRef(({
     const cellData = cellDataMap.current.get(cellKey);
     const spilloverData = spilloverMap.current.get(cellKey);
     
+    // Calculate selection and highlight state early
+    const isSelected = selectedCell?.row === rowIndex && selectedCell?.col === columnIndex;
+    const isHighlighted = highlightedCells.some(cell => cell.row === rowIndex && cell.col === columnIndex);
+    
     // Debug log for object values
     if (cellData && typeof cellData.value === 'object' && cellData.value !== null && !(cellData.value instanceof Date)) {
       console.warn('[ExcelSheet] Object value found in cellData:', {
@@ -386,9 +390,6 @@ const ExcelSheet = memo(forwardRef(({
         />
       );
     }
-
-    const isSelected = selectedCell?.row === rowIndex && selectedCell?.col === columnIndex;
-    const isHighlighted = highlightedCells.some(cell => cell.row === rowIndex && cell.col === columnIndex);
 
     // Check if this cell is a source cell for spillover
     const isSpilloverSource = data.spilloverRanges?.some(range => 
@@ -471,69 +472,116 @@ const ExcelSheet = memo(forwardRef(({
     );
   }, [data.mergedCells, getColumnWidth, getRowHeight, onCellClick, darkMode, isPrintMode]);
 
-  // Handle text spillover overlay
-  const SpilloverOverlay = useMemo(() => {
-    if (!data.spilloverRanges?.length) return null;
+  // Create custom inner element that includes spillover overlays
+  const innerElementType = useMemo(() => {
+    return forwardRef(({ children, style, ...rest }, ref) => {
+      // Render spillover overlays inside the scrollable area
+      const spilloverOverlays = data.spilloverRanges?.map((spillRange, index) => {
+        const sourceCell = cellDataMap.current.get(`${spillRange.sourceRow}-${spillRange.sourceCol}`);
+        if (!sourceCell) return null;
 
-    return (
-      <div className="absolute top-0 left-0 pointer-events-none" style={{ zIndex: 5 }}>
-        {data.spilloverRanges.map((spillRange, index) => {
-          // Calculate position and dimensions for the spillover text
-          const sourceLeft = Array.from({ length: spillRange.sourceCol }, (_, i) => getColumnWidth(i)).reduce((a, b) => a + b, 0);
-          const sourceTop = Array.from({ length: spillRange.sourceRow }, (_, i) => getRowHeight(i)).reduce((a, b) => a + b, 0);
-          const sourceWidth = getColumnWidth(spillRange.sourceCol);
-          const sourceHeight = getRowHeight(spillRange.sourceRow);
-          
-          // Calculate total width including spillover columns
-          const totalWidth = Array.from({ length: spillRange.endCol - spillRange.sourceCol + 1 }, (_, i) => 
-            getColumnWidth(spillRange.sourceCol + i)
-          ).reduce((a, b) => a + b, 0);
+        // Calculate position and dimensions for the spillover text
+        // For right-aligned text, spillover starts from startCol (which may be less than sourceCol)
+        const spilloverStartCol = Math.min(spillRange.startCol, spillRange.sourceCol);
+        const spilloverEndCol = Math.max(spillRange.endCol, spillRange.sourceCol);
+        
+        const spilloverLeft = Array.from({ length: spilloverStartCol }, (_, i) => getColumnWidth(i)).reduce((a, b) => a + b, 0);
+        const sourceTop = Array.from({ length: spillRange.sourceRow }, (_, i) => getRowHeight(i)).reduce((a, b) => a + b, 0);
+        const sourceHeight = getRowHeight(spillRange.sourceRow);
+        
+        // Calculate total width from start to end of spillover
+        const totalWidth = Array.from({ length: spilloverEndCol - spilloverStartCol + 1 }, (_, i) => 
+          getColumnWidth(spilloverStartCol + i)
+        ).reduce((a, b) => a + b, 0);
 
-          const sourceCell = cellDataMap.current.get(`${spillRange.sourceRow}-${spillRange.sourceCol}`);
-          if (!sourceCell) return null;
+        // Get all cell formatting properties
+        const cellStyle = sourceCell.style || {};
+        const alignment = cellStyle.alignment || {};
+        const font = cellStyle.font || {};
+        
+        // Process text alignment and indentation
+        let textAlign = alignment.horizontal || 'left';
+        let paddingLeft = 6; // Default padding
+        let paddingRight = 6;
+        
+        // Handle indentation
+        if (alignment.indent) {
+          paddingLeft += alignment.indent * 8; // Each indent level is roughly 8px
+        }
+        
+        // Handle text rotation if present
+        const textRotation = alignment.textRotation || 0;
+        
+        // Extract all font properties
+        const fontSize = font.size ? Math.round(font.size * 1.333) : 15;
+        const fontFamily = font.name ? `"${font.name}", sans-serif` : 'Calibri, "Segoe UI", Arial, sans-serif';
+        const fontWeight = font.bold ? '700' : '400';
+        const fontStyle = font.italic ? 'italic' : 'normal';
+        const textDecorationLine = [];
+        if (font.underline) textDecorationLine.push('underline');
+        if (font.strike) textDecorationLine.push('line-through');
+        const textDecoration = textDecorationLine.length > 0 ? textDecorationLine.join(' ') : 'none';
+        const fontColor = convertColorForCSS(font.color) || (darkMode ? '#e5e7eb' : '#000000');
 
-          return (
+        return (
+          <div
+            key={`spillover-${index}`}
+            className="absolute pointer-events-none"
+            style={{
+              left: `${spilloverLeft}px`,
+              top: `${sourceTop}px`,
+              width: `${totalWidth}px`,
+              height: `${sourceHeight}px`,
+              zIndex: 1, // Lower z-index to sit between background and cell content
+              opacity: 0.99 // Slightly less than 1 to blend better and prevent doubling
+            }}
+          >
             <div
-              key={`spillover-${index}`}
-              className="absolute pointer-events-none"
               style={{
-                left: `${sourceLeft}px`,
-                top: `${sourceTop}px`,
-                width: `${totalWidth}px`,
-                height: `${sourceHeight}px`,
-                zIndex: 2
+                width: '100%',
+                height: '100%',
+                paddingTop: '3px',
+                paddingBottom: '3px',
+                paddingLeft: `${paddingLeft}px`,
+                paddingRight: `${paddingRight}px`,
+                boxSizing: 'border-box',
+                overflow: 'hidden',
+                whiteSpace: alignment.wrapText ? 'normal' : 'nowrap',
+                wordWrap: alignment.wrapText ? 'break-word' : 'normal',
+                fontSize: `${fontSize}px`,
+                fontFamily: fontFamily,
+                fontWeight: fontWeight,
+                fontStyle: fontStyle,
+                textDecoration: textDecoration,
+                color: fontColor,
+                textAlign: textAlign,
+                verticalAlign: alignment.vertical || 'middle',
+                display: 'flex',
+                alignItems: alignment.vertical === 'top' ? 'flex-start' : 
+                          alignment.vertical === 'bottom' ? 'flex-end' : 'center',
+                justifyContent: textAlign === 'center' ? 'center' : 
+                               textAlign === 'right' ? 'flex-end' : 'flex-start',
+                transform: textRotation ? `rotate(${textRotation}deg)` : 'none',
+                transformOrigin: 'center',
+                backgroundColor: 'transparent', // Ensure no background
+                letterSpacing: font.letterSpacing ? `${font.letterSpacing}px` : 'normal',
+                lineHeight: alignment.lineHeight || 'normal',
+                textShadow: isPrintMode ? 'none' : undefined
               }}
             >
-              <div
-                style={{
-                  width: '100%',
-                  height: '100%',
-                  padding: '3px 6px',
-                  boxSizing: 'border-box',
-                  overflow: 'hidden',
-                  whiteSpace: 'nowrap',
-                  fontSize: sourceCell.style?.font?.size ? `${Math.round(sourceCell.style.font.size * 1.333)}px` : '15px',
-                  fontFamily: sourceCell.style?.font?.name ? `"${sourceCell.style.font.name}", sans-serif` : 'Calibri, "Segoe UI", Arial, sans-serif',
-                  fontWeight: sourceCell.style?.font?.bold ? '700' : '400',
-                  fontStyle: sourceCell.style?.font?.italic ? 'italic' : 'normal',
-                  textDecoration: sourceCell.style?.font?.underline ? 'underline' : 'none',
-                  color: convertColorForCSS(sourceCell.style?.font?.color) || (darkMode ? '#e5e7eb' : '#000000'),
-                  textAlign: sourceCell.style?.alignment?.horizontal || 'left',
-                  verticalAlign: sourceCell.style?.alignment?.vertical || 'middle',
-                  display: 'flex',
-                  alignItems: sourceCell.style?.alignment?.vertical === 'top' ? 'flex-start' : 
-                            sourceCell.style?.alignment?.vertical === 'bottom' ? 'flex-end' : 'center',
-                  backgroundColor: 'transparent', // Ensure spillover doesn't have background
-                  textShadow: isPrintMode ? 'none' : undefined
-                }}
-              >
-                {spillRange.text}
-              </div>
+              {spillRange.text}
             </div>
-          );
-        })}
-      </div>
-    );
+          </div>
+        );
+      });
+
+      return (
+        <div ref={ref} style={style} {...rest}>
+          {children}
+          {spilloverOverlays}
+        </div>
+      );
+    });
   }, [data.spilloverRanges, getColumnWidth, getRowHeight, darkMode, isPrintMode]);
 
   // Don't render Grid until dimensions are ready to prevent misalignment
@@ -592,10 +640,10 @@ const ExcelSheet = memo(forwardRef(({
           zIndex: 1
         }}
         data-dark={darkMode}
+        innerElementType={innerElementType}
       >
         {Cell}
       </Grid>
-      {SpilloverOverlay}
       {MergedCellsOverlay}
     </div>
   );

@@ -509,8 +509,8 @@ async function processSheet(data, id) {
             
             // Calculate text spillover if text content exists
             if (cellValue && typeof cellValue === 'string' && cellValue.length > 0) {
-              const spillRange = calculateSpilloverRange(cellValue, rowNum, colNum, processedData.columnWidths, worksheet);
-              if (spillRange.endCol > colNum) {
+              const spillRange = calculateSpilloverRange(cellValue, rowNum, colNum, processedData.columnWidths, worksheet, cellData.style);
+              if (spillRange.needsSpillover) {
                 spilloverRanges.push(spillRange);
               }
             }
@@ -633,7 +633,7 @@ async function processSheet(data, id) {
   processedData.spilloverRanges = spilloverRanges;
   
   console.log(`[Spillover] Found ${spilloverRanges.length} spillover ranges:`, 
-    spilloverRanges.map(r => `${getColumnName(r.sourceCol)}${r.sourceRow} → ${getColumnName(r.startCol)}-${getColumnName(r.endCol)}`)
+    spilloverRanges.map(r => `${getColumnName(r.sourceCol)}${r.sourceRow} (${r.alignment}) → ${getColumnName(r.startCol)}-${getColumnName(r.endCol)}`)
   );
   
   self.postMessage({
@@ -1227,7 +1227,7 @@ function getColumnName(index) {
 }
 
 // Calculate text spillover range for a cell
-function calculateSpilloverRange(text, row, col, columnWidths, worksheet) {
+function calculateSpilloverRange(text, row, col, columnWidths, worksheet, cellStyle) {
   const EXCEL_COLUMN_WIDTH_TO_PIXEL = 8.0;
   const DEFAULT_COLUMN_WIDTH = 67;
   const AVG_CHAR_WIDTH = 8; // Average character width in pixels for Calibri 11pt
@@ -1244,6 +1244,11 @@ function calculateSpilloverRange(text, row, col, columnWidths, worksheet) {
       needsSpillover: false
     };
   }
+  
+  // Get text alignment
+  const alignment = cellStyle?.alignment?.horizontal || 'left';
+  const isRightAligned = alignment === 'right';
+  const isCenterAligned = alignment === 'center';
   
   // Get source cell width
   const sourceWidth = columnWidths[col] 
@@ -1269,39 +1274,113 @@ function calculateSpilloverRange(text, row, col, columnWidths, worksheet) {
   
   // Calculate how many additional columns we need
   let remainingWidth = textWidth - availableSourceWidth;
+  let startCol = col;
   let endCol = col;
   
-  // Check adjacent cells to the right for spillover space
-  for (let checkCol = col + 1; checkCol <= col + MAX_SPILLOVER_COLS && remainingWidth > 0; checkCol++) {
-    try {
-      // Check if this cell has content (would block spillover)
-      const blockingCell = worksheet.getCell(row, checkCol);
-      if (blockingCell && blockingCell.value !== null && blockingCell.value !== undefined && blockingCell.value !== '') {
-        break; // Stop spillover at non-empty cell
+  if (isRightAligned) {
+    // For right-aligned text, spillover goes to the left
+    for (let checkCol = col - 1; checkCol >= Math.max(1, col - MAX_SPILLOVER_COLS) && remainingWidth > 0; checkCol--) {
+      try {
+        // Check if this cell has content (would block spillover)
+        const blockingCell = worksheet.getCell(row, checkCol);
+        if (blockingCell && blockingCell.value !== null && blockingCell.value !== undefined && blockingCell.value !== '') {
+          break; // Stop spillover at non-empty cell
+        }
+        
+        // Get width of this column
+        const colWidth = columnWidths[checkCol] 
+          ? columnWidths[checkCol] * EXCEL_COLUMN_WIDTH_TO_PIXEL 
+          : DEFAULT_COLUMN_WIDTH;
+        
+        const availableColWidth = Math.max(colWidth - 12, 20); // Account for padding
+        startCol = checkCol;
+        remainingWidth -= availableColWidth;
+      } catch (error) {
+        // If we can't access the cell, stop spillover here
+        console.warn(`[Spillover] Cannot check cell ${getColumnName(checkCol)}${row}:`, error);
+        break;
       }
-      
-      // Get width of this column
-      const colWidth = columnWidths[checkCol] 
-        ? columnWidths[checkCol] * EXCEL_COLUMN_WIDTH_TO_PIXEL 
-        : DEFAULT_COLUMN_WIDTH;
-      
-      const availableColWidth = Math.max(colWidth - 12, 20); // Account for padding
-      endCol = checkCol;
-      remainingWidth -= availableColWidth;
-    } catch (error) {
-      // If we can't access the cell, stop spillover here
-      console.warn(`[Spillover] Cannot check cell ${getColumnName(checkCol)}${row}:`, error);
-      break;
+    }
+  } else if (isCenterAligned) {
+    // For center-aligned text, spillover goes both directions
+    let leftRemainingWidth = remainingWidth / 2;
+    let rightRemainingWidth = remainingWidth / 2;
+    
+    // Check left side
+    for (let checkCol = col - 1; checkCol >= Math.max(1, col - MAX_SPILLOVER_COLS/2) && leftRemainingWidth > 0; checkCol--) {
+      try {
+        const blockingCell = worksheet.getCell(row, checkCol);
+        if (blockingCell && blockingCell.value !== null && blockingCell.value !== undefined && blockingCell.value !== '') {
+          rightRemainingWidth += leftRemainingWidth; // Add unused left width to right
+          break;
+        }
+        
+        const colWidth = columnWidths[checkCol] 
+          ? columnWidths[checkCol] * EXCEL_COLUMN_WIDTH_TO_PIXEL 
+          : DEFAULT_COLUMN_WIDTH;
+        
+        const availableColWidth = Math.max(colWidth - 12, 20);
+        startCol = checkCol;
+        leftRemainingWidth -= availableColWidth;
+      } catch (error) {
+        rightRemainingWidth += leftRemainingWidth;
+        break;
+      }
+    }
+    
+    // Check right side
+    for (let checkCol = col + 1; checkCol <= col + MAX_SPILLOVER_COLS/2 && rightRemainingWidth > 0; checkCol++) {
+      try {
+        const blockingCell = worksheet.getCell(row, checkCol);
+        if (blockingCell && blockingCell.value !== null && blockingCell.value !== undefined && blockingCell.value !== '') {
+          break;
+        }
+        
+        const colWidth = columnWidths[checkCol] 
+          ? columnWidths[checkCol] * EXCEL_COLUMN_WIDTH_TO_PIXEL 
+          : DEFAULT_COLUMN_WIDTH;
+        
+        const availableColWidth = Math.max(colWidth - 12, 20);
+        endCol = checkCol;
+        rightRemainingWidth -= availableColWidth;
+      } catch (error) {
+        break;
+      }
+    }
+  } else {
+    // For left-aligned text (default), spillover goes to the right
+    for (let checkCol = col + 1; checkCol <= col + MAX_SPILLOVER_COLS && remainingWidth > 0; checkCol++) {
+      try {
+        // Check if this cell has content (would block spillover)
+        const blockingCell = worksheet.getCell(row, checkCol);
+        if (blockingCell && blockingCell.value !== null && blockingCell.value !== undefined && blockingCell.value !== '') {
+          break; // Stop spillover at non-empty cell
+        }
+        
+        // Get width of this column
+        const colWidth = columnWidths[checkCol] 
+          ? columnWidths[checkCol] * EXCEL_COLUMN_WIDTH_TO_PIXEL 
+          : DEFAULT_COLUMN_WIDTH;
+        
+        const availableColWidth = Math.max(colWidth - 12, 20); // Account for padding
+        endCol = checkCol;
+        remainingWidth -= availableColWidth;
+      } catch (error) {
+        // If we can't access the cell, stop spillover here
+        console.warn(`[Spillover] Cannot check cell ${getColumnName(checkCol)}${row}:`, error);
+        break;
+      }
     }
   }
   
   return {
     sourceRow: row,
     sourceCol: col,
-    startCol: col + 1, // Spillover starts from next column
+    startCol: startCol,
     endCol: endCol,
     text: text,
-    needsSpillover: endCol > col
+    alignment: alignment,
+    needsSpillover: startCol < col || endCol > col
   };
 }
 

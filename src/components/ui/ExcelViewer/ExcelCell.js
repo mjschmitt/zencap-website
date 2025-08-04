@@ -397,6 +397,11 @@ const ExcelCell = memo(({
       return '';
     }
     
+    // Handle spillover source cells - don't show content as it will be rendered by the spillover overlay
+    if (isSpilloverSource) {
+      return '';
+    }
+    
     if (value === null || value === undefined) return '';
     
     // Debug D26 at the start
@@ -523,7 +528,7 @@ const ExcelCell = memo(({
     // }
     
     return result;
-  }, [value, style.numberFormat, row, columnName]);
+  }, [value, style.numberFormat, row, columnName, isSpilloverCell, isSpilloverSource]);
 
   // Get cell classes based on state
   const cellClasses = useMemo(() => {
