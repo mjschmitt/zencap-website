@@ -69,22 +69,40 @@ const ExcelCell = memo(({
       return fmt && fmt.includes('%');
     };
     
-    // Function to check if format is date/time
-    // Currently not used for alignment as dates don't have universal alignment conventions
-    // const isDateTimeFormat = (fmt) => {
-    //   return fmt && (
-    //     fmt.match(/[dmyhs]/i) && !fmt.match(/[#0]/) // Has date patterns but no number patterns
-    //   );
-    // };
+    // Function to check if format is a standard date/time format (not custom)
+    const isStandardDateTimeFormat = (fmt) => {
+      if (!fmt) return false;
+      
+      // Common standard date formats that should be right-aligned
+      const standardDateFormats = [
+        'mm/dd/yyyy', 'dd/mm/yyyy', 'yyyy-mm-dd', 
+        'mm/dd/yy', 'dd/mm/yy', 'yy-mm-dd',
+        'mmm dd, yyyy', 'dd mmm yyyy', 'd-mmm-yy',
+        'mm-dd-yyyy', 'dd-mm-yyyy', 'yyyy/mm/dd',
+        'mmmm d, yyyy', 'd mmmm yyyy',
+        'h:mm', 'h:mm:ss', 'hh:mm', 'hh:mm:ss',
+        'h:mm am/pm', 'h:mm:ss am/pm'
+      ];
+      
+      // Check if it's exactly a standard format (case-insensitive)
+      const normalizedFmt = fmt.toLowerCase().replace(/\s+/g, ' ');
+      if (standardDateFormats.some(f => normalizedFmt === f)) {
+        return true;
+      }
+      
+      // For custom formats like "d-mmm" that are ambiguous, return false
+      // This ensures we only right-align clear date/time formats
+      return false;
+    };
     
     // Apply alignment based on format
     if (isAccountingFormat(format)) {
       return 'right';
     } else if (isCurrencyFormat(format) || isPercentageFormat(format)) {
       return 'right';
-    // Note: We don't auto-align dates as they don't have a universal alignment convention
-    // } else if (isDateTimeFormat(format)) {
-    //   return 'right';
+    } else if (isStandardDateTimeFormat(format)) {
+      // Only right-align standard date formats, not custom formats like "d-mmm"
+      return 'right';
     } else if (format && (format.includes('#') || format.includes('0'))) {
       return 'right';
     } else if (format === '@') {
