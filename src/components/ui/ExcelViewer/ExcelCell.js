@@ -436,22 +436,12 @@ const ExcelCell = memo(({
     // }
     
     // Apply number formatting if specified
-    // if (columnName === 'D' && row === 26) {
-    //   console.log('[D26 Format Check]',
-    //     'hasFormat=', !!style.numberFormat,
-    //     'format=', style.numberFormat,
-    //     'isNumber=', typeof value === 'number',
-    //     'value=', value,
-    //     'willFormat=', !!(style.numberFormat && typeof value === 'number')
-    //   );
-    // }
     
     if (style.numberFormat && typeof value === 'number') {
       // console.log('[ExcelCell] About to call formatNumber:', { value, format: style.numberFormat, cell: `${columnName}${row}` });
       const formatted = formatNumber(value, style.numberFormat);
       // console.log('[ExcelCell] formatNumber returned:', { formatted, cell: `${columnName}${row}` });
       
-      // Debug specific cell D26
       // if (columnName === 'D' && row === 26) {
       //   console.log(`[D26 Debug] Cell ${columnName}${row}:`, 
       //     'value=', value,
@@ -742,12 +732,23 @@ function formatNumber(value, format) {
   // Debug entry - log ALL calls to this function
   // console.log('[formatNumber] Called with:', { value, format, valueType: typeof value });
   
-  // Handle simple custom formats with quoted text followed by a number format
-  // Examples: "Month" 0, "Year" 0, "Quarter" 0, etc.
-  const simpleCustomMatch = format.match(/^"([^"]+)"\s*0+$/);
-  if (simpleCustomMatch) {
-    const customText = simpleCustomMatch[1];
+  // Handle simple custom formats with quoted text
+  // Examples: "Month" 0, "Year" 0, "Quarter" 0, 0 "acres", etc.
+  const prefixCustomMatch = format.match(/^"([^"]+)"\s*0+$/);
+  if (prefixCustomMatch) {
+    const customText = prefixCustomMatch[1];
     return customText + ' ' + value;
+  }
+  
+  // Handle custom formats where text comes after the number
+  // Examples: 0 "acres", 0.00 "kg", etc.
+  const suffixCustomMatch = format.match(/^0+(?:\.0+)?\s*"([^"]+)"$/);
+  if (suffixCustomMatch) {
+    const customText = suffixCustomMatch[1];
+    const decimalMatch = format.match(/0\.(0+)/);
+    const decimals = decimalMatch ? decimalMatch[1].length : 0;
+    const formattedValue = value.toFixed(decimals);
+    return formattedValue + ' ' + customText;
   }
   
   // Handle Excel number format codes
@@ -762,6 +763,7 @@ function formatNumber(value, format) {
   const hasDatePattern = datePatterns.test(format);
   const hasQuotes = format.includes('"');
   const hasNumberPattern = /[#0]/.test(format);
+  
   
   if (value instanceof Date || 
       (typeof value === 'number' && hasDatePattern && !hasNumberPattern && !hasQuotes)) {
@@ -910,6 +912,7 @@ function formatNumber(value, format) {
 }
 
 function formatDate(value, format) {
+  
   // Convert Excel date serial to JS Date
   let date;
   if (typeof value === 'number') {
@@ -933,28 +936,56 @@ function formatDate(value, format) {
   const y = date.getFullYear();
   const yy = y.toString().substr(-2);
   
-  let result = format;
+  // Build result by parsing the format string
+  let result = '';
+  let i = 0;
   
-  // Handle format codes case-insensitively but preserve the case in non-format parts
-  // Process from longest to shortest patterns to avoid conflicts
+  while (i < format.length) {
+    // Check for year patterns
+    if (format.substring(i, i + 4).toLowerCase() === 'yyyy') {
+      result += y.toString();
+      i += 4;
+    } else if (format.substring(i, i + 2).toLowerCase() === 'yy') {
+      result += yy;
+      i += 2;
+    }
+    // Check for month patterns
+    else if (format.substring(i, i + 4).toLowerCase() === 'mmmm') {
+      result += monthsFull[date.getMonth()];
+      i += 4;
+    } else if (format.substring(i, i + 3).toLowerCase() === 'mmm') {
+      result += months[date.getMonth()];
+      i += 3;
+    } else if (format.substring(i, i + 2).toLowerCase() === 'mm') {
+      result += m.toString().padStart(2, '0');
+      i += 2;
+    } else if (format[i].toLowerCase() === 'm' && 
+               (i + 1 >= format.length || format[i + 1].toLowerCase() !== 'm')) {
+      result += m.toString();
+      i += 1;
+    }
+    // Check for day patterns
+    else if (format.substring(i, i + 4).toLowerCase() === 'dddd') {
+      result += date.toLocaleDateString('en-US', { weekday: 'long' });
+      i += 4;
+    } else if (format.substring(i, i + 3).toLowerCase() === 'ddd') {
+      result += date.toLocaleDateString('en-US', { weekday: 'short' });
+      i += 3;
+    } else if (format.substring(i, i + 2).toLowerCase() === 'dd') {
+      result += d.toString().padStart(2, '0');
+      i += 2;
+    } else if (format[i].toLowerCase() === 'd' && 
+               (i + 1 >= format.length || format[i + 1].toLowerCase() !== 'd')) {
+      result += d.toString();
+      i += 1;
+    }
+    // Not a date pattern, copy the character as-is
+    else {
+      result += format[i];
+      i += 1;
+    }
+  }
   
-  // Year patterns
-  result = result.replace(/yyyy/gi, (match) => y.toString());
-  result = result.replace(/yy/gi, (match) => yy);
-  
-  // Month patterns - be careful with 'm' vs 'M'
-  result = result.replace(/mmmm/gi, (match) => monthsFull[date.getMonth()]);
-  result = result.replace(/mmm/gi, (match) => months[date.getMonth()]);
-  result = result.replace(/mm/gi, (match) => m.toString().padStart(2, '0'));
-  // Only replace standalone 'm' or 'M' not followed by another m/M
-  result = result.replace(/m(?!m)/gi, (match) => m.toString());
-  
-  // Day patterns
-  result = result.replace(/dddd/gi, (match) => date.toLocaleDateString('en-US', { weekday: 'long' }));
-  result = result.replace(/ddd/gi, (match) => date.toLocaleDateString('en-US', { weekday: 'short' }));
-  result = result.replace(/dd/gi, (match) => d.toString().padStart(2, '0'));
-  // Only replace standalone 'd' or 'D' not followed by another d/D
-  result = result.replace(/d(?!d)/gi, (match) => d.toString());
   
   // Common patterns like "d-mmm-yy" should now work correctly
   return result;

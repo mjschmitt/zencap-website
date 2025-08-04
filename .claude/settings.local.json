@@ -31,7 +31,8 @@
       "Bash(git ls-tree:*)",
       "Bash(git commit:*)",
       "Bash(wmic process where:*)",
-      "Bash(start http://localhost:3005/models/111-SW-16th-Ter)"
+      "Bash(start http://localhost:3005/models/111-SW-16th-Ter)",
+      "Bash(git reset:*)"
     ],
     "deny": []
   }
