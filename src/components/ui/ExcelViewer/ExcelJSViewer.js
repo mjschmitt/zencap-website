@@ -92,6 +92,7 @@ const ExcelJSViewer = ({
   }, [activeSheet, worksheets.length]);
 
   const handleZoomChange = useCallback((newZoom) => {
+    console.log('[ExcelJSViewer] Zoom change requested:', newZoom);
     setZoom(newZoom);
   }, []);
 

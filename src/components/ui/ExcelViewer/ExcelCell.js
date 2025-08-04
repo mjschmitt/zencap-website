@@ -20,7 +20,8 @@ const ExcelCell = memo(({
   showGridLines = true,
   isSpilloverCell = false,
   spilloverData = null,
-  isSpilloverSource = false
+  isSpilloverSource = false,
+  zoom = 100
 }) => {
   const { cellTheme } = useTheme(darkMode);
   // Determine cell type
@@ -98,13 +99,14 @@ const ExcelCell = memo(({
 
   // Memoize cell styles to prevent re-renders
   const cellStyle = useMemo(() => {
+    const zoomFactor = zoom / 100;
     const baseStyle = {
       width: '100%',
       height: '100%',
       overflow: isSpilloverCell ? 'visible' : 'hidden', // Allow spillover cells to show overflow
       whiteSpace: 'nowrap',
       textOverflow: isSpilloverCell ? 'clip' : 'ellipsis', // Don't ellipsis spillover text
-      padding: '3px 6px', // More generous padding like Excel
+      padding: `${3 * zoomFactor}px ${6 * zoomFactor}px`, // More generous padding like Excel, scaled by zoom
       cursor: 'cell',
       userSelect: 'none',
       boxSizing: 'border-box',
@@ -181,13 +183,13 @@ const ExcelCell = memo(({
           // }
         }
       }
-      // Convert Excel points to pixels (1pt = 1.333px)
+      // Convert Excel points to pixels (1pt = 1.333px) and scale by zoom
       if (style.font.size) {
-        const pixels = Math.round(style.font.size * 1.333);
+        const pixels = Math.round(style.font.size * 1.333 * zoomFactor);
         baseStyle.fontSize = `${pixels}px`;
       } else {
-        // Default Excel font size is 11pt = ~15px
-        baseStyle.fontSize = '15px';
+        // Default Excel font size is 11pt = ~15px, scaled by zoom
+        baseStyle.fontSize = `${15 * zoomFactor}px`;
       }
       // Always apply font colors to maintain Excel fidelity
       if (style.font.color) {
@@ -219,7 +221,7 @@ const ExcelCell = memo(({
     } else {
       // Set Excel defaults when no font style is specified
       baseStyle.fontWeight = '400';
-      baseStyle.fontSize = '15px'; // 11pt
+      baseStyle.fontSize = `${15 * zoomFactor}px`; // 11pt scaled by zoom
       baseStyle.fontFamily = 'Calibri, "Segoe UI", Arial, sans-serif';
     }
 
@@ -252,7 +254,7 @@ const ExcelCell = memo(({
         baseStyle.wordWrap = 'break-word';
       }
       if (style.alignment.indent) {
-        baseStyle.paddingLeft = `${4 + style.alignment.indent * 8}px`;
+        baseStyle.paddingLeft = `${(4 + style.alignment.indent * 8) * zoomFactor}px`;
       }
     }
     
@@ -388,7 +390,7 @@ const ExcelCell = memo(({
     }
 
     return baseStyle;
-  }, [style, isSelected, isHighlighted, width, height, darkMode, isPrintMode, showGridLines, row, columnName, isSpilloverCell]);
+  }, [style, isSelected, isHighlighted, width, height, darkMode, isPrintMode, showGridLines, row, columnName, isSpilloverCell, zoom]);
 
   // Format the display value
   const displayValue = useMemo(() => {

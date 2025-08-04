@@ -1,4 +1,4 @@
-import React, { memo, useCallback, useMemo, useRef, useEffect, useState, forwardRef, useImperativeHandle } from 'react';
+import React, { memo, useCallback, useMemo, useRef, useEffect, useState, forwardRef, useImperativeHandle, useLayoutEffect } from 'react';
 import { VariableSizeGrid as Grid } from 'react-window';
 import ExcelCell from './ExcelCell';
 import styles from '../../../styles/ExcelViewer.module.css';
@@ -29,14 +29,31 @@ const ExcelSheet = memo(forwardRef(({
   showGridLines = true
 }, ref) => {
   const gridRef = useRef(null);
-  const [columnWidths, setColumnWidths] = useState({});
-  const [rowHeights, setRowHeights] = useState({});
   const [dimensionsReady, setDimensionsReady] = useState(false);
   const cellDataMap = useRef(new Map());
   const spilloverMap = useRef(new Map()); // Map to track spillover data
 
   // Zoom factor
   const zoomFactor = zoom / 100;
+  
+  // Handle zoom changes - reset grid cache after dimensions are recalculated
+  const prevZoomRef = useRef(zoom);
+  useEffect(() => {
+    console.log('[ExcelSheet] Zoom changed:', zoom, 'zoomFactor:', zoomFactor);
+    
+    // Only reset if zoom actually changed and grid exists
+    if (prevZoomRef.current !== zoom && gridRef.current) {
+      // Use requestAnimationFrame to ensure dimensions are recalculated first
+      requestAnimationFrame(() => {
+        gridRef.current.resetAfterIndices({
+          columnIndex: 0,
+          rowIndex: 0,
+          shouldForceUpdate: false
+        });
+      });
+    }
+    prevZoomRef.current = zoom;
+  }, [zoom, zoomFactor]);
 
   // Expose methods to parent component
   useImperativeHandle(ref, () => ({
@@ -123,23 +140,22 @@ const ExcelSheet = memo(forwardRef(({
     }
   }, [data.cells, data.spilloverRanges]);
 
-  // Calculate column widths with zoom
-  useEffect(() => {
+  // Calculate column widths with zoom - using useMemo for immediate updates
+  const columnWidths = useMemo(() => {
     const widths = {};
     if (data.columnWidths) {
       Object.entries(data.columnWidths).forEach(([col, width]) => {
         // Excel width units to pixels using proper conversion factor
         // Excel width is in character units, convert to pixels
         // For very narrow columns (< 1 unit), use a smaller minimum to preserve proportions
-        const minWidth = width < 1 ? 7 : 15; // Very narrow columns get 7px min, others 15px
+        const minWidth = width < 1 ? 7 * zoomFactor : 15 * zoomFactor; // Scale minimum widths too
         const calculatedWidth = width * EXCEL_COLUMN_WIDTH_TO_PIXEL * zoomFactor;
         widths[col] = Math.max(minWidth, Math.round(calculatedWidth));
       });
     }
-    setColumnWidths(widths);
     
     // Always log column width info for debugging
-    console.log('[ExcelSheet] Column widths:', {
+    console.log('[ExcelSheet] Column widths recalculated:', {
       inputWidths: data.columnWidths,
       outputPixelWidths: widths,
       conversionFactor: EXCEL_COLUMN_WIDTH_TO_PIXEL,
@@ -148,14 +164,18 @@ const ExcelSheet = memo(forwardRef(({
       allWidths: widths // Show all calculated widths
     });
     
-    // Mark dimensions as ready once we have column widths
-    if (Object.keys(widths).length > 0 || data.columnWidths) {
+    return widths;
+  }, [data.columnWidths, zoomFactor]);
+  
+  // Mark dimensions as ready
+  useEffect(() => {
+    if ((columnWidths && Object.keys(columnWidths).length > 0) || data.columnWidths) {
       setDimensionsReady(true);
     }
-  }, [data.columnWidths, zoomFactor, debugMode]);
+  }, [columnWidths, data.columnWidths]);
 
-  // Calculate row heights with zoom
-  useEffect(() => {
+  // Calculate row heights with zoom - using useMemo for immediate updates
+  const rowHeights = useMemo(() => {
     const heights = {};
     if (data.rowHeights) {
       Object.entries(data.rowHeights).forEach(([row, height]) => {
@@ -176,17 +196,18 @@ const ExcelSheet = memo(forwardRef(({
         }
       });
     }
-    setRowHeights(heights);
     
     // Always log row height info for debugging
-    console.log('[ExcelSheet] Row heights:', {
+    console.log('[ExcelSheet] Row heights recalculated:', {
       inputHeights: data.rowHeights,
       outputPixelHeights: heights,
       conversionFactor: EXCEL_ROW_HEIGHT_TO_PIXEL,
       zoomFactor,
       sampleHeights: Object.entries(heights).slice(0, 5)
     });
-  }, [data.rowHeights, zoomFactor, debugMode]);
+    
+    return heights;
+  }, [data.rowHeights, zoomFactor]);
 
   // Column width getter for react-window
   const getColumnWidth = useCallback((index) => {
@@ -198,7 +219,7 @@ const ExcelSheet = memo(forwardRef(({
       ? data.defaultColWidth * EXCEL_COLUMN_WIDTH_TO_PIXEL 
       : DEFAULT_COLUMN_WIDTH;
     
-    const width = columnWidths[index] || defaultWidth * zoomFactor;
+    const width = columnWidths[index] || (defaultWidth * zoomFactor);
     
     // Log first few column widths for debugging with more detail (only in debug mode)
     if (debugMode && index <= 5 && index > 0) {
@@ -367,6 +388,7 @@ const ExcelSheet = memo(forwardRef(({
               showGridLines={showGridLines}
               isSpilloverCell={true}
               spilloverData={spilloverData}
+              zoom={zoom}
             />
           </div>
         );
@@ -414,10 +436,11 @@ const ExcelSheet = memo(forwardRef(({
           accessibilityMode={accessibilityMode}
           showGridLines={showGridLines}
           isSpilloverSource={isSpilloverSource}
+          zoom={zoom}
         />
       </div>
     );
-  }, [getColumnWidth, getRowHeight, selectedCell, highlightedCells, onCellClick, darkMode, isPrintMode, accessibilityMode, showGridLines, data.spilloverRanges]);
+  }, [getColumnWidth, getRowHeight, selectedCell, highlightedCells, onCellClick, darkMode, isPrintMode, accessibilityMode, showGridLines, data.spilloverRanges, zoom]);
 
   // Handle merged cells overlay
   const MergedCellsOverlay = useMemo(() => {
@@ -463,6 +486,7 @@ const ExcelSheet = memo(forwardRef(({
                   isPrintMode={isPrintMode}
                   isMerged={true}
                   showGridLines={showGridLines}
+                  zoom={zoom}
                 />
               )}
             </div>
@@ -506,19 +530,20 @@ const ExcelSheet = memo(forwardRef(({
         
         // Process text alignment and indentation
         let textAlign = alignment.horizontal || 'left';
-        let paddingLeft = 6; // Default padding
-        let paddingRight = 6;
+        let paddingLeft = 6 * zoomFactor; // Default padding scaled by zoom
+        let paddingRight = 6 * zoomFactor;
         
         // Handle indentation
         if (alignment.indent) {
-          paddingLeft += alignment.indent * 8; // Each indent level is roughly 8px
+          paddingLeft += alignment.indent * 8 * zoomFactor; // Each indent level is roughly 8px, scaled
         }
         
         // Handle text rotation if present
         const textRotation = alignment.textRotation || 0;
         
-        // Extract all font properties
-        const fontSize = font.size ? Math.round(font.size * 1.333) : 15;
+        // Extract all font properties and scale by zoom
+        const baseFontSize = font.size ? Math.round(font.size * 1.333) : 15;
+        const fontSize = baseFontSize * zoomFactor;
         const fontFamily = font.name ? `"${font.name}", sans-serif` : 'Calibri, "Segoe UI", Arial, sans-serif';
         const fontWeight = font.bold ? '700' : '400';
         const fontStyle = font.italic ? 'italic' : 'normal';
@@ -545,8 +570,8 @@ const ExcelSheet = memo(forwardRef(({
               style={{
                 width: '100%',
                 height: '100%',
-                paddingTop: '3px',
-                paddingBottom: '3px',
+                paddingTop: `${3 * zoomFactor}px`,
+                paddingBottom: `${3 * zoomFactor}px`,
                 paddingLeft: `${paddingLeft}px`,
                 paddingRight: `${paddingRight}px`,
                 boxSizing: 'border-box',
@@ -587,7 +612,7 @@ const ExcelSheet = memo(forwardRef(({
         </div>
       );
     });
-  }, [data.spilloverRanges, getColumnWidth, getRowHeight, darkMode, isPrintMode]);
+  }, [data.spilloverRanges, getColumnWidth, getRowHeight, darkMode, isPrintMode, zoomFactor]);
 
   // Don't render Grid until dimensions are ready to prevent misalignment
   if (!dimensionsReady && data.columnWidths) {
