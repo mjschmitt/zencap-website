@@ -581,7 +581,7 @@ const ExcelCell = memo(({
       )}
       
       <span className={isMerged ? 'flex items-center justify-center h-full' : ''}>
-        {displayValue}
+        {height > 5 ? displayValue : ''}
       </span>
     </div>
   );

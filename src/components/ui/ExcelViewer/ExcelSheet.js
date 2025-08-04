@@ -489,6 +489,11 @@ const ExcelSheet = memo(forwardRef(({
         const sourceTop = Array.from({ length: spillRange.sourceRow }, (_, i) => getRowHeight(i)).reduce((a, b) => a + b, 0);
         const sourceHeight = getRowHeight(spillRange.sourceRow);
         
+        // Skip rendering spillover for very small/hidden rows
+        if (sourceHeight <= 5) {
+          return null;
+        }
+        
         // Calculate total width from start to end of spillover
         const totalWidth = Array.from({ length: spilloverEndCol - spilloverStartCol + 1 }, (_, i) => 
           getColumnWidth(spilloverStartCol + i)
