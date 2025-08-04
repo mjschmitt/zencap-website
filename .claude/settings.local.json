@@ -1,4 +1,5 @@
 {
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
   "permissions": {
     "allow": [
       "Bash(node:*)",
@@ -29,9 +30,9 @@
       "Bash(powershell:*)",
       "Bash(git ls-tree:*)",
       "Bash(git commit:*)",
-      "Bash(wmic process where:*)"
+      "Bash(wmic process where:*)",
+      "Bash(start http://localhost:3005/models/111-SW-16th-Ter)"
     ],
     "deny": []
-  },
-  "$schema": "https://json.schemastore.org/claude-code-settings.json"
+  }
 }

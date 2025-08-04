@@ -70,19 +70,21 @@ const ExcelCell = memo(({
     };
     
     // Function to check if format is date/time
-    const isDateTimeFormat = (fmt) => {
-      return fmt && (
-        fmt.match(/[dmyhs]/i) && !fmt.match(/[#0]/) // Has date patterns but no number patterns
-      );
-    };
+    // Currently not used for alignment as dates don't have universal alignment conventions
+    // const isDateTimeFormat = (fmt) => {
+    //   return fmt && (
+    //     fmt.match(/[dmyhs]/i) && !fmt.match(/[#0]/) // Has date patterns but no number patterns
+    //   );
+    // };
     
     // Apply alignment based on format
     if (isAccountingFormat(format)) {
       return 'right';
     } else if (isCurrencyFormat(format) || isPercentageFormat(format)) {
       return 'right';
-    } else if (isDateTimeFormat(format)) {
-      return 'right';
+    // Note: We don't auto-align dates as they don't have a universal alignment convention
+    // } else if (isDateTimeFormat(format)) {
+    //   return 'right';
     } else if (format && (format.includes('#') || format.includes('0'))) {
       return 'right';
     } else if (format === '@') {

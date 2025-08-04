@@ -199,6 +199,8 @@ async function loadWorkbook(data, id) {
     // Store workbook and sheet mapping for later use
     self.workbook = workbook;
     self.worksheetMapping = finalWorksheets;
+    // Clear formula cache when loading new workbook
+    self.formulaCache = new Map();
   } catch (error) {
     throw new Error(`Failed to load workbook: ${error.message}`);
   }
@@ -511,6 +513,25 @@ async function processSheet(data, id) {
             // }
             
             processedData.cells.push(cellData);
+            
+            // Debug B4 and B5 alignment specifically
+            if (worksheet.name === "Unit Mix - Rent Roll" && colNum === 2 && (rowNum === 4 || rowNum === 5)) {
+              console.log(`[Final Cell Data] B${rowNum}:`, {
+                value: cellData.value,
+                style: cellData.style,
+                hasAlignment: !!cellData.style?.alignment,
+                alignmentIndent: cellData.style?.alignment?.indent,
+                rawCell: cell
+              });
+              
+              // Check if there's any spillover in the same column
+              const spilloverInColumn = processedData.spilloverRanges?.find(range => 
+                range.sourceCol === colNum || (range.startCol <= colNum && range.endCol >= colNum)
+              );
+              if (spilloverInColumn) {
+                console.log(`[Spillover Check] B${rowNum} has spillover in column:`, spilloverInColumn);
+              }
+            }
             cellCount++;
             
             // Calculate text spillover if text content exists
@@ -545,13 +566,37 @@ async function processSheet(data, id) {
               cellData.value = cell.text || cell.value?.toString() || '';
             }
             
-            // Special handling for formula cells with Invalid Date results
-            if (cell.type === 6 && cell.text === 'Invalid Date' && worksheet.name === "Unit Mix - Rent Roll") {
-              // For specific known cells in this model
-              if (colNum === 2 && rowNum === 4) {
-                cellData.value = "111 SW 16th Ter";
-              } else if (colNum === 2 && rowNum === 5) {
-                cellData.value = "Cape Coral, FL 33991";
+            // Debug formula cells to understand value extraction
+            if (cell.type === 6 && cell.formula) {
+              // Log different ways ExcelJS might store the value
+              const debugInfo = {
+                formula: cell.formula,
+                cellValue: cell.value,
+                cellText: cell.text,
+                cellResult: cell.result,
+                model: cell.model,
+                hasSharedFormula: !!(cell.value && cell.value.sharedFormula),
+                valueType: typeof cell.value,
+                isDate: cell.value instanceof Date,
+                isInvalidDate: cell.value instanceof Date && isNaN(cell.value.getTime()),
+                // Check if there's a _value property
+                _value: cell._value,
+                // Check various model properties
+                modelValue: cell.model?.value,
+                modelSharedValue: cell.model?.sharedValue,
+                // Raw cell properties
+                rawProperties: Object.keys(cell).filter(k => !k.startsWith('_'))
+              };
+              
+              // Only log for problematic cells or specific debug scenarios
+              if (cell.text === 'Invalid Date' || (worksheet.name === "Unit Mix - Rent Roll" && colNum === 2 && (rowNum === 4 || rowNum === 5))) {
+                console.log(`[Formula Debug] Cell ${getColumnName(colNum)}${rowNum}:`, debugInfo);
+                // Also log the style to check for indentation
+                console.log(`[Style Debug] Cell ${getColumnName(colNum)}${rowNum} style:`, cellData.style);
+                // Check the raw cell alignment
+                if (cell.alignment) {
+                  console.log(`[Style Debug] Cell ${getColumnName(colNum)}${rowNum} raw alignment:`, cell.alignment);
+                }
               }
             }
             
@@ -659,6 +704,72 @@ async function processSheet(data, id) {
   });
 }
 
+// Function to resolve formula references to get actual values
+function resolveFormulaReference(formula) {
+  if (!self.workbook || !formula) return null;
+  
+  // Check cache first
+  if (self.formulaCache.has(formula)) {
+    return self.formulaCache.get(formula);
+  }
+  
+  // Parse simple cell references like "SheetName!A1" or "SheetName!$A$1"
+  const cellRefPattern = /^([^!]+)!(\$?[A-Z]+\$?\d+)$/i;
+  const match = formula.match(cellRefPattern);
+  
+  if (match) {
+    const [_, sheetName, cellRef] = match;
+    
+    try {
+      // Find the worksheet
+      const worksheet = self.workbook.worksheets.find(ws => ws.name === sheetName);
+      if (!worksheet) {
+        console.warn(`Sheet "${sheetName}" not found for formula: ${formula}`);
+        return null;
+      }
+      
+      // Remove $ signs from cell reference
+      const cleanCellRef = cellRef.replace(/\$/g, '');
+      
+      // Get the cell
+      const targetCell = worksheet.getCell(cleanCellRef);
+      if (targetCell) {
+        // Debug the source cell if it's one we're tracking
+        if (sheetName === "Underwriting" && (cleanCellRef === "B96" || cleanCellRef === "B97")) {
+          console.log(`[Formula Source] ${sheetName}!${cleanCellRef}:`, {
+            value: targetCell.value,
+            style: targetCell.style,
+            alignment: targetCell.style?.alignment,
+            indent: targetCell.style?.alignment?.indent
+          });
+        }
+        
+        // Get the actual value, avoiding recursive formula lookups
+        let value = null;
+        if (targetCell.value !== null && targetCell.value !== undefined) {
+          // For non-formula cells or cells with resolved values
+          if (targetCell.type !== 6 || typeof targetCell.value !== 'object') {
+            value = targetCell.value;
+          } else if (targetCell.value && typeof targetCell.value === 'object') {
+            // For formula cells, try to get the cached result
+            if (targetCell.value.result !== undefined) {
+              value = targetCell.value.result;
+            }
+          }
+        }
+        
+        // Cache the result
+        self.formulaCache.set(formula, value);
+        return value;
+      }
+    } catch (error) {
+      console.warn(`Error resolving formula reference "${formula}":`, error);
+    }
+  }
+  
+  return null;
+}
+
 function getCellValue(cell) {
   if (cell.value === null || cell.value === undefined) return '';
   
@@ -666,6 +777,16 @@ function getCellValue(cell) {
   // For formula cells, ExcelJS stores the formula in cell.formula and the result in cell.value
   // Type 6 is formula in ExcelJS
   if (cell.formula && cell.type === 6) {
+    // Check if value is an Invalid Date first
+    if (cell.value instanceof Date && isNaN(cell.value.getTime())) {
+      // Try to resolve the formula reference
+      const resolvedValue = resolveFormulaReference(cell.formula);
+      if (resolvedValue !== null) {
+        return resolvedValue;
+      }
+      return '';
+    }
+    
     // If value is primitive (string, number, boolean), it's already the calculated result
     if (typeof cell.value !== 'object' || cell.value instanceof Date) {
       // Return the value - this includes 0, false, empty string, etc.
@@ -706,7 +827,12 @@ function getCellValue(cell) {
       // Check if result is an Invalid Date
       if (cell.value.result instanceof Date && isNaN(cell.value.result.getTime())) {
         // Invalid Date - this means ExcelJS couldn't parse the formula result
-        // Return empty string for now, but we should try to get the actual text
+        // Try to resolve the formula reference to get the actual value
+        const resolvedValue = resolveFormulaReference(cell.formula);
+        if (resolvedValue !== null) {
+          return resolvedValue;
+        }
+        // If we can't resolve it, return empty string
         return '';
       }
       
@@ -1112,6 +1238,14 @@ function extractCellStyle(cell) {
       indent: cell.alignment.indent || 0,
       textRotation: cell.alignment.textRotation || 0
     };
+    
+    // Debug alignment extraction for specific cells
+    if (cell.fullAddress === 'B4' || cell.fullAddress === 'B5') {
+      console.log(`[Alignment Extract] ${cell.fullAddress}:`, {
+        rawAlignment: cell.alignment,
+        extractedAlignment: style.alignment
+      });
+    }
   }
   
   // Borders - extract all border properties
@@ -1442,6 +1576,16 @@ async function getCellRange(data, id) {
           // Check if cell has any formatting even if no value
           const cellStyle = extractCellStyle(cell);
           const hasStyle = cellStyle && Object.keys(cellStyle).length > 0;
+          
+          // Debug B2 on Unit Mix - Rent Roll sheet
+          if (worksheet.name === "Unit Mix - Rent Roll" && col === 2 && row === 2) {
+            console.log(`[B2 Debug] Cell B2:`, {
+              value: cell.value,
+              style: cellStyle,
+              alignment: cellStyle?.alignment,
+              hasIndent: cellStyle?.alignment?.indent
+            });
+          }
           const hasValue = cell.value !== null && cell.value !== undefined;
           
           // Include cell if it has a value OR if it has styling
@@ -1529,6 +1673,10 @@ function clearCache() {
     // Clear workbook reference and mapping
     self.workbook = null;
     self.worksheetMapping = null;
+    // Clear formula cache
+    if (self.formulaCache) {
+      self.formulaCache.clear();
+    }
     
     // Force garbage collection if available
     if (self.gc) {
