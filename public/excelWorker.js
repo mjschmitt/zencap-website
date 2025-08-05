@@ -267,7 +267,9 @@ async function processSheet(data, id) {
     defaultColWidth: worksheet.properties?.defaultColWidth,
     defaultRowHeight: worksheet.properties?.defaultRowHeight,
     // Extract gridline visibility setting (default is true in Excel)
-    showGridLines: worksheet.views?.[0]?.showGridLines !== false
+    showGridLines: worksheet.views?.[0]?.showGridLines !== false,
+    columnOutlines: [], // Store column grouping information
+    rowOutlines: [] // Store row grouping information
   };
   
   // console.log('Worksheet properties:', {
@@ -276,19 +278,31 @@ async function processSheet(data, id) {
   //   outlineProperties: worksheet.properties?.outlineProperties
   // });
   
-  // Process column widths
+  // Process column widths, hidden state, and outline levels
   if (worksheet.columns && worksheet.columns.length > 0) {
     // console.log('Processing worksheet.columns:', worksheet.columns.length);
     worksheet.columns.forEach((col, index) => {
-      if (col && col.width !== undefined && col.width !== null) {
-        // Store column widths with 1-based indexing to match Excel
-        // Only store if width is different from default
-        if (col.width !== worksheet.properties?.defaultColWidth) {
-          processedData.columnWidths[index + 1] = col.width;
-          
-          // if (index < 10) { // Log first few columns for debugging
-          //   console.log(`Column ${index + 1} width:`, col.width);
-          // }
+      if (col) {
+        // Check if column is hidden
+        if (col.hidden === true) {
+          processedData.columnWidths[index + 1] = 0; // Set width to 0 for hidden columns
+          // console.log(`Column ${index + 1} is hidden`);
+        } else if (col.width !== undefined && col.width !== null) {
+          // Store column widths with 1-based indexing to match Excel
+          // Only store if width is different from default
+          if (col.width !== worksheet.properties?.defaultColWidth) {
+            processedData.columnWidths[index + 1] = col.width;
+          }
+        }
+        
+        // Check for outline level (grouping)
+        if (col.outlineLevel !== undefined && col.outlineLevel > 0) {
+          processedData.columnOutlines.push({
+            column: index + 1,
+            level: col.outlineLevel,
+            collapsed: col.collapsed || false
+          });
+          // console.log(`Column ${index + 1} has outline level ${col.outlineLevel}`);
         }
       }
     });
@@ -298,18 +312,36 @@ async function processSheet(data, id) {
   if (worksheet.model && worksheet.model.cols && worksheet.model.cols.length > 0) {
     // console.log('Found worksheet.model.cols:', worksheet.model.cols.length);
     worksheet.model.cols.forEach((colDef) => {
-      if (colDef && colDef.width !== undefined) {
-        // Only process columns within reasonable range (up to column 100)
-        const maxCol = Math.min(colDef.max || colDef.min, 100);
-        for (let i = colDef.min; i <= maxCol; i++) {
-          if (!processedData.columnWidths[i]) { // Don't override if already set
-            processedData.columnWidths[i] = colDef.width;
+      if (colDef) {
+        // Check if column is hidden
+        if (colDef.hidden === true) {
+          const maxCol = Math.min(colDef.max || colDef.min, 100);
+          for (let i = colDef.min; i <= maxCol; i++) {
+            processedData.columnWidths[i] = 0; // Set width to 0 for hidden columns
+            // console.log(`Column ${i} is hidden (from model)`);
+          }
+        } else if (colDef.width !== undefined) {
+          // Only process columns within reasonable range (up to column 100)
+          const maxCol = Math.min(colDef.max || colDef.min, 100);
+          for (let i = colDef.min; i <= maxCol; i++) {
+            if (!processedData.columnWidths[i]) { // Don't override if already set
+              processedData.columnWidths[i] = colDef.width;
+            }
           }
         }
         
-        // if (colDef.min <= 10) {
-        //   console.log(`Column range ${colDef.min}-${maxCol} width:`, colDef.width);
-        // }
+        // Check for outline level in model columns
+        if (colDef.outlineLevel !== undefined && colDef.outlineLevel > 0) {
+          const maxCol = Math.min(colDef.max || colDef.min, 100);
+          for (let i = colDef.min; i <= maxCol; i++) {
+            processedData.columnOutlines.push({
+              column: i,
+              level: colDef.outlineLevel,
+              collapsed: colDef.collapsed || false
+            });
+            // console.log(`Column ${i} has outline level ${colDef.outlineLevel} (from model)`);
+          }
+        }
       }
     });
   }
@@ -328,13 +360,25 @@ async function processSheet(data, id) {
   for (let rowNum = startRow; rowNum <= endRow; rowNum++) {
     try {
       const row = worksheet.getRow(rowNum);
-      if (row && row.height) {
-        // ExcelJS provides row height in points (not pixels)
-        processedData.rowHeights[rowNum] = row.height;
+      if (row) {
+        // Check if row is hidden
+        if (row.hidden === true) {
+          processedData.rowHeights[rowNum] = 0; // Set height to 0 for hidden rows
+          // console.log(`Row ${rowNum} is hidden`);
+        } else if (row.height) {
+          // ExcelJS provides row height in points (not pixels)
+          processedData.rowHeights[rowNum] = row.height;
+        }
         
-        // if (rowNum <= 5) { // Log first few rows for debugging
-        //   console.log(`Row ${rowNum} height:`, row.height, 'points');
-        // }
+        // Check for outline level (grouping)
+        if (row.outlineLevel !== undefined && row.outlineLevel > 0) {
+          processedData.rowOutlines.push({
+            row: rowNum,
+            level: row.outlineLevel,
+            collapsed: row.collapsed || false
+          });
+          // console.log(`Row ${rowNum} has outline level ${row.outlineLevel}`);
+        }
       }
       
       // Debug: Check row model for styles

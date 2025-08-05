@@ -141,6 +141,14 @@ const ExcelCell = memo(({
       baseStyle.padding = '0px';
       baseStyle.overflow = 'hidden';
     }
+    
+    // Hide content in very narrow columns (width <= 5px)
+    if (width <= 5) {
+      baseStyle.fontSize = '0px';
+      baseStyle.padding = '0px';
+      baseStyle.overflow = 'hidden';
+      baseStyle.whiteSpace = 'nowrap';
+    }
 
     // Apply font styles with proper precedence
     if (style.font) {
