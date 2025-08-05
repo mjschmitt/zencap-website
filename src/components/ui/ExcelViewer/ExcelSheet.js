@@ -351,7 +351,7 @@ const ExcelSheet = memo(forwardRef(({
     });
     
     if (isInCollapsedGroup) {
-      return 1; // Minimal width for collapsed columns, effectively hidden
+      return 0.1; // Nearly invisible width for collapsed columns
     }
     
     // Use specific column width if available, otherwise use default from Excel or fallback
@@ -384,7 +384,7 @@ const ExcelSheet = memo(forwardRef(({
     });
     
     if (isInCollapsedGroup) {
-      return 1; // Minimal height for collapsed rows, effectively hidden
+      return 0.1; // Nearly invisible height for collapsed rows
     }
     
     // Use specific row height if available, otherwise use default from Excel or fallback
@@ -482,6 +482,12 @@ const ExcelSheet = memo(forwardRef(({
                columnIndex <= group.endCol;
       });
       
+      // Check if this column is right after a collapsed group (for expand button)
+      const collapsedGroupBefore = columnGroups.find(group => {
+        return collapsedGroups.has(group.id) && 
+               columnIndex === group.endCol + 1;
+      });
+      
       return (
         <div 
           style={{
@@ -492,7 +498,7 @@ const ExcelSheet = memo(forwardRef(({
           }}
           className={`flex items-center justify-center font-medium text-xs ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
-          } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''} ${isInGroup ? 'relative' : ''}`}
+          } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''} ${isInGroup || collapsedGroupBefore ? 'relative' : ''}`}
         >
           {/* Add visual indicator for grouped columns */}
           {columnGroup && (
@@ -509,16 +515,14 @@ const ExcelSheet = memo(forwardRef(({
             />
           )}
           {isInCollapsedGroup ? '' : getColumnName(columnIndex)}
-          {isInGroup && (
+          
+          {/* Collapse button for columns in a group */}
+          {isInGroup && !isCollapsed && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 const newCollapsed = new Set(collapsedGroups);
-                if (isCollapsed) {
-                  newCollapsed.delete(columnGroup.id);
-                } else {
-                  newCollapsed.add(columnGroup.id);
-                }
+                newCollapsed.add(columnGroup.id);
                 setCollapsedGroups(newCollapsed);
                 // Reset grid cache to update column widths
                 if (gridRef.current) {
@@ -545,9 +549,48 @@ const ExcelSheet = memo(forwardRef(({
                 cursor: 'pointer',
                 zIndex: 2
               }}
-              title={isCollapsed ? 'Expand columns' : 'Collapse columns'}
+              title='Collapse columns'
             >
-              {isCollapsed ? '+' : '-'}
+              -
+            </button>
+          )}
+          
+          {/* Expand button for column after a collapsed group */}
+          {collapsedGroupBefore && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const newCollapsed = new Set(collapsedGroups);
+                newCollapsed.delete(collapsedGroupBefore.id);
+                setCollapsedGroups(newCollapsed);
+                // Reset grid cache to update column widths
+                if (gridRef.current) {
+                  gridRef.current.resetAfterIndices({
+                    columnIndex: collapsedGroupBefore.startCol - 1,
+                    rowIndex: 0,
+                    shouldForceUpdate: true
+                  });
+                }
+              }}
+              className={`hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
+                ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}`}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                width: '16px',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '10px',
+                lineHeight: '1',
+                cursor: 'pointer',
+                zIndex: 2
+              }}
+              title='Expand columns'
+            >
+              +
             </button>
           )}
         </div>
@@ -572,6 +615,12 @@ const ExcelSheet = memo(forwardRef(({
       const isInGroup = rowGroup !== undefined;
       const isRowCollapsed = rowGroup && collapsedRowGroups.has(rowGroup.id);
       
+      // Check if this row is right after a collapsed group (for expand button)
+      const collapsedRowGroupBefore = rowGroups.find(group => {
+        return collapsedRowGroups.has(group.id) && 
+               rowIndex === group.endRow + 1;
+      });
+      
       return (
         <div 
           style={{
@@ -582,7 +631,7 @@ const ExcelSheet = memo(forwardRef(({
           }}
           className={`flex items-center justify-center font-medium text-xs ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
-          } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''}`}
+          } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''} relative`}
         >
           {/* Add visual indicator for grouped rows - similar to columns */}
           {rowGroup && (
@@ -599,16 +648,14 @@ const ExcelSheet = memo(forwardRef(({
             />
           )}
           {isInCollapsedRowGroup ? '' : rowIndex}
-          {isInGroup && (
+          
+          {/* Collapse button for rows in a group */}
+          {isInGroup && !isRowCollapsed && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
                 const newCollapsed = new Set(collapsedRowGroups);
-                if (isRowCollapsed) {
-                  newCollapsed.delete(rowGroup.id);
-                } else {
-                  newCollapsed.add(rowGroup.id);
-                }
+                newCollapsed.add(rowGroup.id);
                 setCollapsedRowGroups(newCollapsed);
                 // Reset grid cache to update row heights
                 if (gridRef.current) {
@@ -624,7 +671,7 @@ const ExcelSheet = memo(forwardRef(({
               style={{
                 position: 'absolute',
                 top: 0,
-                right: 0,
+                left: '-8px',
                 bottom: 0,
                 width: '16px',
                 display: 'flex',
@@ -635,9 +682,48 @@ const ExcelSheet = memo(forwardRef(({
                 cursor: 'pointer',
                 zIndex: 2
               }}
-              title={isRowCollapsed ? 'Expand rows' : 'Collapse rows'}
+              title='Collapse rows'
             >
-              {isRowCollapsed ? '+' : '-'}
+              -
+            </button>
+          )}
+          
+          {/* Expand button for row after a collapsed group */}
+          {collapsedRowGroupBefore && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const newCollapsed = new Set(collapsedRowGroups);
+                newCollapsed.delete(collapsedRowGroupBefore.id);
+                setCollapsedRowGroups(newCollapsed);
+                // Reset grid cache to update row heights
+                if (gridRef.current) {
+                  gridRef.current.resetAfterIndices({
+                    columnIndex: 0,
+                    rowIndex: collapsedRowGroupBefore.startRow - 1,
+                    shouldForceUpdate: true
+                  });
+                }
+              }}
+              className={`hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
+                ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}`}
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: '-8px',
+                bottom: 0,
+                width: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                fontSize: '10px',
+                lineHeight: '1',
+                cursor: 'pointer',
+                zIndex: 2
+              }}
+              title='Expand rows'
+            >
+              +
             </button>
           )}
         </div>
@@ -671,7 +757,7 @@ const ExcelSheet = memo(forwardRef(({
              rowIndex <= group.endRow;
     });
     
-    // Don't render content for collapsed rows or columns
+    // Render collapsed cells - just empty cells, no interaction
     if (isInCollapsedGroup || isInCollapsedRowGroup) {
       return <div style={style} />;
     }
