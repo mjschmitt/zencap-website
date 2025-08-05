@@ -1,6 +1,6 @@
 import fs from 'fs/promises';
 import path from 'path';
-import { query } from '../../../utils/database.js';
+import { query } from '../../utils/database.js';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {

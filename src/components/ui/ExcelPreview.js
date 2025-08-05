@@ -13,7 +13,13 @@ const ExcelPreview = ({ file, excelFile, modelId, title = "Model Viewer", height
   // Check if file exists and get updated URL if needed
   useEffect(() => {
     const checkFile = async () => {
-      if (!fileUrl || !modelId) return;
+      // Only check if we have both fileUrl and modelId
+      // If no modelId, just use the fileUrl as-is
+      if (!fileUrl) return;
+      if (!modelId) {
+        console.log('No modelId provided, using fileUrl directly');
+        return;
+      }
       
       setIsChecking(true);
       try {

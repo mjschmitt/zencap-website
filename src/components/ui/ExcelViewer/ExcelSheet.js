@@ -80,12 +80,17 @@ const ExcelSheet = memo(forwardRef(({
     const groups = [];
     const outlinesByLevel = {};
     
-    // First, organize by level
+    // First, organize by level and remove duplicates
+    const seen = new Set();
     data.columnOutlines.forEach(outline => {
-      if (!outlinesByLevel[outline.level]) {
-        outlinesByLevel[outline.level] = [];
+      const key = `${outline.column}-${outline.level}`;
+      if (!seen.has(key)) {
+        seen.add(key);
+        if (!outlinesByLevel[outline.level]) {
+          outlinesByLevel[outline.level] = [];
+        }
+        outlinesByLevel[outline.level].push(outline);
       }
-      outlinesByLevel[outline.level].push(outline);
     });
     
     // Then create groups for consecutive columns at each level
@@ -94,17 +99,20 @@ const ExcelSheet = memo(forwardRef(({
       outlines.sort((a, b) => a.column - b.column);
       
       let currentGroup = null;
-      outlines.forEach(outline => {
+      outlines.forEach((outline, index) => {
         if (!currentGroup || outline.column !== currentGroup.endCol + 1) {
-          // Start new group
+          // Start new group - only if there's a real gap
+          if (currentGroup) {
+            // Save the previous group before starting a new one
+            groups.push(currentGroup);
+          }
           currentGroup = {
             level: parseInt(level),
             startCol: outline.column,
             endCol: outline.column,
             collapsed: outline.collapsed,
-            id: `group-${level}-${outline.column}`
+            id: `col-group-${level}-${outline.column}` // Include start column in ID for uniqueness
           };
-          groups.push(currentGroup);
         } else {
           // Extend current group
           currentGroup.endCol = outline.column;
@@ -113,12 +121,20 @@ const ExcelSheet = memo(forwardRef(({
             currentGroup.collapsed = true;
           }
         }
+        
+        // Add the last group if we're at the end
+        if (index === outlines.length - 1 && currentGroup) {
+          groups.push(currentGroup);
+        }
       });
     });
     
     console.log('[ExcelSheet] Column groups:', {
       outlines: data.columnOutlines,
-      groups: groups
+      outlineColumns: data.columnOutlines.map(o => `${o.column}(L${o.level})`).join(', '),
+      groups: groups,
+      groupIds: groups.map(g => g.id),
+      groupRanges: groups.map(g => `${g.startCol}-${g.endCol}`)
     });
     
     return groups;
@@ -148,17 +164,18 @@ const ExcelSheet = memo(forwardRef(({
       let currentGroup = null;
       outlines.forEach(outline => {
         if (!currentGroup || outline.row !== currentGroup.endRow + 1) {
-          // Start new group
+          // Start new group - use the start row for the ID
+          const startRow = outline.row;
           currentGroup = {
             level: parseInt(level),
-            startRow: outline.row,
+            startRow: startRow,
             endRow: outline.row,
             collapsed: outline.collapsed,
-            id: `row-group-${level}-${outline.row}`
+            id: `row-group-${level}-${startRow}` // Use start row for consistent group ID
           };
           groups.push(currentGroup);
         } else {
-          // Extend current group
+          // Extend current group - keep same ID
           currentGroup.endRow = outline.row;
           // If any row in group is collapsed, mark group as collapsed
           if (outline.collapsed) {
@@ -376,7 +393,13 @@ const ExcelSheet = memo(forwardRef(({
       ? data.defaultRowHeight * EXCEL_ROW_HEIGHT_TO_PIXEL 
       : DEFAULT_ROW_HEIGHT;
     
-    return rowHeights[index] || defaultHeight * zoomFactor;
+    // Handle hidden rows (height = 0 from Excel)
+    const rowHeight = rowHeights[index];
+    if (rowHeight === 0) {
+      return 0; // Hidden row
+    }
+    
+    return rowHeight || defaultHeight * zoomFactor;
   }, [rowHeights, zoomFactor, data.defaultRowHeight, rowGroups, collapsedRowGroups]);
 
   // Get total dimensions
@@ -448,8 +471,8 @@ const ExcelSheet = memo(forwardRef(({
         columnIndex >= group.startCol && columnIndex <= group.endCol
       );
       
-      // Check if this is the last column of a group (where we show the button)
-      const isGroupEnd = columnGroup && columnIndex === columnGroup.endCol;
+      // Check if this column is in a group (show button on every column in the group)
+      const isInGroup = columnGroup !== undefined;
       const isCollapsed = columnGroup && collapsedGroups.has(columnGroup.id);
       
       // Check if this column is in a collapsed group
@@ -469,7 +492,7 @@ const ExcelSheet = memo(forwardRef(({
           }}
           className={`flex items-center justify-center font-medium text-xs ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
-          } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''} ${isGroupEnd ? 'relative' : ''}`}
+          } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''} ${isInGroup ? 'relative' : ''}`}
         >
           {/* Add visual indicator for grouped columns */}
           {columnGroup && (
@@ -486,7 +509,7 @@ const ExcelSheet = memo(forwardRef(({
             />
           )}
           {isInCollapsedGroup ? '' : getColumnName(columnIndex)}
-          {isGroupEnd && (
+          {isInGroup && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -511,7 +534,7 @@ const ExcelSheet = memo(forwardRef(({
               style={{
                 position: 'absolute',
                 top: 0,
-                right: 0,
+                left: 0,
                 width: '16px',
                 height: '100%',
                 display: 'flex',
@@ -533,15 +556,6 @@ const ExcelSheet = memo(forwardRef(({
 
     // Row numbers
     if (columnIndex === 0) {
-      // Check if this row is part of a group
-      const rowGroup = rowGroups.find(group => 
-        rowIndex >= group.startRow && rowIndex <= group.endRow
-      );
-      
-      // Check if this is the last row of a group (where we show the button)
-      const isGroupEnd = rowGroup && rowIndex === rowGroup.endRow;
-      const isRowCollapsed = rowGroup && collapsedRowGroups.has(rowGroup.id);
-      
       // Check if this row is in a collapsed group
       const isInCollapsedRowGroup = rowGroups.some(group => {
         return collapsedRowGroups.has(group.id) && 
@@ -549,20 +563,28 @@ const ExcelSheet = memo(forwardRef(({
                rowIndex <= group.endRow;
       });
       
+      // Check if this row is part of a group
+      const rowGroup = rowGroups.find(group => 
+        rowIndex >= group.startRow && rowIndex <= group.endRow
+      );
+      
+      // Check if this row is in a group (show button on every row in the group)
+      const isInGroup = rowGroup !== undefined;
+      const isRowCollapsed = rowGroup && collapsedRowGroups.has(rowGroup.id);
+      
       return (
         <div 
           style={{
             ...style,
             borderRight: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
             borderBottom: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
-            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6',
-            position: 'relative'
+            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6'
           }}
           className={`flex items-center justify-center font-medium text-xs ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
           } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''}`}
         >
-          {/* Add visual indicator for grouped rows */}
+          {/* Add visual indicator for grouped rows - similar to columns */}
           {rowGroup && (
             <div
               style={{
@@ -577,7 +599,7 @@ const ExcelSheet = memo(forwardRef(({
             />
           )}
           {isInCollapsedRowGroup ? '' : rowIndex}
-          {isGroupEnd && (
+          {isInGroup && (
             <button
               onClick={(e) => {
                 e.stopPropagation();
@@ -588,14 +610,22 @@ const ExcelSheet = memo(forwardRef(({
                   newCollapsed.add(rowGroup.id);
                 }
                 setCollapsedRowGroups(newCollapsed);
+                // Reset grid cache to update row heights
+                if (gridRef.current) {
+                  gridRef.current.resetAfterIndices({
+                    columnIndex: 0,
+                    rowIndex: rowGroup.startRow - 1,
+                    shouldForceUpdate: true
+                  });
+                }
               }}
               className={`hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
                 ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}`}
               style={{
                 position: 'absolute',
                 top: 0,
-                bottom: 0,
                 right: 0,
+                bottom: 0,
                 width: '16px',
                 display: 'flex',
                 alignItems: 'center',
