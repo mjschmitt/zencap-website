@@ -562,6 +562,20 @@ const ExcelSheet = memo(forwardRef(({
             darkMode ? 'text-gray-300' : 'text-gray-700'
           } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''}`}
         >
+          {/* Add visual indicator for grouped rows */}
+          {rowGroup && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                bottom: 0,
+                left: 0,
+                width: '2px',
+                backgroundColor: darkMode ? '#60a5fa' : '#3b82f6',
+                pointerEvents: 'none'
+              }}
+            />
+          )}
           {isInCollapsedRowGroup ? '' : rowIndex}
           {isGroupEnd && (
             <button
@@ -575,17 +589,14 @@ const ExcelSheet = memo(forwardRef(({
                 }
                 setCollapsedRowGroups(newCollapsed);
               }}
-              className={`${
-                darkMode 
-                  ? 'bg-navy-700 hover:bg-navy-600 text-gray-300 border-navy-600' 
-                  : 'bg-gray-200 hover:bg-gray-300 text-gray-700 border-gray-400'
-              } border rounded`}
+              className={`hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
+                ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}`}
               style={{
                 position: 'absolute',
+                top: 0,
                 bottom: 0,
                 right: 0,
-                width: '100%',
-                height: '16px',
+                width: '16px',
                 display: 'flex',
                 alignItems: 'center',
                 justifyContent: 'center',

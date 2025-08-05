@@ -17,7 +17,7 @@ const ExcelPreview = ({ file, excelFile, modelId, title = "Model Viewer", height
       
       setIsChecking(true);
       try {
-        const response = await fetch('/api/models/check-excel', {
+        const response = await fetch('/api/check-excel', {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ modelId, excelUrl: fileUrl })
