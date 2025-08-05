@@ -200,17 +200,29 @@ const ExcelJSViewer = ({
     };
   }, [sheetData]); // Re-run when sheet data changes
 
-  // Handle memory warnings
+  // Handle memory warnings with debouncing to prevent repeated toasts
+  const memoryWarningShownRef = useRef(false);
+  const criticalWarningShownRef = useRef(false);
+  
   useEffect(() => {
-    if (isCritical) {
+    if (isCritical && !criticalWarningShownRef.current) {
       showToast('Critical memory usage detected. Please refresh the page.', 'error');
       captureMessage('Critical memory usage in Excel viewer', 'error', {
         memoryInfo,
         fileSize: file?.size,
         activeSheet
       });
-    } else if (isWarning) {
+      criticalWarningShownRef.current = true;
+      memoryWarningShownRef.current = true; // Also mark regular warning as shown
+    } else if (isWarning && !isCritical && !memoryWarningShownRef.current) {
       showToast('High memory usage detected. Performance may be affected.', 'warning');
+      memoryWarningShownRef.current = true;
+    }
+    
+    // Reset flags when warnings are cleared
+    if (!isWarning && !isCritical) {
+      memoryWarningShownRef.current = false;
+      criticalWarningShownRef.current = false;
     }
   }, [isWarning, isCritical, memoryInfo, file, activeSheet, showToast]);
 
@@ -735,7 +747,7 @@ const ExcelJSViewer = ({
         
         <div className="flex-1 overflow-hidden relative" ref={sheetContainerRef}>
           {!sheetData ? (
-            <div className="flex items-center justify-center h-full">
+            <div className="absolute inset-0 flex items-center justify-center">
               <div className={`text-center ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
                 <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-current mx-auto mb-4"></div>
                 <p>Loading sheet data...</p>

@@ -1013,18 +1013,19 @@ function getCellValue(cell) {
   return cell.value;
 }
 
-// Theme colors mapping for Excel - these are standard Excel theme colors
+// Theme colors mapping for Excel - Financial model blue theme
+// These map to common financial model themes that use blue color schemes
 const THEME_COLORS = {
   0: '#FFFFFF', // Background 1
   1: '#000000', // Text 1
   2: '#E7E6E6', // Background 2
   3: '#44546A', // Text 2
-  4: '#5B9BD5', // Accent 1 (Blue)
-  5: '#ED7D31', // Accent 2
-  6: '#A5A5A5', // Accent 3
-  7: '#FFC000', // Accent 4
-  8: '#4472C4', // Accent 5
-  9: '#70AD47'  // Accent 6
+  4: '#4472C4', // Accent 1 (Primary Blue)
+  5: '#5B9BD5', // Accent 2 (Light Blue) 
+  6: '#264478', // Accent 3 (Navy Blue)
+  7: '#7CAFDD', // Accent 4 (Sky Blue)
+  8: '#2E5C8A', // Accent 5 (Medium Blue)
+  9: '#1E3A5F'  // Accent 6 (Dark Blue)
 };
 
 // Excel indexed colors (legacy palette)

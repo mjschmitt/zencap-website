@@ -794,8 +794,13 @@ const ExcelSheet = memo(forwardRef(({
     return (
       <div 
         className={`relative ${darkMode ? 'bg-navy-900' : 'bg-white'} ${isPrintMode ? 'print:bg-white' : ''}`} 
-        style={{ width, height, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-        <span className={darkMode ? 'text-gray-400' : 'text-gray-600'}>Loading sheet...</span>
+        style={{ width, height }}>
+        <div className="absolute inset-0 flex items-center justify-center">
+          <div className={`text-center ${darkMode ? 'text-gray-400' : 'text-gray-600'}`}>
+            <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-current mx-auto mb-4"></div>
+            <p>Loading sheet...</p>
+          </div>
+        </div>
       </div>
     );
   }

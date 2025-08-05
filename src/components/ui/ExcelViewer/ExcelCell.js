@@ -631,12 +631,12 @@ function convertARGBToHex(argb) {
       1: '#000000', // Text 1 (Dark 1) - xlThemeColorDark1 = 1
       2: '#E7E6E6', // Background 2 (Light 2) - xlThemeColorLight2 = 4
       3: '#44546A', // Text 2 (Dark 2) - xlThemeColorDark2 = 3
-      4: '#4472C4', // Accent 1 - xlThemeColorAccent1 = 5
-      5: '#ED7D31', // Accent 2 - xlThemeColorAccent2 = 6
-      6: '#A5A5A5', // Accent 3 - xlThemeColorAccent3 = 7
-      7: '#FFC000', // Accent 4 - xlThemeColorAccent4 = 8
-      8: '#5B9BD5', // Accent 5 - xlThemeColorAccent5 = 9
-      9: '#70AD47', // Accent 6 - xlThemeColorAccent6 = 10
+      4: '#4472C4', // Accent 1 - Primary Blue
+      5: '#5B9BD5', // Accent 2 - Light Blue
+      6: '#264478', // Accent 3 - Navy Blue
+      7: '#7CAFDD', // Accent 4 - Sky Blue
+      8: '#2E5C8A', // Accent 5 - Medium Blue
+      9: '#1E3A5F', // Accent 6 - Dark Blue
       10: '#0563C1', // Hyperlink - xlThemeColorHyperlink = 11 (standard blue hyperlink)
       11: '#954F72'  // Followed Hyperlink - xlThemeColorFollowedHyperlink = 12 (purple)
     };
