@@ -380,12 +380,11 @@ const ExcelSheet = memo(forwardRef(({
             ...style,
             borderRight: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
             borderBottom: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
-            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6',
-            position: 'relative'
+            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6'
           }}
           className={`flex items-center justify-center font-medium text-xs ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
-          } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''}`}
+          } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''} ${isGroupEnd ? 'relative' : ''}`}
         >
           {/* Add visual indicator for grouped columns */}
           {columnGroup && (
@@ -393,11 +392,11 @@ const ExcelSheet = memo(forwardRef(({
               style={{
                 position: 'absolute',
                 top: 0,
-                left: columnIndex === columnGroup.startCol ? 0 : -1,
-                right: columnIndex === columnGroup.endCol ? 0 : -1,
+                left: 0,
+                right: 0,
                 height: '2px',
                 backgroundColor: darkMode ? '#60a5fa' : '#3b82f6',
-                zIndex: 1
+                pointerEvents: 'none'
               }}
             />
           )}
@@ -422,13 +421,21 @@ const ExcelSheet = memo(forwardRef(({
                   });
                 }
               }}
-              className={`absolute top-0 right-0 w-4 h-full flex items-center justify-center
-                hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
+              className={`hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
                 ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}`}
               style={{
+                position: 'absolute',
+                top: 0,
+                right: 0,
+                width: '16px',
+                height: '100%',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
                 fontSize: '10px',
                 lineHeight: '1',
-                cursor: 'pointer'
+                cursor: 'pointer',
+                zIndex: 2
               }}
               title={isCollapsed ? 'Expand columns' : 'Collapse columns'}
             >
