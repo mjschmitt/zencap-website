@@ -16,6 +16,7 @@ import { createAuditLog, logFileAccess } from '../../utils/audit.js';
 import { scanFile, quarantineFile } from '../../utils/virus-scanner.js';
 import { FILE_SECURITY, SECURITY_HEADERS } from '../../config/security.js';
 import { PRODUCTION_CONFIG } from '../../config/production.js';
+import { cleanupOldUploads } from '../../utils/fileCleanup.js';
 import winston from 'winston';
 
 export const config = {
@@ -307,6 +308,17 @@ const handler = async (req, res) => {
         securityChecks: validationResult.checks,
         warnings: hasSuspiciousContent ? ['File contains potentially dangerous formulas'] : []
       };
+
+      // Trigger async cleanup of old files (don't wait for it)
+      cleanupOldUploads({
+        directory: uploadsDir,
+        maxAge: 7 * 24 * 60 * 60 * 1000, // 7 days
+        maxFiles: 30, // Increased to accommodate backups
+        keepBackups: true, // Keep one backup per unique file
+        dryRun: false
+      }).catch(err => {
+        logger.warn('Failed to cleanup old uploads:', err);
+      });
 
       return res.status(200).json({
         success: true,
