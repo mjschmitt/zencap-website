@@ -113,6 +113,11 @@ const ExcelSheet = memo(forwardRef(({
       });
     });
     
+    console.log('[ExcelSheet] Column groups:', {
+      outlines: data.columnOutlines,
+      groups: groups
+    });
+    
     return groups;
   }, [data.columnOutlines]);
   
@@ -195,10 +200,17 @@ const ExcelSheet = memo(forwardRef(({
       Object.entries(data.columnWidths).forEach(([col, width]) => {
         // Excel width units to pixels using proper conversion factor
         // Excel width is in character units, convert to pixels
-        // For very narrow columns (< 1 unit), use a smaller minimum to preserve proportions
-        const minWidth = width < 1 ? 7 * zoomFactor : 15 * zoomFactor; // Scale minimum widths too
-        const calculatedWidth = width * EXCEL_COLUMN_WIDTH_TO_PIXEL * zoomFactor;
-        widths[col] = Math.max(minWidth, Math.round(calculatedWidth));
+        // Handle hidden columns (width === 0) the same way as hidden rows
+        if (width === 0) {
+          widths[col] = 0; // Completely hidden
+        } else if (width < 0.5) {
+          // Very narrow columns - make them 1px so column exists but content is not visible
+          widths[col] = 1;
+        } else {
+          // For normal columns, use proper conversion
+          const calculatedWidth = width * EXCEL_COLUMN_WIDTH_TO_PIXEL * zoomFactor;
+          widths[col] = Math.round(calculatedWidth);
+        }
       });
     }
     
@@ -209,7 +221,15 @@ const ExcelSheet = memo(forwardRef(({
       conversionFactor: EXCEL_COLUMN_WIDTH_TO_PIXEL,
       zoomFactor,
       sampleWidths: Object.entries(widths).slice(0, 5),
-      allWidths: widths // Show all calculated widths
+      allWidths: widths, // Show all calculated widths
+      // Log columns K-O (11-15) specifically to debug
+      columnsKtoO: {
+        K: { input: data.columnWidths?.[11], output: widths[11] },
+        L: { input: data.columnWidths?.[12], output: widths[12] },
+        M: { input: data.columnWidths?.[13], output: widths[13] },
+        N: { input: data.columnWidths?.[14], output: widths[14] },
+        O: { input: data.columnWidths?.[15], output: widths[15] }
+      }
     });
     
     return widths;
@@ -278,7 +298,8 @@ const ExcelSheet = memo(forwardRef(({
       ? data.defaultColWidth * EXCEL_COLUMN_WIDTH_TO_PIXEL 
       : DEFAULT_COLUMN_WIDTH;
     
-    const width = columnWidths[index] || (defaultWidth * zoomFactor);
+    // Check if we have a specific width for this column (including 0 for hidden)
+    const width = columnWidths[index] !== undefined ? columnWidths[index] : (defaultWidth * zoomFactor);
     
     // Log first few column widths for debugging with more detail (only in debug mode)
     if (debugMode && index <= 5 && index > 0) {
