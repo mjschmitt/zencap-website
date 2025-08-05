@@ -257,6 +257,7 @@ export default function ModelDetail({ model, relatedModels }) {
               <Card className="bg-white dark:bg-navy-800 p-6">
                 <ExcelPreview
                   excelFile={model.excel_url}
+                  modelId={model.id}
                   title={model.title}
                   height="800px"
                   readonly={true}

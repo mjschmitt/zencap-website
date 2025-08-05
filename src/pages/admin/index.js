@@ -792,6 +792,7 @@ function ModelsAdmin() {
                           </div>
                           <ExcelPreview
                             file={form.excel_url}
+                            modelId={form.id}
                             title={form.title || "Model Preview"}
                             height="850px"
                             preferInteractive={false}
