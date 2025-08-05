@@ -32,6 +32,7 @@ const ExcelSheet = memo(forwardRef(({
   const [dimensionsReady, setDimensionsReady] = useState(false);
   const cellDataMap = useRef(new Map());
   const spilloverMap = useRef(new Map()); // Map to track spillover data
+  const [collapsedGroups, setCollapsedGroups] = useState(new Set()); // Track collapsed column groups
 
   // Zoom factor
   const zoomFactor = zoom / 100;
@@ -68,6 +69,53 @@ const ExcelSheet = memo(forwardRef(({
     }
   }), []);
 
+  // Process column outline data into groups
+  const columnGroups = useMemo(() => {
+    if (!data.columnOutlines || data.columnOutlines.length === 0) return [];
+    
+    // Group columns by their outline level and consecutive ranges
+    const groups = [];
+    const outlinesByLevel = {};
+    
+    // First, organize by level
+    data.columnOutlines.forEach(outline => {
+      if (!outlinesByLevel[outline.level]) {
+        outlinesByLevel[outline.level] = [];
+      }
+      outlinesByLevel[outline.level].push(outline);
+    });
+    
+    // Then create groups for consecutive columns at each level
+    Object.entries(outlinesByLevel).forEach(([level, outlines]) => {
+      // Sort by column number
+      outlines.sort((a, b) => a.column - b.column);
+      
+      let currentGroup = null;
+      outlines.forEach(outline => {
+        if (!currentGroup || outline.column !== currentGroup.endCol + 1) {
+          // Start new group
+          currentGroup = {
+            level: parseInt(level),
+            startCol: outline.column,
+            endCol: outline.column,
+            collapsed: outline.collapsed,
+            id: `group-${level}-${outline.column}`
+          };
+          groups.push(currentGroup);
+        } else {
+          // Extend current group
+          currentGroup.endCol = outline.column;
+          // If any column in group is collapsed, mark group as collapsed
+          if (outline.collapsed) {
+            currentGroup.collapsed = true;
+          }
+        }
+      });
+    });
+    
+    return groups;
+  }, [data.columnOutlines]);
+  
   // Process data into a Map for O(1) lookups
   useEffect(() => {
     const newMap = new Map();
@@ -213,6 +261,17 @@ const ExcelSheet = memo(forwardRef(({
   const getColumnWidth = useCallback((index) => {
     if (index === 0) return ROW_NUMBER_WIDTH * zoomFactor; // Row number column
     
+    // Check if this column is in a collapsed group
+    const isInCollapsedGroup = columnGroups.some(group => {
+      return collapsedGroups.has(group.id) && 
+             index >= group.startCol && 
+             index <= group.endCol;
+    });
+    
+    if (isInCollapsedGroup) {
+      return 5 * zoomFactor; // Very narrow width for collapsed columns (matching row behavior)
+    }
+    
     // Use specific column width if available, otherwise use default from Excel or fallback
     // Note: Some Excel files have defaultColWidth of 0, which we should ignore
     const defaultWidth = (data.defaultColWidth && data.defaultColWidth > 0)
@@ -227,7 +286,7 @@ const ExcelSheet = memo(forwardRef(({
     }
     
     return width;
-  }, [columnWidths, zoomFactor, data.defaultColWidth]);
+  }, [columnWidths, zoomFactor, data.defaultColWidth, columnGroups, collapsedGroups]);
 
   // Row height getter for react-window
   const getRowHeight = useCallback((index) => {
@@ -306,19 +365,76 @@ const ExcelSheet = memo(forwardRef(({
         );
       }
       // Column headers (A, B, C, etc.)
+      // Check if this column is part of a group
+      const columnGroup = columnGroups.find(group => 
+        columnIndex >= group.startCol && columnIndex <= group.endCol
+      );
+      
+      // Check if this is the last column of a group (where we show the button)
+      const isGroupEnd = columnGroup && columnIndex === columnGroup.endCol;
+      const isCollapsed = columnGroup && collapsedGroups.has(columnGroup.id);
+      
       return (
         <div 
           style={{
             ...style,
             borderRight: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
             borderBottom: darkMode && !isPrintMode ? '1px solid #374151' : '1px solid #9ca3af',
-            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6'
+            backgroundColor: darkMode && !isPrintMode ? '#1f2937' : '#f3f4f6',
+            position: 'relative'
           }}
           className={`flex items-center justify-center font-medium text-xs ${
             darkMode ? 'text-gray-300' : 'text-gray-700'
           } ${isPrintMode ? 'print:bg-gray-100 print:border-gray-300 print:text-black' : ''}`}
         >
+          {/* Add visual indicator for grouped columns */}
+          {columnGroup && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 0,
+                left: columnIndex === columnGroup.startCol ? 0 : -1,
+                right: columnIndex === columnGroup.endCol ? 0 : -1,
+                height: '2px',
+                backgroundColor: darkMode ? '#60a5fa' : '#3b82f6',
+                zIndex: 1
+              }}
+            />
+          )}
           {getColumnName(columnIndex)}
+          {isGroupEnd && (
+            <button
+              onClick={(e) => {
+                e.stopPropagation();
+                const newCollapsed = new Set(collapsedGroups);
+                if (isCollapsed) {
+                  newCollapsed.delete(columnGroup.id);
+                } else {
+                  newCollapsed.add(columnGroup.id);
+                }
+                setCollapsedGroups(newCollapsed);
+                // Reset grid cache to update column widths
+                if (gridRef.current) {
+                  gridRef.current.resetAfterIndices({
+                    columnIndex: columnGroup.startCol - 1,
+                    rowIndex: 0,
+                    shouldForceUpdate: true
+                  });
+                }
+              }}
+              className={`absolute top-0 right-0 w-4 h-full flex items-center justify-center
+                hover:bg-gray-200 dark:hover:bg-gray-600 transition-colors
+                ${darkMode ? 'text-gray-400 hover:text-gray-200' : 'text-gray-600 hover:text-gray-800'}`}
+              style={{
+                fontSize: '10px',
+                lineHeight: '1',
+                cursor: 'pointer'
+              }}
+              title={isCollapsed ? 'Expand columns' : 'Collapse columns'}
+            >
+              {isCollapsed ? '+' : '-'}
+            </button>
+          )}
         </div>
       );
     }
@@ -355,6 +471,13 @@ const ExcelSheet = memo(forwardRef(({
     const isSelected = selectedCell?.row === rowIndex && selectedCell?.col === columnIndex;
     const isHighlighted = highlightedCells.some(cell => cell.row === rowIndex && cell.col === columnIndex);
     
+    // Check if this column is in a collapsed group
+    const isInCollapsedGroup = columnGroups.some(group => {
+      return collapsedGroups.has(group.id) && 
+             columnIndex >= group.startCol && 
+             columnIndex <= group.endCol;
+    });
+    
     // Debug log for object values
     if (cellData && typeof cellData.value === 'object' && cellData.value !== null && !(cellData.value instanceof Date)) {
       console.warn('[ExcelSheet] Object value found in cellData:', {
@@ -366,7 +489,7 @@ const ExcelSheet = memo(forwardRef(({
     }
     
     // Handle spillover cells - these should show part of another cell's text
-    if (!cellData && spilloverData) {
+    if (!cellData && spilloverData && !isInCollapsedGroup) {
       const sourceCell = cellDataMap.current.get(`${spilloverData.sourceRow}-${spilloverData.sourceCol}`);
       if (sourceCell) {
         return (
@@ -395,8 +518,8 @@ const ExcelSheet = memo(forwardRef(({
       }
     }
     
-    if (!cellData && !spilloverData) {
-      // Empty cell with Excel-like grid lines
+    if (!cellData && !spilloverData || isInCollapsedGroup) {
+      // Empty cell with Excel-like grid lines (also for collapsed columns)
       return (
         <div 
           style={{
@@ -408,7 +531,7 @@ const ExcelSheet = memo(forwardRef(({
           className={`${isPrintMode ? 'print:border-gray-200' : ''}`}
           onClick={() => onCellClick?.(rowIndex, columnIndex, '')}
           role="gridcell"
-          aria-label={`Cell ${getColumnName(columnIndex)}${rowIndex}, empty`}
+          aria-label={`Cell ${getColumnName(columnIndex)}${rowIndex}, ${isInCollapsedGroup ? 'collapsed' : 'empty'}`}
         />
       );
     }
@@ -440,7 +563,7 @@ const ExcelSheet = memo(forwardRef(({
         />
       </div>
     );
-  }, [getColumnWidth, getRowHeight, selectedCell, highlightedCells, onCellClick, darkMode, isPrintMode, accessibilityMode, showGridLines, data.spilloverRanges, zoom]);
+  }, [getColumnWidth, getRowHeight, selectedCell, highlightedCells, onCellClick, darkMode, isPrintMode, accessibilityMode, showGridLines, data.spilloverRanges, zoom, columnGroups, collapsedGroups]);
 
   // Handle merged cells overlay
   const MergedCellsOverlay = useMemo(() => {
