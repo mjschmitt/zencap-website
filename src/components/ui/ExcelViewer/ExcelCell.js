@@ -935,6 +935,11 @@ function formatDate(value, format) {
     return value;
   }
   
+  // Normalize format: convert hyphen separators to slashes for consistency
+  // This preserves the original format pattern (including yyyy vs yy)
+  // while ensuring we use the expected separator
+  format = format.replace(/(\d+|[a-z]+)-(\d+|[a-z]+)-(\d+|[a-z]+)/gi, '$1/$2/$3');
+  
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monthsFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
   

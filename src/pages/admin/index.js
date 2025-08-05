@@ -747,7 +747,18 @@ function ModelsAdmin() {
                                 </div>
                                 <button
                                   type="button"
-                                  onClick={() => setShowExcelPreview(!showExcelPreview)}
+                                  onClick={() => {
+                                    setShowExcelPreview(!showExcelPreview);
+                                    // If showing preview, scroll to it after a brief delay for render
+                                    if (!showExcelPreview) {
+                                      setTimeout(() => {
+                                        const element = document.getElementById('excel-preview-container');
+                                        if (element) {
+                                          element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                                        }
+                                      }, 100);
+                                    }
+                                  }}
                                   className={`ml-auto text-xs px-2 py-1 rounded transition-colors ${
                                     showExcelPreview 
                                       ? 'bg-gray-600 text-white hover:bg-gray-700' // Hide Preview - gray like close buttons
@@ -765,7 +776,7 @@ function ModelsAdmin() {
                       
                       {/* Excel Preview Section - MOVED to appear after success banner */}
                       {showExcelPreview && form.excel_url && isClient && (
-                        <div className="bg-white dark:bg-navy-800 p-6 rounded shadow border border-gray-200 dark:border-navy-700 space-y-4 mb-6" style={{ minHeight: '750px' }}>
+                        <div id="excel-preview-container" className="bg-white dark:bg-navy-800 p-6 rounded shadow border border-gray-200 dark:border-navy-700 space-y-4 mb-6">
                           <div className="flex items-center justify-between">
                             <h4 className="text-lg font-semibold text-gray-900 dark:text-white">
                               Model Viewer
@@ -921,7 +932,18 @@ function ModelsAdmin() {
                     </div>
                     <button
                       type="button"
-                      onClick={() => setShowExcelPreview(!showExcelPreview)}
+                      onClick={() => {
+                        setShowExcelPreview(!showExcelPreview);
+                        // If showing preview, scroll to it after a brief delay for render
+                        if (!showExcelPreview) {
+                          setTimeout(() => {
+                            const element = document.getElementById('excel-preview-container');
+                            if (element) {
+                              element.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                            }
+                          }, 100);
+                        }
+                      }}
                       className={`text-sm px-3 py-1 rounded border font-medium transition-colors ${
                         showExcelPreview 
                           ? 'bg-gray-600 text-white border-gray-600 hover:bg-gray-700' // Hide Preview - gray like close buttons

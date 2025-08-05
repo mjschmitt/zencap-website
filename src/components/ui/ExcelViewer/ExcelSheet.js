@@ -7,10 +7,11 @@ const HEADER_HEIGHT = 25;
 const ROW_NUMBER_WIDTH = 50;
 // Excel column width units: 1 unit = width of one character in default font (Calibri 11pt)
 // Excel default column width is 8.43 units (64 pixels)
-// Better conversion: 1 Excel unit ≈ 8.0 pixels (more accurate for modern displays)
-const DEFAULT_COLUMN_WIDTH = 67; // 8.43 units * 8.0 pixels/unit ≈ 67 pixels
+// Adjusted conversion: 1 Excel unit ≈ 7.0 pixels (better for proportional accuracy)
+// This provides better visual match with Excel, especially for wider columns
+const DEFAULT_COLUMN_WIDTH = 64; // 8.43 units * 7.5 pixels/unit ≈ 64 pixels
 const DEFAULT_ROW_HEIGHT = 20; // Excel default is 15 points = 20 pixels
-const EXCEL_COLUMN_WIDTH_TO_PIXEL = 8.0; // More accurate conversion factor
+const EXCEL_COLUMN_WIDTH_TO_PIXEL = 7.0; // Reduced for better proportional accuracy
 const EXCEL_ROW_HEIGHT_TO_PIXEL = 1.333; // Excel stores row height in points, 1pt = 1.333px
 
 const ExcelSheet = memo(forwardRef(({ 
@@ -40,20 +41,21 @@ const ExcelSheet = memo(forwardRef(({
   // Handle zoom changes - reset grid cache after dimensions are recalculated
   const prevZoomRef = useRef(zoom);
   useEffect(() => {
-    console.log('[ExcelSheet] Zoom changed:', zoom, 'zoomFactor:', zoomFactor);
-    
-    // Only reset if zoom actually changed and grid exists
-    if (prevZoomRef.current !== zoom && gridRef.current) {
-      // Use requestAnimationFrame to ensure dimensions are recalculated first
-      requestAnimationFrame(() => {
+    // Only log and reset if zoom actually changed
+    if (prevZoomRef.current !== zoom) {
+      console.log('[ExcelSheet] Zoom changed:', zoom, 'zoomFactor:', zoomFactor);
+      
+      if (gridRef.current) {
+        // Force immediate update - don't wait for requestAnimationFrame
+        // This ensures the Grid uses the new dimensions right away
         gridRef.current.resetAfterIndices({
           columnIndex: 0,
           rowIndex: 0,
-          shouldForceUpdate: false
+          shouldForceUpdate: true  // Force update to ensure new dimensions are used
         });
-      });
+      }
+      prevZoomRef.current = zoom;
     }
-    prevZoomRef.current = zoom;
   }, [zoom, zoomFactor]);
 
   // Expose methods to parent component
@@ -207,30 +209,21 @@ const ExcelSheet = memo(forwardRef(({
           // Very narrow columns - make them 1px so column exists but content is not visible
           widths[col] = 1;
         } else {
-          // For normal columns, use proper conversion
+          // For normal columns, use proper conversion with a reasonable maximum
           const calculatedWidth = width * EXCEL_COLUMN_WIDTH_TO_PIXEL * zoomFactor;
-          widths[col] = Math.round(calculatedWidth);
+          // Cap maximum width at 400px (at 100% zoom) to prevent extremely wide columns
+          const maxWidth = 400 * zoomFactor;
+          widths[col] = Math.round(Math.min(calculatedWidth, maxWidth));
         }
       });
     }
     
-    // Always log column width info for debugging
-    console.log('[ExcelSheet] Column widths recalculated:', {
-      inputWidths: data.columnWidths,
-      outputPixelWidths: widths,
-      conversionFactor: EXCEL_COLUMN_WIDTH_TO_PIXEL,
-      zoomFactor,
-      sampleWidths: Object.entries(widths).slice(0, 5),
-      allWidths: widths, // Show all calculated widths
-      // Log columns K-O (11-15) specifically to debug
-      columnsKtoO: {
-        K: { input: data.columnWidths?.[11], output: widths[11] },
-        L: { input: data.columnWidths?.[12], output: widths[12] },
-        M: { input: data.columnWidths?.[13], output: widths[13] },
-        N: { input: data.columnWidths?.[14], output: widths[14] },
-        O: { input: data.columnWidths?.[15], output: widths[15] }
-      }
-    });
+    // Debug column width info only on significant changes
+    // Commented out to reduce console noise - uncomment if needed for debugging
+    // console.log('[ExcelSheet] Column widths recalculated:', {
+    //   zoomFactor,
+    //   sampleWidths: Object.entries(widths).slice(0, 3)
+    // });
     
     return widths;
   }, [data.columnWidths, zoomFactor]);
@@ -265,14 +258,12 @@ const ExcelSheet = memo(forwardRef(({
       });
     }
     
-    // Always log row height info for debugging
-    console.log('[ExcelSheet] Row heights recalculated:', {
-      inputHeights: data.rowHeights,
-      outputPixelHeights: heights,
-      conversionFactor: EXCEL_ROW_HEIGHT_TO_PIXEL,
-      zoomFactor,
-      sampleHeights: Object.entries(heights).slice(0, 5)
-    });
+    // Debug row height info only on significant changes
+    // Commented out to reduce console noise - uncomment if needed for debugging
+    // console.log('[ExcelSheet] Row heights recalculated:', {
+    //   zoomFactor,
+    //   sampleHeights: Object.entries(heights).slice(0, 3)
+    // });
     
     return heights;
   }, [data.rowHeights, zoomFactor]);
@@ -302,9 +293,10 @@ const ExcelSheet = memo(forwardRef(({
     const width = columnWidths[index] !== undefined ? columnWidths[index] : (defaultWidth * zoomFactor);
     
     // Log first few column widths for debugging with more detail (only in debug mode)
-    if (debugMode && index <= 5 && index > 0) {
-      console.log(`Column ${index} width: ${width}px (has custom: ${!!columnWidths[index]}, stored width: ${columnWidths[index]}, default: ${defaultWidth * zoomFactor})`);
-    }
+    // Commented out to reduce console noise - uncomment if needed for debugging
+    // if (debugMode && index <= 5 && index > 0) {
+    //   console.log(`Column ${index} width: ${width}px (has custom: ${!!columnWidths[index]}, stored width: ${columnWidths[index]}, default: ${defaultWidth * zoomFactor})`);
+    // }
     
     return width;
   }, [columnWidths, zoomFactor, data.defaultColWidth, columnGroups, collapsedGroups]);
@@ -833,6 +825,7 @@ const ExcelSheet = memo(forwardRef(({
         }}
       />
       <Grid
+        key={`grid-${zoom}`}  // Force re-render when zoom changes
         ref={gridRef}
         className={`${styles['excel-grid']} excel-grid`}
         columnCount={totalColumns}
@@ -842,6 +835,8 @@ const ExcelSheet = memo(forwardRef(({
         rowHeight={getRowHeight}
         width={width}
         onScroll={handleScroll}
+        overscanColumnCount={2}  // Reduce from default to minimize memory usage
+        overscanRowCount={2}     // Reduce from default to minimize memory usage
         style={{ 
           overflowX: 'auto', 
           overflowY: 'auto',

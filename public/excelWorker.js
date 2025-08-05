@@ -153,8 +153,8 @@ async function loadWorkbook(data, id) {
         id: sheet.id,
         name: sheet.name,
         originalIndex: index,  // Store the original index in workbook.worksheets
-        rowCount: sheet.rowCount || 0,
-        columnCount: sheet.columnCount || 0,
+        rowCount: sheet.actualRowCount || sheet.lastRow?.number || 100,
+        columnCount: sheet.actualColumnCount || sheet.lastColumn?.number || 50,
         state: sheet.state || 'visible',  // Default to visible if not specified
         isHidden: sheet.state === 'hidden' || sheet.state === 'veryHidden'
       };
@@ -238,13 +238,21 @@ async function processSheet(data, id) {
   //   console.log('[Worker] Worksheet has column definitions with potential formats');
   // }
   
-  // Process only the visible viewport for performance
-  const startRow = viewportStart?.row || 1;
-  const endRow = Math.min(viewportEnd?.row || 1000, worksheet.rowCount || 1000);
-  const startCol = viewportStart?.col || 1;
-  const endCol = Math.min(viewportEnd?.col || 200, worksheet.columnCount || 200);
+  // Get actual data bounds (not full worksheet dimensions)
+  // Use actualRowCount/actualColumnCount to get the last row/column with actual data
+  // But ensure we always include at least the first row and column (even if empty)
+  const actualLastRow = Math.max(worksheet.actualRowCount || worksheet.lastRow?.number || 100, 1);
+  const actualLastCol = Math.max(worksheet.actualColumnCount || worksheet.lastColumn?.number || 50, 1);
   
-  // console.log(`Processing range: rows ${startRow}-${endRow}, cols ${startCol}-${endCol}`);
+  // Process only the visible viewport for performance
+  // Always ensure we include row 1 and column 1 even if viewport starts later
+  const startRow = 1; // Always start from row 1 to include header/spacer rows
+  const endRow = Math.min(viewportEnd?.row || actualLastRow, actualLastRow);
+  const startCol = 1; // Always start from column 1 to include header/spacer columns
+  const endCol = Math.min(viewportEnd?.col || actualLastCol, actualLastCol);
+  
+  // Only log in debug mode to reduce console noise
+  // console.log(`[Worker] Processing actual data range: rows ${startRow}-${endRow}, cols ${startCol}-${endCol} (actual bounds: ${actualLastRow}×${actualLastCol})`);
   
   // Debug: Check if D26 is in the viewport
   // const colD = 4; // Column D is the 4th column
@@ -1346,11 +1354,13 @@ function extractCellStyle(cell) {
     if (cell.fullAddress === 'D26') {
       console.log('[D26 Number Format] Found format:', foundFormat);
     }
-    // Debug date formats
-    // if (foundFormat && foundFormat.match(/[dmyhs]/i)) {
-    //   console.log('[Worker] Date format found:', { 
+    // Debug date formats - check for mm-dd-yy pattern
+    // Commented out since date format issue is resolved
+    // if (foundFormat && foundFormat.toLowerCase().includes('mm-dd-yy')) {
+    //   console.log('[Worker] Date format with hyphens detected:', { 
     //     cellRef: `${cell.fullAddress || 'unknown'}`,
-    //     numFmt: foundFormat 
+    //     numFmt: foundFormat,
+    //     value: cell.value
     //   });
     // }
   } else if (cell.style && typeof cell.style === 'number') {
@@ -1715,9 +1725,9 @@ async function searchInSheet(data, id) {
   const results = [];
   const searchQuery = caseSensitive ? query : query.toLowerCase();
   
-  // Search through all cells
-  const maxRow = Math.min(worksheet.rowCount || 1000, 10000); // Limit search to 10k rows
-  const maxCol = Math.min(worksheet.columnCount || 100, 256); // Limit to 256 columns
+  // Search through all cells (use actual data bounds)
+  const maxRow = Math.min(worksheet.actualRowCount || worksheet.lastRow?.number || 1000, 10000); // Limit search to 10k rows
+  const maxCol = Math.min(worksheet.actualColumnCount || worksheet.lastColumn?.number || 100, 256); // Limit to 256 columns
   
   for (let row = 1; row <= maxRow; row++) {
     for (let col = 1; col <= maxCol; col++) {

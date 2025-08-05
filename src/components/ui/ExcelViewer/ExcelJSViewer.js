@@ -45,6 +45,7 @@ const ExcelJSViewer = ({
   const [loadingStage, setLoadingStage] = useState('initializing');
   const [error, setError] = useState(null);
   const [isFullScreen, setIsFullScreen] = useState(false);
+  const [isTransitioningFullscreen, setIsTransitioningFullscreen] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [zoom, setZoom] = useState(100);
   const [selectedCell, setSelectedCell] = useState(null);
@@ -114,12 +115,22 @@ const ExcelJSViewer = ({
     }
   }, [showToast]);
 
-  // Fullscreen implementation with Fullscreen API
+  // Fullscreen implementation with memory optimization
   const enterFullScreen = useCallback(async () => {
-    if (!containerRef.current) return;
+    if (!containerRef.current || processingRef.current) return;
+    
+    // Prevent re-entry while processing
+    processingRef.current = true;
+    setIsTransitioningFullscreen(true);
     
     const element = containerRef.current;
     try {
+      // Show loading state during transition
+      showToast('Entering fullscreen mode...', 'info');
+      
+      // Small delay to allow UI to update
+      await new Promise(resolve => setTimeout(resolve, 100));
+      
       if (element.requestFullscreen) {
         await element.requestFullscreen();
       } else if (element.webkitRequestFullscreen) {
@@ -130,12 +141,22 @@ const ExcelJSViewer = ({
         await element.msRequestFullscreen();
       }
       setIsFullScreen(true);
+      
+      // Don't change viewport or reload data - just enter fullscreen
+      // The existing data and viewport should work fine
+      
     } catch (error) {
       console.error('Failed to enter fullscreen:', error);
       // Fallback to CSS fullscreen
       setIsFullScreen(true);
+    } finally {
+      // Delay clearing transition state to allow render to stabilize
+      setTimeout(() => {
+        setIsTransitioningFullscreen(false);
+        processingRef.current = false;
+      }, 300);
     }
-  }, []);
+  }, [showToast]);
 
   const exitFullScreenMode = useCallback(() => {
     if (document.fullscreenElement || document.webkitFullscreenElement) {
@@ -165,26 +186,41 @@ const ExcelJSViewer = ({
     exitFullScreenMode();
   }, [exitFullScreenMode]);
 
-  // Track sheet container dimensions
+  // Track sheet container dimensions with debouncing
   useEffect(() => {
     if (!sheetContainerRef.current) return;
 
+    let timeoutId;
     const updateDimensions = () => {
-      if (sheetContainerRef.current) {
-        const rect = sheetContainerRef.current.getBoundingClientRect();
-        setSheetDimensions({
-          width: rect.width || 800,
-          height: rect.height || 480
-        });
-      }
+      // Skip updates during fullscreen transition
+      if (isTransitioningFullscreen) return;
+      
+      // Clear any pending updates
+      clearTimeout(timeoutId);
+      
+      // Debounce dimension updates to prevent rapid re-renders
+      timeoutId = setTimeout(() => {
+        if (sheetContainerRef.current && !isTransitioningFullscreen) {
+          const rect = sheetContainerRef.current.getBoundingClientRect();
+          // Validate dimensions to prevent crashes
+          const width = rect.width > 0 ? rect.width : 800;
+          const height = rect.height > 0 ? rect.height : 480;
+          
+          // Ensure minimum dimensions
+          setSheetDimensions({
+            width: Math.max(200, width),
+            height: Math.max(200, height)
+          });
+        }
+      }, 150); // Slightly longer delay for stability
     };
 
-    // Initial measurement
-    updateDimensions();
+    // Initial measurement after short delay
+    const initialTimer = setTimeout(updateDimensions, 50);
 
     // Create ResizeObserver with compatibility check
     let resizeObserver;
-    if (typeof ResizeObserver !== 'undefined') {
+    if (typeof ResizeObserver !== 'undefined' && sheetContainerRef.current) {
       resizeObserver = new ResizeObserver(updateDimensions);
       resizeObserver.observe(sheetContainerRef.current);
     }
@@ -193,12 +229,14 @@ const ExcelJSViewer = ({
     window.addEventListener('resize', updateDimensions);
 
     return () => {
+      clearTimeout(timeoutId);
+      clearTimeout(initialTimer);
       if (resizeObserver) {
         resizeObserver.disconnect();
       }
       window.removeEventListener('resize', updateDimensions);
     };
-  }, [sheetData]); // Re-run when sheet data changes
+  }, [sheetData, isTransitioningFullscreen]); // Re-run when sheet data or transition state changes
 
   // Handle memory warnings with debouncing to prevent repeated toasts
   const memoryWarningShownRef = useRef(false);
@@ -468,55 +506,91 @@ const ExcelJSViewer = ({
     }
   }, [activeSheet, loadSheetData, worksheets.length]);
 
-  // Handle viewport change for progressive loading
+  // Debounce timer ref for viewport changes
+  const viewportDebounceRef = useRef(null);
+  const lastLoadedViewport = useRef(null);
+  
+  // Handle viewport change for progressive loading with fullscreen optimization
   const handleViewportChange = useCallback((newViewport) => {
-    // Only reload if we're going outside the already loaded data range
-    const needsReload = !isInitialLoadComplete || 
-                       newViewport.endRow > viewport.end.row || 
-                       newViewport.endCol > viewport.end.col ||
-                       newViewport.startRow < viewport.start.row ||
-                       newViewport.startCol < viewport.start.col;
+    // Skip if this is the same viewport we just loaded
+    if (lastLoadedViewport.current &&
+        lastLoadedViewport.current.startRow === newViewport.startRow &&
+        lastLoadedViewport.current.endRow === newViewport.endRow &&
+        lastLoadedViewport.current.startCol === newViewport.startCol &&
+        lastLoadedViewport.current.endCol === newViewport.endCol) {
+      return;
+    }
     
-    if (needsReload) {
-      // Expand the viewport to load a larger buffer around the visible area
-      const bufferRows = 200;
-      const bufferCols = 50;
+    // Clear any pending viewport update
+    if (viewportDebounceRef.current) {
+      clearTimeout(viewportDebounceRef.current);
+    }
+    
+    // Debounce viewport changes to prevent rapid reloading
+    viewportDebounceRef.current = setTimeout(() => {
+      // Only reload if we're going outside the already loaded data range
+      const needsReload = !isInitialLoadComplete || 
+                         newViewport.endRow > viewport.end.row || 
+                         newViewport.endCol > viewport.end.col ||
+                         newViewport.startRow < viewport.start.row ||
+                         newViewport.startCol < viewport.start.col;
       
-      const newStart = {
-        row: Math.max(1, newViewport.startRow - bufferRows),
-        col: Math.max(1, newViewport.startCol - bufferCols)
-      };
-      const newEnd = {
-        row: newViewport.endRow + bufferRows,
-        col: newViewport.endCol + bufferCols
-      };
-      
-      setViewport({
-        start: newStart,
-        end: newEnd
-      });
-      
-      // Reload sheet data for new expanded viewport
-      if (activeSheet >= 0 && isWorkerReady && worksheets[activeSheet]) {
-        const actualIndex = worksheets[activeSheet].originalIndex;
-        console.log(`Loading expanded viewport: rows ${newStart.row}-${newEnd.row}, cols ${newStart.col}-${newEnd.col}`);
+      if (needsReload && !processingRef.current) {
+        processingRef.current = true;
         
-        processSheet(actualIndex, {
+        // Adjust buffer size based on memory status
+        // Use adaptive buffers based on memory warnings
+        const bufferRows = isCritical ? 30 : (isWarning ? 50 : 100);
+        const bufferCols = isCritical ? 15 : (isWarning ? 20 : 30);
+        
+        const newStart = {
+          row: Math.max(1, newViewport.startRow - bufferRows),
+          col: Math.max(1, newViewport.startCol - bufferCols)
+        };
+        const newEnd = {
+          row: newViewport.endRow + bufferRows,
+          col: newViewport.endCol + bufferCols
+        };
+        
+        // Track this viewport to avoid duplicate loads
+        lastLoadedViewport.current = {
+          startRow: newViewport.startRow,
+          endRow: newViewport.endRow,
+          startCol: newViewport.startCol,
+          endCol: newViewport.endCol
+        };
+        
+        setViewport({
           start: newStart,
           end: newEnd
-        }).then(data => {
-          setSheetData(data);
-          // Update gridlines setting from Excel file (if provided)
-          if (data.showGridLines !== undefined) {
-            setShowGridLines(data.showGridLines);
-          }
-          setIsInitialLoadComplete(true);
-        }).catch(err => {
-          console.error('Failed to load viewport data:', err);
         });
+        
+        // Reload sheet data for new expanded viewport
+        if (activeSheet >= 0 && isWorkerReady && worksheets[activeSheet]) {
+          const actualIndex = worksheets[activeSheet].originalIndex;
+          console.log(`Loading expanded viewport: rows ${newStart.row}-${newEnd.row}, cols ${newStart.col}-${newEnd.col}`);
+          
+          processSheet(actualIndex, {
+            start: newStart,
+            end: newEnd
+          }).then(data => {
+            setSheetData(data);
+            // Update gridlines setting from Excel file (if provided)
+            if (data.showGridLines !== undefined) {
+              setShowGridLines(data.showGridLines);
+            }
+            setIsInitialLoadComplete(true);
+          }).catch(err => {
+            console.error('Failed to load viewport data:', err);
+          }).finally(() => {
+            processingRef.current = false;
+          });
+        } else {
+          processingRef.current = false;
+        }
       }
-    }
-  }, [viewport, activeSheet, isWorkerReady, processSheet, worksheets, isInitialLoadComplete]);
+    }, 300); // Slightly longer debounce for stability
+  }, [viewport, activeSheet, isWorkerReady, processSheet, worksheets, isInitialLoadComplete, isCritical, isWarning]);
 
   // Handle cell click
   const handleCellClick = useCallback((row, col, value) => {
@@ -658,15 +732,17 @@ const ExcelJSViewer = ({
     showToast(`Result ${newIndex + 1} of ${searchResults.length}`, 'info');
   }, [currentSearchIndex, searchResults, showToast]);
 
-  // Calculate container dimensions
+  // Container dimensions - simplified for reliability
   const containerDimensions = useMemo(() => {
-    if (isFullScreen && typeof window !== 'undefined') {
+    if (isFullScreen) {
+      // In fullscreen, use viewport dimensions
       return {
-        width: window.innerWidth,
-        height: window.innerHeight - 96 // Subtract toolbar and sheet tabs height
+        width: '100vw',
+        height: '100vh'
       };
     }
     
+    // Normal mode
     const heightValue = typeof height === 'string' ? height : `${height}px`;
     return {
       width: '100%',
@@ -711,7 +787,7 @@ const ExcelJSViewer = ({
         } ${
           isPrintMode ? 'print-mode' : ''
         }`}
-        style={isFullScreen ? {} : { height: '100%', minHeight: containerDimensions.height }}
+        style={isFullScreen ? { width: '100vw', height: '100vh' } : { height: containerDimensions.height }}
         role="application"
         aria-label={`Excel viewer for ${title}`}
         data-dark={darkMode}

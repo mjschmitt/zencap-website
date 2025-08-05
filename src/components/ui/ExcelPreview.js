@@ -49,8 +49,8 @@ const ExcelPreview = ({ file, title = "Model Viewer", height = "100%" }) => {
 
   return (
     <div 
-      className="excel-preview-container h-full flex flex-col"
-      style={{ minHeight: '500px' }}
+      className="excel-preview-container flex flex-col"
+      style={{ height: height }}
       onClick={(e) => {
         // Prevent any clicks within the Excel viewer from bubbling up to parent forms
         e.stopPropagation();
