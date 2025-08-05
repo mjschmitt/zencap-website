@@ -269,7 +269,7 @@ const ExcelSheet = memo(forwardRef(({
     });
     
     if (isInCollapsedGroup) {
-      return 5 * zoomFactor; // Very narrow width for collapsed columns (matching row behavior)
+      return 1; // Minimal width for collapsed columns, effectively hidden
     }
     
     // Use specific column width if available, otherwise use default from Excel or fallback
@@ -374,6 +374,13 @@ const ExcelSheet = memo(forwardRef(({
       const isGroupEnd = columnGroup && columnIndex === columnGroup.endCol;
       const isCollapsed = columnGroup && collapsedGroups.has(columnGroup.id);
       
+      // Check if this column is in a collapsed group
+      const isInCollapsedGroup = columnGroups.some(group => {
+        return collapsedGroups.has(group.id) && 
+               columnIndex >= group.startCol && 
+               columnIndex <= group.endCol;
+      });
+      
       return (
         <div 
           style={{
@@ -400,7 +407,7 @@ const ExcelSheet = memo(forwardRef(({
               }}
             />
           )}
-          {getColumnName(columnIndex)}
+          {isInCollapsedGroup ? '' : getColumnName(columnIndex)}
           {isGroupEnd && (
             <button
               onClick={(e) => {
@@ -648,6 +655,18 @@ const ExcelSheet = memo(forwardRef(({
           return null;
         }
         
+        // Skip rendering spillover if any columns in the range are collapsed
+        const isAnyColumnCollapsed = columnGroups.some(group => {
+          return collapsedGroups.has(group.id) && 
+                 ((spilloverStartCol >= group.startCol && spilloverStartCol <= group.endCol) ||
+                  (spilloverEndCol >= group.startCol && spilloverEndCol <= group.endCol) ||
+                  (group.startCol >= spilloverStartCol && group.endCol <= spilloverEndCol));
+        });
+        
+        if (isAnyColumnCollapsed) {
+          return null;
+        }
+        
         // Calculate total width from start to end of spillover
         const totalWidth = Array.from({ length: spilloverEndCol - spilloverStartCol + 1 }, (_, i) => 
           getColumnWidth(spilloverStartCol + i)
@@ -747,7 +766,7 @@ const ExcelSheet = memo(forwardRef(({
         </div>
       );
     });
-  }, [data.spilloverRanges, getColumnWidth, getRowHeight, darkMode, isPrintMode, zoomFactor]);
+  }, [data.spilloverRanges, getColumnWidth, getRowHeight, darkMode, isPrintMode, zoomFactor, columnGroups, collapsedGroups]);
 
   // Don't render Grid until dimensions are ready to prevent misalignment
   if (!dimensionsReady && data.columnWidths) {
