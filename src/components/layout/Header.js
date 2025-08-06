@@ -99,7 +99,7 @@ export default function Header() {
                 <div className="h-8 w-16 bg-gray-200 rounded"></div>
               </div>
             ) : session ? (
-              <div className="relative">
+              <div className="relative user-menu-container">
                 <button
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
@@ -112,7 +112,7 @@ export default function Header() {
                 </button>
                 
                 {userMenuOpen && (
-                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-navy-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-navy-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5 z-50">
                     <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-navy-600">
                       <p className="font-medium">{session.user?.name || 'User'}</p>
                       <p className="text-xs text-gray-500 dark:text-gray-400">{session.user?.email}</p>

@@ -37,7 +37,9 @@
       "Bash(git restore:*)",
       "Bash(dir:*)",
       "Bash(npx next-bundle-analyzer:*)",
-      "Bash(npx lighthouse:*)"
+      "Bash(npx lighthouse:*)",
+      "Bash(npx next build:*)",
+      "Bash(del \"src\\pages\\api\\auth\\[...auth].js\")"
     ],
     "deny": []
   }
