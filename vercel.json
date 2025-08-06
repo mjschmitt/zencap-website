@@ -9,15 +9,12 @@
   "regions": ["iad1"],
   "functions": {
     "src/pages/api/**/*.js": {
-      "runtime": "@vercel/node@18.x",
       "maxDuration": 30
     },
     "src/pages/api/upload-excel.js": {
-      "runtime": "@vercel/node@18.x",
       "maxDuration": 60
     },
     "src/pages/api/health.js": {
-      "runtime": "@vercel/node@18.x",
       "maxDuration": 10
     }
   },
