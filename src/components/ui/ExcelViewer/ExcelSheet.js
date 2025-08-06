@@ -270,6 +270,8 @@ const ExcelSheet = memo(forwardRef(({
   const columnWidths = useMemo(() => {
     const widths = {};
     if (data.columnWidths) {
+      // Debug: Uncomment to see raw column width data
+      // console.log('[Column Widths Raw Data]', data.columnWidths);
       Object.entries(data.columnWidths).forEach(([col, width]) => {
         // Excel width units to pixels using proper conversion factor
         // Excel width is in character units, convert to pixels
@@ -289,11 +291,12 @@ const ExcelSheet = memo(forwardRef(({
       });
     }
     
-    // Debug column width info only on significant changes
-    // Commented out to reduce console noise - uncomment if needed for debugging
-    // console.log('[ExcelSheet] Column widths recalculated:', {
-    //   zoomFactor,
-    //   sampleWidths: Object.entries(widths).slice(0, 3)
+    // Debug: Uncomment to see processed column widths
+    // console.log('[Column Widths Processed]', {
+    //   widths,
+    //   keys: Object.keys(widths),
+    //   values: Object.values(widths),
+    //   sample: Object.entries(widths).slice(0, 5)
     // });
     
     return widths;
@@ -360,8 +363,11 @@ const ExcelSheet = memo(forwardRef(({
       ? data.defaultColWidth * EXCEL_COLUMN_WIDTH_TO_PIXEL 
       : DEFAULT_COLUMN_WIDTH;
     
-    // Check if we have a specific width for this column (including 0 for hidden)
-    const width = columnWidths[index] !== undefined ? columnWidths[index] : (defaultWidth * zoomFactor);
+    // Excel column widths are 1-indexed (1=A, 2=B, etc.)
+    // Grid columns are: 0=row header, 1=A, 2=B, etc.
+    // So grid column 1 (A) needs Excel column 1, grid column 2 (B) needs Excel column 2
+    const excelColumnIndex = index; // Grid index matches Excel index for columns
+    const width = columnWidths[excelColumnIndex] !== undefined ? columnWidths[excelColumnIndex] : (defaultWidth * zoomFactor);
     
     // Log first few column widths for debugging with more detail (only in debug mode)
     // Commented out to reduce console noise - uncomment if needed for debugging
@@ -903,6 +909,152 @@ const ExcelSheet = memo(forwardRef(({
     );
   }, [data.mergedCells, getColumnWidth, getRowHeight, onCellClick, darkMode, isPrintMode]);
 
+  // Handle images overlay
+  const ImagesOverlay = useMemo(() => {
+    if (!data.images?.length) return null;
+
+    return (
+      <div className="absolute top-0 left-0 pointer-events-none" style={{ zIndex: 15 }}>
+        {data.images.map((image, index) => {
+          // Image positions from ExcelJS
+          // ExcelJS uses 0-based indexing where 0=A, 1=B, etc.
+          // Our grid: col 0=row numbers, col 1=A, col 2=B
+          // So ExcelJS col 1 (B) needs to map to grid col 2
+          const excelTlCol = image.position.tlCol !== undefined ? image.position.tlCol : image.position.startCol;
+          const gridTlRow = Math.floor(image.position.tlRow !== undefined ? image.position.tlRow : image.position.startRow);
+          const gridTlCol = Math.floor(excelTlCol) + 1; // Back to original mapping
+          
+          // Calculate the fractional offset within the starting column
+          const colFraction = excelTlCol - Math.floor(excelTlCol);
+          
+          // Debug logs removed - image positioning working correctly
+          
+          // Excel appears to use 0-based indexing for image positions
+          // brCol ~2 means the image ends at column index 2 (column C in 0-based)
+          // Our grid: 0=row header, 1=A, 2=B, 3=C
+          // So Excel column 2 needs to map to grid column 3
+          const excelBrCol = image.position.brCol !== undefined ? image.position.brCol : image.position.endCol;
+          
+          const gridBrRow = Math.ceil(image.position.brRow !== undefined ? image.position.brRow : image.position.endRow);
+          // For the end position, Excel column 2 (C) should map to grid column 3
+          const gridBrCol = Math.ceil(excelBrCol) + 1; // Add 1 for row header offset
+          
+          
+          
+          
+          // Calculate base position for top-left corner
+          const columnWidths = Array.from({ length: gridTlCol }, (_, i) => getColumnWidth(i));
+          const baseLeft = columnWidths.reduce((a, b) => a + b, 0);
+          const baseTop = Array.from({ length: gridTlRow }, (_, i) => getRowHeight(i)).reduce((a, b) => a + b, 0);
+          
+          // Convert EMU offsets to pixels
+          // Excel uses EMUs (English Metric Units) where 914400 EMUs = 1 inch
+          // At 96 DPI: 914400 EMUs = 96 pixels, so 1 pixel = 9525 EMUs
+          const EMU_PER_PIXEL = 9525;
+          
+          // Apply native offsets for precise positioning within the cell
+          const colOffsetPixels = (image.position.tlColOffset || 0) / EMU_PER_PIXEL;
+          const rowOffsetPixels = (image.position.tlRowOffset || 0) / EMU_PER_PIXEL;
+          
+          // The offsets are relative to the cell position
+          // Apply offsets directly - these represent the precise position from Excel
+          const left = baseLeft + colOffsetPixels;
+          const top = baseTop + rowOffsetPixels;
+          
+          
+          // Calculate the actual width based on Excel's exact positioning
+          const startColumn = Math.floor(excelTlCol);
+          const endColumn = Math.floor(excelBrCol);
+          
+          // Calculate precise width using Excel's fractional column positions
+          let width;
+          if (startColumn === endColumn) {
+            // Image is within a single column
+            const columnSpan = excelBrCol - excelTlCol;
+            width = getColumnWidth(gridTlCol) * columnSpan;
+          } else {
+            // Image spans multiple columns
+            // Calculate width by summing partial and full column widths
+            const startColFraction = excelTlCol - Math.floor(excelTlCol);
+            const endColFraction = excelBrCol - Math.floor(excelBrCol);
+            
+            // Width from partial start column
+            const startColWidth = getColumnWidth(Math.floor(excelTlCol) + 1) * (1 - startColFraction);
+            
+            // Width from full columns in between
+            let middleColsWidth = 0;
+            for (let col = Math.floor(excelTlCol) + 1; col < Math.floor(excelBrCol); col++) {
+              middleColsWidth += getColumnWidth(col + 1); // +1 for row header offset
+            }
+            
+            // Width from partial end column
+            const endColWidth = getColumnWidth(Math.floor(excelBrCol) + 1) * endColFraction;
+            
+            width = startColWidth + middleColsWidth + endColWidth;
+          }
+          
+          // Apply a small reduction factor only if the image appears to have padding
+          // This is based on the column offset values - if they're small, the image likely has padding
+          const hasLikelyPadding = Math.abs(image.position.tlColOffset || 0) < 100000 && 
+                                   Math.abs(image.position.brColOffset || 0) > 1000000;
+          const reductionFactor = hasLikelyPadding ? 0.85 : 1.0;
+          width = width * reductionFactor;
+          
+          // Keep the original height calculation
+          const baseEndTop = Array.from({ length: gridBrRow }, (_, i) => getRowHeight(i)).reduce((a, b) => a + b, 0);
+          const endRowOffsetPixels = (image.position.brRowOffset || 0) / EMU_PER_PIXEL;
+          const endTop = baseEndTop + endRowOffsetPixels;
+          const height = endTop - top;
+          
+          // For debugging
+          const endLeft = left + width;
+          
+          // Debug: Uncomment to see image dimensions
+          // console.log('[Image Dimensions]', {
+          //   width,
+          //   height,
+          //   columnsSpanned: (excelBrCol - excelTlCol).toFixed(3),
+          //   reductionFactor
+          // });
+
+          // Skip if dimensions are invalid
+          if (width <= 0 || height <= 0) return null;
+
+          
+          return (
+            <div
+              key={`image-${index}-${image.id}`}
+              className="absolute pointer-events-auto"
+              style={{
+                left: `${left}px`,
+                top: `${top}px`,
+                width: `${width}px`,
+                height: `${height}px`,
+                zIndex: 5 // Images should be above cells but below merged cells
+              }}
+              title={image.name || `Image ${index + 1}`}
+            >
+              <img
+                src={image.dataUrl}
+                alt={image.name || `Excel image ${index + 1}`}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'contain',
+                  pointerEvents: 'none'
+                }}
+                onError={(e) => {
+                  console.error(`Failed to load image ${image.id}:`, e);
+                  e.target.style.display = 'none';
+                }}
+              />
+            </div>
+          );
+        })}
+      </div>
+    );
+  }, [data.images, getColumnWidth, getRowHeight]);
+
   // Create custom inner element that includes spillover overlays
   const innerElementType = useMemo(() => {
     return forwardRef(({ children, style, ...rest }, ref) => {
@@ -1106,6 +1258,7 @@ const ExcelSheet = memo(forwardRef(({
       >
         {Cell}
       </Grid>
+      {ImagesOverlay}
       {MergedCellsOverlay}
     </div>
   );
