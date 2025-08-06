@@ -935,10 +935,12 @@ function formatDate(value, format) {
     return value;
   }
   
-  // Normalize format: convert hyphen separators to slashes for consistency
-  // This preserves the original format pattern (including yyyy vs yy)
-  // while ensuring we use the expected separator
-  format = format.replace(/(\d+|[a-z]+)-(\d+|[a-z]+)-(\d+|[a-z]+)/gi, '$1/$2/$3');
+  // Determine which separator to use based on the format type
+  // If format contains month names (mmm), preserve hyphens for DD-Mon-Year style
+  // Otherwise, use slashes for numeric dates (mm/dd/yy style)
+  const hasMonthName = /mmm/i.test(format);
+  const originalSeparator = format.match(/[\/\-\.]/)?.[0] || '/';
+  const separator = hasMonthName ? originalSeparator : '/';
   
   const months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
   const monthsFull = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
@@ -990,6 +992,11 @@ function formatDate(value, format) {
     } else if (format[i].toLowerCase() === 'd' && 
                (i + 1 >= format.length || format[i + 1].toLowerCase() !== 'd')) {
       result += d.toString();
+      i += 1;
+    }
+    // Handle separators - use the determined separator
+    else if (format[i] === '/' || format[i] === '-' || format[i] === '.') {
+      result += separator; // Use the appropriate separator based on format type
       i += 1;
     }
     // Not a date pattern, copy the character as-is
