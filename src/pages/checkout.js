@@ -5,6 +5,7 @@ import Button from '@/components/ui/Button';
 import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
 import LoadingSpinner from '@/components/ui/LoadingSpinner';
+import TrustBadges from '@/components/ui/TrustBadges';
 
 export default function Checkout() {
   const router = useRouter();
@@ -140,9 +141,12 @@ export default function Checkout() {
             <h1 className="text-3xl font-bold text-navy-700 dark:text-white mb-4">
               Complete Your Purchase
             </h1>
-            <p className="text-gray-600 dark:text-gray-300">
+            <p className="text-gray-600 dark:text-gray-300 mb-6">
               Secure checkout for professional financial models
             </p>
+            
+            {/* Trust Badges */}
+            <TrustBadges className="max-w-2xl mx-auto" />
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">

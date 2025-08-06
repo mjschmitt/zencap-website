@@ -28,19 +28,32 @@ export default function Header() {
   // Close mobile menu when route changes
   useEffect(() => {
     setMobileMenuOpen(false);
+    setUserMenuOpen(false);
   }, [router.pathname]);
   
-  // Close mobile menu when pressing escape key
+  // Close menus when pressing escape key or clicking outside
   useEffect(() => {
     const handleEsc = (event) => {
-      if (event.keyCode === 27) setMobileMenuOpen(false);
+      if (event.keyCode === 27) {
+        setMobileMenuOpen(false);
+        setUserMenuOpen(false);
+      }
     };
+    
+    const handleClickOutside = (event) => {
+      if (userMenuOpen && !event.target.closest('.user-menu-container')) {
+        setUserMenuOpen(false);
+      }
+    };
+    
     window.addEventListener('keydown', handleEsc);
+    window.addEventListener('click', handleClickOutside);
     
     return () => {
       window.removeEventListener('keydown', handleEsc);
+      window.removeEventListener('click', handleClickOutside);
     };
-  }, []);
+  }, [userMenuOpen]);
   
   // Prevent scrolling when mobile menu is open
   useEffect(() => {
@@ -79,6 +92,58 @@ export default function Header() {
           <div className="hidden md:flex md:items-center md:space-x-4">
             <DarkModeToggle />
             <Navbar />
+            
+            {/* User Authentication */}
+            {status === 'loading' ? (
+              <div className="animate-pulse">
+                <div className="h-8 w-16 bg-gray-200 rounded"></div>
+              </div>
+            ) : session ? (
+              <div className="relative">
+                <button
+                  onClick={() => setUserMenuOpen(!userMenuOpen)}
+                  className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
+                >
+                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                    <span className="text-white font-medium">
+                      {session.user?.name?.charAt(0) || session.user?.email?.charAt(0) || 'U'}
+                    </span>
+                  </div>
+                </button>
+                
+                {userMenuOpen && (
+                  <div className="absolute right-0 mt-2 w-48 bg-white dark:bg-navy-800 rounded-md shadow-lg py-1 ring-1 ring-black ring-opacity-5">
+                    <div className="px-4 py-2 text-sm text-gray-700 dark:text-gray-300 border-b border-gray-200 dark:border-navy-600">
+                      <p className="font-medium">{session.user?.name || 'User'}</p>
+                      <p className="text-xs text-gray-500 dark:text-gray-400">{session.user?.email}</p>
+                    </div>
+                    <Link
+                      href="/account/purchases"
+                      className="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-navy-700"
+                      onClick={() => setUserMenuOpen(false)}
+                    >
+                      My Purchases
+                    </Link>
+                    <button
+                      onClick={() => {
+                        setUserMenuOpen(false);
+                        signOut();
+                      }}
+                      className="block w-full text-left px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-navy-700"
+                    >
+                      Sign out
+                    </button>
+                  </div>
+                )}
+              </div>
+            ) : (
+              <button
+                onClick={() => signIn()}
+                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+              >
+                Sign In
+              </button>
+            )}
           </div>
           
           {/* Mobile menu button and Dark Mode Toggle */}
@@ -234,10 +299,49 @@ export default function Header() {
               </Link>
             </nav>
             
+            {/* Mobile Authentication */}
             <div className="mt-6 pt-6 border-t border-gray-200 dark:border-navy-700">
+              {status === 'loading' ? (
+                <div className="animate-pulse">
+                  <div className="h-12 bg-gray-200 rounded-md"></div>
+                </div>
+              ) : session ? (
+                <div className="space-y-3">
+                  <div className="px-4 py-2 bg-gray-50 dark:bg-navy-700 rounded-md">
+                    <p className="font-medium text-navy-700 dark:text-white">{session.user?.name || 'User'}</p>
+                    <p className="text-xs text-gray-500 dark:text-gray-400">{session.user?.email}</p>
+                  </div>
+                  <Link 
+                    href="/account/purchases" 
+                    className="block w-full px-4 py-3 text-center rounded-md shadow bg-blue-600 text-white font-medium hover:bg-blue-700 transition duration-150 ease-in-out"
+                  >
+                    My Purchases
+                  </Link>
+                  <button
+                    onClick={() => {
+                      setMobileMenuOpen(false);
+                      signOut();
+                    }}
+                    className="block w-full px-4 py-3 text-center rounded-md border border-gray-300 dark:border-navy-600 text-gray-700 dark:text-gray-300 font-medium hover:bg-gray-50 dark:hover:bg-navy-700 transition duration-150 ease-in-out"
+                  >
+                    Sign Out
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={() => {
+                    setMobileMenuOpen(false);
+                    signIn();
+                  }}
+                  className="block w-full px-4 py-3 text-center rounded-md shadow bg-blue-600 text-white font-medium hover:bg-blue-700 transition duration-150 ease-in-out"
+                >
+                  Sign In
+                </button>
+              )}
+              
               <Link 
                 href="/contact" 
-                className="block w-full px-4 py-3 text-center rounded-md shadow bg-teal-500 text-white font-medium hover:bg-teal-600 transition duration-150 ease-in-out"
+                className="block w-full px-4 py-3 mt-3 text-center rounded-md shadow bg-teal-500 text-white font-medium hover:bg-teal-600 transition duration-150 ease-in-out"
               >
                 Get In Touch
               </Link>
