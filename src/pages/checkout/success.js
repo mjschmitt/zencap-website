@@ -8,9 +8,13 @@ import SEO from '@/components/SEO';
 export default function CheckoutSuccess() {
   const router = useRouter();
   const { modelTitle, sessionId } = router.query;
-  const [countdown, setCountdown] = useState(10);
+  const [countdown, setCountdown] = useState(30); // Increased to 30 seconds
+  const [autoRedirect, setAutoRedirect] = useState(true);
 
   useEffect(() => {
+    // Only run countdown if auto-redirect is enabled
+    if (!autoRedirect) return;
+    
     // Countdown timer for auto-redirect
     const timer = setInterval(() => {
       setCountdown(prev => {
@@ -24,7 +28,7 @@ export default function CheckoutSuccess() {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [router]);
+  }, [router, autoRedirect]);
 
   return (
     <Layout>
@@ -124,15 +128,29 @@ export default function CheckoutSuccess() {
             
             {/* Auto-redirect notice */}
             <div className="mt-8 text-sm text-gray-500 dark:text-gray-400">
-              <p>
-                Redirecting to models page in {countdown} seconds...
-              </p>
-              <button 
-                onClick={() => router.push('/models')}
-                className="underline hover:text-teal-600 dark:hover:text-teal-400"
-              >
-                Skip waiting
-              </button>
+              {autoRedirect ? (
+                <>
+                  <p>
+                    Redirecting to models page in {countdown} seconds...
+                  </p>
+                  <div className="mt-2 space-x-4">
+                    <button 
+                      onClick={() => setAutoRedirect(false)}
+                      className="underline hover:text-teal-600 dark:hover:text-teal-400"
+                    >
+                      Stay on this page
+                    </button>
+                    <button 
+                      onClick={() => router.push('/models')}
+                      className="underline hover:text-teal-600 dark:hover:text-teal-400"
+                    >
+                      Go to models now
+                    </button>
+                  </div>
+                </>
+              ) : (
+                <p>Auto-redirect disabled. Take your time to review your purchase details.</p>
+              )}
             </div>
           </div>
         </div>

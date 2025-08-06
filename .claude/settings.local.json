@@ -39,7 +39,16 @@
       "Bash(npx next-bundle-analyzer:*)",
       "Bash(npx lighthouse:*)",
       "Bash(npx next build:*)",
-      "Bash(del \"src\\pages\\api\\auth\\[...auth].js\")"
+      "Bash(del \"src\\pages\\api\\auth\\[...auth].js\")",
+      "Bash(stripe-cli\\stripe.exe version:*)",
+      "Bash(.stripe-clistripe.exe version)",
+      "Bash(\"stripe-cli\\stripe.exe\" version)",
+      "Bash(\"stripe-cli\\stripe.exe\" login)",
+      "Bash(start cmd /k \"stripe-cli\\stripe.exe\" listen --forward-to localhost:3001/api/stripe/webhook)",
+      "Bash(\"stripe-cli\\stripe.exe\" listen --forward-to localhost:3001/api/stripe/webhook --print-secret)",
+      "Bash(start cmd /k \"stripe-cli\\stripe.exe\" listen --forward-to localhost:3005/api/stripe/webhook)",
+      "Bash(\"stripe-cli\\stripe.exe\" listen --forward-to localhost:3005/api/stripe/webhook --print-secret)",
+      "Bash(vercel:*)"
     ],
     "deny": []
   }
