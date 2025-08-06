@@ -277,7 +277,8 @@ async function processSheet(data, id) {
     // Extract gridline visibility setting (default is true in Excel)
     showGridLines: worksheet.views?.[0]?.showGridLines !== false,
     columnOutlines: [], // Store column grouping information
-    rowOutlines: [] // Store row grouping information
+    rowOutlines: [], // Store row grouping information
+    images: [] // Store images with position and data
   };
   
   // console.log('Worksheet properties:', {
@@ -750,6 +751,93 @@ async function processSheet(data, id) {
   console.log(`[Spillover] Found ${spilloverRanges.length} spillover ranges:`, 
     spilloverRanges.map(r => `${getColumnName(r.sourceCol)}${r.sourceRow} (${r.alignment}) → ${getColumnName(r.startCol)}-${getColumnName(r.endCol)}`)
   );
+  
+  // Extract images from the worksheet
+  try {
+    const images = worksheet.getImages();
+    console.log(`[Images] Found ${images.length} images in worksheet`);
+    
+    if (images && images.length > 0) {
+      for (const image of images) {
+        try {
+          // Find the corresponding media item
+          const imageData = self.workbook.model.media.find(m => m.index === image.imageId);
+          
+          if (imageData) {
+            // Convert buffer to base64 data URL
+            const base64 = btoa(String.fromCharCode.apply(null, new Uint8Array(imageData.buffer)));
+            const mimeType = imageData.extension === 'png' ? 'image/png' : 
+                           imageData.extension === 'jpg' || imageData.extension === 'jpeg' ? 'image/jpeg' :
+                           imageData.extension === 'gif' ? 'image/gif' : 'image/png';
+            
+            processedData.images.push({
+              id: image.imageId,
+              dataUrl: `data:${mimeType};base64,${base64}`,
+              position: {
+                // Excel uses floating point row/col positions for images
+                // tl = top-left, br = bottom-right
+                // Note: ExcelJS uses 0-based indexing for images
+                startRow: Math.floor(image.range.tl.row || image.range.tl.nativeRow || 0),
+                startCol: Math.floor(image.range.tl.col || image.range.tl.nativeCol || 0),
+                endRow: Math.ceil(image.range.br.row || image.range.br.nativeRow || 0),
+                endCol: Math.ceil(image.range.br.col || image.range.br.nativeCol || 0),
+                // Keep precise positions for better rendering
+                tlRow: image.range.tl.row || image.range.tl.nativeRow || 0,
+                tlCol: image.range.tl.col || image.range.tl.nativeCol || 0,
+                brRow: image.range.br.row || image.range.br.nativeRow || 0,
+                brCol: image.range.br.col || image.range.br.nativeCol || 0,
+                // Native offsets in EMUs (English Metric Units)
+                // 1 pixel = 9525 EMUs
+                tlColOffset: image.range.tl.nativeColOff || 0,
+                tlRowOffset: image.range.tl.nativeRowOff || 0,
+                brColOffset: image.range.br.nativeColOff || 0,
+                brRowOffset: image.range.br.nativeRowOff || 0
+              },
+              name: imageData.name || `image_${image.imageId}`,
+              extension: imageData.extension
+            });
+            
+            console.log(`[Images] Processed image ${image.imageId} at position:`, {
+              topLeft: {
+                row: image.range.tl.row,
+                col: image.range.tl.col,
+                nativeRow: image.range.tl.nativeRow,
+                nativeCol: image.range.tl.nativeCol,
+                nativeRowOff: image.range.tl.nativeRowOff,
+                nativeColOff: image.range.tl.nativeColOff
+              },
+              bottomRight: {
+                row: image.range.br.row,
+                col: image.range.br.col,
+                nativeRow: image.range.br.nativeRow,
+                nativeCol: image.range.br.nativeCol,
+                nativeRowOff: image.range.br.nativeRowOff,
+                nativeColOff: image.range.br.nativeColOff
+              },
+              calculated: {
+                startRow: Math.floor(image.range.tl.row || image.range.tl.nativeRow || 0),
+                startCol: Math.floor(image.range.tl.col || image.range.tl.nativeCol || 0),
+                endRow: Math.ceil(image.range.br.row || image.range.br.nativeRow || 0),
+                endCol: Math.ceil(image.range.br.col || image.range.br.nativeCol || 0)
+              }
+            });
+          }
+        } catch (imageError) {
+          console.error(`[Images] Error processing image ${image.imageId}:`, imageError);
+        }
+      }
+    }
+    
+    // Fallback: If getImages() doesn't work (common with MS Excel files), 
+    // try to access media directly (though we won't have position info)
+    if (images.length === 0 && self.workbook.model.media && self.workbook.model.media.length > 0) {
+      console.log(`[Images] getImages() returned empty, but found ${self.workbook.model.media.length} media items`);
+      // Note: Without position data, we can't place these images correctly
+      // This is a known limitation with ExcelJS and MS Excel files
+    }
+  } catch (error) {
+    console.error('[Images] Error extracting images:', error);
+  }
   
   
   self.postMessage({

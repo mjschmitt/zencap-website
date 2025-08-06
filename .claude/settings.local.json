@@ -32,7 +32,10 @@
       "Bash(git commit:*)",
       "Bash(wmic process where:*)",
       "Bash(start http://localhost:3005/models/111-SW-16th-Ter)",
-      "Bash(git reset:*)"
+      "Bash(git reset:*)",
+      "Bash(git rm:*)",
+      "Bash(git restore:*)",
+      "Bash(dir:*)"
     ],
     "deny": []
   }

@@ -45,3 +45,7 @@ next-env.d.ts
 # backup files
 **/backup/
 *.backup
+
+# uploaded Excel files
+public/uploads/excel/
+temp_models.json
