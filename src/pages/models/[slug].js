@@ -162,8 +162,16 @@ export default function ModelDetail({ model, relatedModels }) {
                 </div>
                 
                 <div className="flex flex-wrap gap-4">
-                  <Button href={model.file_url || "#"} variant="accent" size="lg">
-                    Purchase Now
+                  <Button 
+                    href={`/checkout?modelId=${model.id}&modelSlug=${model.slug}&modelTitle=${encodeURIComponent(model.title)}&modelPrice=${model.price}`} 
+                    variant="accent" 
+                    size="lg"
+                    className="flex items-center"
+                  >
+                    <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                    </svg>
+                    Buy Now - ${model.price.toLocaleString()}
                   </Button>
                   <Button href="#faq" variant="secondary" size="lg">
                     Learn More
@@ -386,7 +394,15 @@ export default function ModelDetail({ model, relatedModels }) {
           
           <Motion animation="fade" direction="up" delay={400}>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button href={model.file_url || "#"} variant="accent" size="lg">
+              <Button 
+                href={`/checkout?modelId=${model.id}&modelSlug=${model.slug}&modelTitle=${encodeURIComponent(model.title)}&modelPrice=${model.price}`} 
+                variant="accent" 
+                size="lg"
+                className="flex items-center"
+              >
+                <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                </svg>
                 Purchase for ${model.price.toLocaleString()}
               </Button>
               <Button href="/contact" variant="secondary" size="lg">
@@ -396,6 +412,31 @@ export default function ModelDetail({ model, relatedModels }) {
           </Motion>
         </div>
       </section>
+
+      {/* Floating Buy Now Button - Mobile Sticky */}
+      <div className="fixed bottom-0 left-0 right-0 bg-white dark:bg-navy-800 border-t border-gray-200 dark:border-navy-600 p-4 z-50 lg:hidden">
+        <div className="flex items-center justify-between">
+          <div>
+            <div className="text-lg font-bold text-navy-700 dark:text-white">
+              ${model.price.toLocaleString()}
+            </div>
+            <div className="text-sm text-gray-600 dark:text-gray-300">
+              {model.title}
+            </div>
+          </div>
+          <Button 
+            href={`/checkout?modelId=${model.id}&modelSlug=${model.slug}&modelTitle=${encodeURIComponent(model.title)}&modelPrice=${model.price}`} 
+            variant="accent" 
+            size="lg"
+            className="flex items-center"
+          >
+            <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+            </svg>
+            Buy Now
+          </Button>
+        </div>
+      </div>
     </Layout>
   );
 }

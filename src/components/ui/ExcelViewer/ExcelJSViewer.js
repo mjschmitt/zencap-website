@@ -50,7 +50,7 @@ const ExcelJSViewer = ({
   const [zoom, setZoom] = useState(100);
   const [selectedCell, setSelectedCell] = useState(null);
   const [viewport, setViewport] = useState({
-    start: { row: 1, col: 1 },
+    start: { row: 0, col: 0 },  // Fixed: Excel uses 0-based indexing internally
     end: { row: 1000, col: 200 }  // Load more data upfront
   });
   const [isInitialLoadComplete, setIsInitialLoadComplete] = useState(false);
@@ -86,7 +86,7 @@ const ExcelJSViewer = ({
       // Set new active sheet - this will trigger data loading via useEffect
       setActiveSheet(index);
       setViewport({
-        start: { row: 1, col: 1 },
+        start: { row: 0, col: 0 },  // Fixed: Excel uses 0-based indexing internally
         end: { row: 1000, col: 200 }
       });
     }
@@ -544,8 +544,8 @@ const ExcelJSViewer = ({
         const bufferCols = isCritical ? 15 : (isWarning ? 20 : 30);
         
         const newStart = {
-          row: Math.max(1, newViewport.startRow - bufferRows),
-          col: Math.max(1, newViewport.startCol - bufferCols)
+          row: Math.max(0, newViewport.startRow - bufferRows),  // Fixed: Excel uses 0-based indexing internally
+          col: Math.max(0, newViewport.startCol - bufferCols)  // Fixed: Excel uses 0-based indexing internally
         };
         const newEnd = {
           row: newViewport.endRow + bufferRows,
@@ -610,28 +610,28 @@ const ExcelJSViewer = ({
     if (!sheetData) return;
 
     // If no cell is selected, start from the first cell
-    const currentRow = selectedCell?.row || 1;
-    const currentCol = selectedCell?.col || 1;
+    const currentRow = selectedCell?.row || 0;  // Fixed: Excel uses 0-based indexing internally
+    const currentCol = selectedCell?.col || 0;  // Fixed: Excel uses 0-based indexing internally
 
     let newRow = currentRow;
     let newCol = currentCol;
 
     switch (direction) {
       case 'up':
-        newRow = Math.max(1, currentRow - 1);
+        newRow = Math.max(0, currentRow - 1);  // Fixed: Excel uses 0-based indexing internally
         break;
       case 'down':
         newRow = currentRow + 1;
         break;
       case 'left':
-        newCol = Math.max(1, currentCol - 1);
+        newCol = Math.max(0, currentCol - 1);  // Fixed: Excel uses 0-based indexing internally
         break;
       case 'right':
         newCol = currentCol + 1;
         break;
       case 'start':
-        newRow = 1;
-        newCol = 1;
+        newRow = 0;  // Fixed: Excel uses 0-based indexing internally
+        newCol = 0;  // Fixed: Excel uses 0-based indexing internally
         break;
       case 'end':
         // Find the last cell with data
@@ -643,7 +643,7 @@ const ExcelJSViewer = ({
         }
         break;
       case 'pageUp':
-        newRow = Math.max(1, currentRow - 20);
+        newRow = Math.max(0, currentRow - 20);  // Fixed: Excel uses 0-based indexing internally
         break;
       case 'pageDown':
         newRow = currentRow + 20;

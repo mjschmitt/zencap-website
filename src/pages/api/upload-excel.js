@@ -2,7 +2,7 @@ import formidable from 'formidable';
 import fs from 'fs/promises';
 import fsSync from 'fs';
 import path from 'path';
-import * as XLSX from 'xlsx';
+import * as XLSX from 'node-xlsx';
 import crypto from 'crypto';
 import { withRateLimit } from '../../middleware/rate-limit.js';
 import { 

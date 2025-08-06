@@ -1,0 +1,74 @@
+{
+  "framework": "nextjs",
+  "buildCommand": "npm run build",
+  "outputDirectory": ".next",
+  "installCommand": "npm install",
+  "devCommand": "npm run dev",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "regions": ["iad1"],
+  "functions": {
+    "src/pages/api/**/*.js": {
+      "runtime": "@vercel/node@18.x",
+      "maxDuration": 30
+    },
+    "src/pages/api/upload-excel.js": {
+      "runtime": "@vercel/node@18.x",
+      "maxDuration": 60
+    },
+    "src/pages/api/health.js": {
+      "runtime": "@vercel/node@18.x",
+      "maxDuration": 10
+    }
+  },
+  "headers": [
+    {
+      "source": "/api/(.*)",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "no-cache, no-store, must-revalidate"
+        }
+      ]
+    },
+    {
+      "source": "/(.*)",
+      "headers": [
+        {
+          "key": "X-Content-Type-Options",
+          "value": "nosniff"
+        },
+        {
+          "key": "X-Frame-Options",
+          "value": "DENY"
+        },
+        {
+          "key": "X-XSS-Protection",
+          "value": "1; mode=block"
+        }
+      ]
+    }
+  ],
+  "redirects": [
+    {
+      "source": "/debug-viewport",
+      "destination": "/",
+      "permanent": false
+    },
+    {
+      "source": "/health-check",
+      "destination": "/api/health",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/models/private-equity",
+      "destination": "/models/private-equity"
+    },
+    {
+      "source": "/solutions/research",
+      "destination": "/solutions/research"
+    }
+  ]
+}

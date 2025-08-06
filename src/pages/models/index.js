@@ -131,8 +131,8 @@ export default function Models() {
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
               {featuredModels.map((model) => (
                 <Motion key={model.id} animation="fade" direction="up" delay={200} className="h-full">
-                  <Link href={`/models/${model.slug}`} className="block h-full">
-                    <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
+                  <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
+                    <Link href={`/models/${model.slug}`}>
                       {model.thumbnail_url ? (
                         <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                           <img 
@@ -146,32 +146,47 @@ export default function Models() {
                           [{model.title} Preview]
                         </div>
                       )}
-                      <div className="p-6">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
-                            {model.category}
-                          </span>
-                          <span className="text-lg font-bold text-teal-500">
-                            ${model.price?.toLocaleString() || 'Contact'}
-                          </span>
-                        </div>
-                        <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3">
+                    </Link>
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
+                          {model.category}
+                        </span>
+                        <span className="text-lg font-bold text-teal-500">
+                          ${model.price?.toLocaleString() || 'Contact'}
+                        </span>
+                      </div>
+                      <Link href={`/models/${model.slug}`}>
+                        <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer">
                           {model.title}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-300 mb-4">
-                          {model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : 'Professional financial model for investment analysis.'}
-                        </p>
-                        <div className="flex items-center justify-between">
-                          <span className="text-sm text-teal-600 dark:text-teal-400 font-medium">
-                            View Details
-                          </span>
-                          <svg className="w-5 h-5 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </Link>
+                      <p className="text-gray-600 dark:text-gray-300 mb-4">
+                        {model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : 'Professional financial model for investment analysis.'}
+                      </p>
+                      <div className="flex items-center justify-between gap-3">
+                        <Button
+                          href={`/models/${model.slug}`}
+                          variant="ghost"
+                          size="sm"
+                          className="text-sm"
+                        >
+                          View Details
+                        </Button>
+                        <Button
+                          href={`/checkout?modelId=${model.id}&modelSlug=${model.slug}&modelTitle=${encodeURIComponent(model.title)}&modelPrice=${model.price}`}
+                          variant="accent"
+                          size="sm"
+                          className="flex items-center"
+                        >
+                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                           </svg>
-                        </div>
+                          Buy Now
+                        </Button>
                       </div>
-                    </Card>
-                  </Link>
+                    </div>
+                  </Card>
                 </Motion>
               ))}
             </div>
@@ -192,8 +207,8 @@ export default function Models() {
             {regularModels.length > 0 ? (
               regularModels.map((model) => (
                 <Motion key={model.id} animation="fade" direction="up" delay={200} className="h-full">
-                  <Link href={`/models/${model.slug}`} className="block h-full">
-                    <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
+                  <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
+                    <Link href={`/models/${model.slug}`}>
                       {model.thumbnail_url ? (
                         <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                           <img 
@@ -207,32 +222,47 @@ export default function Models() {
                           [{model.title} Preview]
                         </div>
                       )}
-                      <div className="p-6">
-                        <div className="flex items-center justify-between mb-3">
-                          <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
-                            {model.category}
-                          </span>
-                          <span className="text-lg font-bold text-teal-500">
-                            ${model.price?.toLocaleString() || 'Contact'}
-                          </span>
-                        </div>
-                        <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2">
+                    </Link>
+                    <div className="p-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
+                          {model.category}
+                        </span>
+                        <span className="text-lg font-bold text-teal-500">
+                          ${model.price?.toLocaleString() || 'Contact'}
+                        </span>
+                      </div>
+                      <Link href={`/models/${model.slug}`}>
+                        <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer">
                           {model.title}
                         </h3>
-                        <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                          {model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : 'Professional financial model for investment analysis.'}
-                        </p>
-                        <div className="flex items-center justify-between mt-auto">
-                          <span className="text-sm text-teal-600 dark:text-teal-400 font-medium">
-                            View Details
-                          </span>
-                          <svg className="w-4 h-4 text-teal-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                      </Link>
+                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
+                        {model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : 'Professional financial model for investment analysis.'}
+                      </p>
+                      <div className="flex items-center justify-between gap-2 mt-auto">
+                        <Button
+                          href={`/models/${model.slug}`}
+                          variant="ghost"
+                          size="sm"
+                          className="text-xs"
+                        >
+                          View Details
+                        </Button>
+                        <Button
+                          href={`/checkout?modelId=${model.id}&modelSlug=${model.slug}&modelTitle=${encodeURIComponent(model.title)}&modelPrice=${model.price}`}
+                          variant="accent"
+                          size="sm"
+                          className="flex items-center text-xs"
+                        >
+                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                           </svg>
-                        </div>
+                          Buy Now
+                        </Button>
                       </div>
-                    </Card>
-                  </Link>
+                    </div>
+                  </Card>
                 </Motion>
               ))
             ) : (

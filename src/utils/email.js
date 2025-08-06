@@ -209,6 +209,124 @@ export async function sendNewsletterWelcome(email) {
 }
 
 /**
+ * General purpose email sending function
+ */
+export async function sendEmail(to, subject, textContent, htmlContent) {
+  try {
+    const msg = {
+      to,
+      from: {
+        email: process.env.SENDGRID_FROM_EMAIL || 'info@zencap.co',
+        name: process.env.SENDGRID_FROM_NAME || 'Zenith Capital Advisors'
+      },
+      subject,
+      text: textContent,
+      html: htmlContent,
+    };
+
+    await sgMail.send(msg);
+    console.log('Email sent successfully to:', to);
+    return true;
+  } catch (error) {
+    console.error('Error sending email:', error);
+    throw error;
+  }
+}
+
+/**
+ * Email templates
+ */
+export const emailTemplates = {
+  purchaseConfirmation: (customerName, modelTitle, sessionId) => `
+    Dear ${customerName},
+
+    Thank you for your purchase of ${modelTitle}!
+
+    Your order has been processed successfully.
+    Order ID: ${sessionId}
+
+    You can download your financial model from your customer portal at any time.
+
+    If you have any questions or need support, please don't hesitate to contact us.
+
+    Best regards,
+    The Zenith Capital Advisors Team
+  `,
+  
+  purchaseConfirmationHtml: (customerName, modelTitle, sessionId) => `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
+      <div style="text-align: center; padding: 20px; background-color: #1a3a5f; color: white;">
+        <h1 style="margin: 0;">Purchase Confirmation</h1>
+      </div>
+      
+      <div style="padding: 30px;">
+        <h2 style="color: #1a3a5f;">Thank You for Your Purchase!</h2>
+        
+        <p style="line-height: 1.6; color: #333;">
+          Dear ${customerName},
+        </p>
+        
+        <p style="line-height: 1.6; color: #333;">
+          Thank you for purchasing <strong>${modelTitle}</strong>. Your order has been processed successfully.
+        </p>
+        
+        <div style="background-color: #f8f9fa; padding: 20px; border-radius: 8px; margin: 20px 0;">
+          <h3 style="color: #1a3a5f; margin-top: 0;">Order Details</h3>
+          <p><strong>Product:</strong> ${modelTitle}</p>
+          <p><strong>Order ID:</strong> ${sessionId}</p>
+          <p><strong>Status:</strong> <span style="color: #046B4E; font-weight: bold;">Complete</span></p>
+        </div>
+        
+        <div style="background-color: #e8f4f8; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #046B4E;">
+          <h3 style="color: #1a3a5f; margin-top: 0;">Next Steps</h3>
+          <ol style="color: #333; line-height: 1.6;">
+            <li>Access your customer portal to download your model</li>
+            <li>Review the included documentation and instructions</li>
+            <li>Contact our support team if you need any assistance</li>
+          </ol>
+        </div>
+        
+        <p style="line-height: 1.6; color: #333;">
+          Your purchase includes:
+        </p>
+        <ul style="color: #333; line-height: 1.6;">
+          <li>Complete Excel financial model</li>
+          <li>Comprehensive documentation</li>
+          <li>30-day email support</li>
+          <li>Lifetime access and updates</li>
+        </ul>
+        
+        <div style="text-align: center; margin: 30px 0;">
+          <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/customer-portal" 
+             style="background-color: #046B4E; color: white; padding: 12px 24px; text-decoration: none; border-radius: 5px; font-weight: bold;">
+            Access Customer Portal
+          </a>
+        </div>
+        
+        <p style="line-height: 1.6; color: #333;">
+          If you have any questions or need support, please contact us at 
+          <a href="mailto:info@zencap.co">info@zencap.co</a> or visit our 
+          <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/contact">contact page</a>.
+        </p>
+        
+        <p style="line-height: 1.6; color: #333;">
+          Best regards,<br>
+          <strong>The Zenith Capital Advisors Team</strong>
+        </p>
+      </div>
+      
+      <div style="text-align: center; padding: 20px; background-color: #f8f9fa; color: #666; font-size: 14px;">
+        <p>© 2025 Zenith Capital Advisors. All rights reserved.</p>
+        <p>
+          <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}" style="color: #046B4E;">Visit our website</a> | 
+          <a href="${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/contact" style="color: #046B4E;">Contact Support</a>
+        </p>
+      </div>
+    </div>
+  `
+};
+
+/**
  * Test email configuration
  */
 export async function testEmailConfiguration() {

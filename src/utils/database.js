@@ -157,6 +157,113 @@ export async function initializeDatabase() {
       );
     `;
 
+    // Create customers table for Stripe integration
+    await sql`
+      CREATE TABLE IF NOT EXISTS customers (
+        id SERIAL PRIMARY KEY,
+        stripe_customer_id VARCHAR(255) UNIQUE NOT NULL,
+        email VARCHAR(255) NOT NULL,
+        name VARCHAR(255),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        metadata JSONB
+      );
+    `;
+
+    // Create orders table for purchase tracking
+    await sql`
+      CREATE TABLE IF NOT EXISTS orders (
+        id SERIAL PRIMARY KEY,
+        stripe_session_id VARCHAR(255) UNIQUE,
+        stripe_payment_intent_id VARCHAR(255),
+        customer_id INTEGER REFERENCES customers(id),
+        model_id INTEGER REFERENCES models(id),
+        model_slug VARCHAR(255),
+        amount NUMERIC NOT NULL,
+        currency VARCHAR(3) DEFAULT 'usd',
+        status VARCHAR(50) DEFAULT 'pending',
+        download_expires_at TIMESTAMP WITH TIME ZONE,
+        download_count INTEGER DEFAULT 0,
+        max_downloads INTEGER DEFAULT 3,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        metadata JSONB
+      );
+    `;
+
+    // Create payment_methods table
+    await sql`
+      CREATE TABLE IF NOT EXISTS payment_methods (
+        id SERIAL PRIMARY KEY,
+        stripe_payment_method_id VARCHAR(255) UNIQUE NOT NULL,
+        customer_id INTEGER REFERENCES customers(id),
+        type VARCHAR(50) NOT NULL,
+        last4 VARCHAR(4),
+        brand VARCHAR(50),
+        exp_month INTEGER,
+        exp_year INTEGER,
+        is_default BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Create user accounts for NextAuth
+    await sql`
+      CREATE TABLE IF NOT EXISTS accounts (
+        id SERIAL PRIMARY KEY,
+        user_id INTEGER NOT NULL,
+        type VARCHAR(255) NOT NULL,
+        provider VARCHAR(255) NOT NULL,
+        provider_account_id VARCHAR(255) NOT NULL,
+        refresh_token TEXT,
+        access_token TEXT,
+        expires_at INTEGER,
+        token_type VARCHAR(255),
+        scope VARCHAR(255),
+        id_token TEXT,
+        session_state VARCHAR(255),
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Create users table for NextAuth
+    await sql`
+      CREATE TABLE IF NOT EXISTS users (
+        id SERIAL PRIMARY KEY,
+        name VARCHAR(255),
+        email VARCHAR(255) UNIQUE,
+        email_verified TIMESTAMP WITH TIME ZONE,
+        image TEXT,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        stripe_customer_id VARCHAR(255)
+      );
+    `;
+
+    // Create sessions table for NextAuth
+    await sql`
+      CREATE TABLE IF NOT EXISTS sessions (
+        id SERIAL PRIMARY KEY,
+        session_token VARCHAR(255) UNIQUE NOT NULL,
+        user_id INTEGER NOT NULL,
+        expires TIMESTAMP WITH TIME ZONE NOT NULL,
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP,
+        updated_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
+    // Create verification_tokens table for NextAuth
+    await sql`
+      CREATE TABLE IF NOT EXISTS verification_tokens (
+        identifier VARCHAR(255) NOT NULL,
+        token VARCHAR(255) NOT NULL,
+        expires TIMESTAMP WITH TIME ZONE NOT NULL,
+        PRIMARY KEY (identifier, token)
+      );
+    `;
+
     // Create indexes for better performance (one at a time)
     await sql`CREATE INDEX IF NOT EXISTS idx_event_type ON security_audit_logs(event_type);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_user_id ON security_audit_logs(user_id);`;
@@ -167,6 +274,19 @@ export async function initializeDatabase() {
     await sql`CREATE INDEX IF NOT EXISTS idx_analytics_timestamp ON user_analytics(timestamp);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_insights_status ON insights(status);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_models_status ON models(status);`;
+    
+    // Payment system indexes
+    await sql`CREATE INDEX IF NOT EXISTS idx_customers_stripe_id ON customers(stripe_customer_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_customers_email ON customers(email);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_orders_customer_id ON orders(customer_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_orders_status ON orders(status);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_orders_stripe_session ON orders(stripe_session_id);`;
+    
+    // NextAuth indexes
+    await sql`CREATE INDEX IF NOT EXISTS idx_accounts_user_id ON accounts(user_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(session_token);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);`;
 
     console.log('Database tables initialized successfully');
   } catch (error) {
@@ -191,6 +311,35 @@ export async function insertLead(leadData) {
     return result.rows[0];
   } catch (error) {
     console.error('Error inserting lead:', error);
+    throw error;
+  }
+}
+
+/**
+ * Get database connection (for backward compatibility)
+ */
+export async function getDbConnection() {
+  // Return a mock connection object for health checks
+  return {
+    query: async (queryString) => {
+      // Use the sql template for actual queries
+      return await sql`${queryString}`;
+    },
+    end: async () => {
+      // Connection pooling handled by Vercel
+      return Promise.resolve();
+    }
+  };
+}
+
+/**
+ * Query function for backward compatibility
+ */
+export async function query(queryString, params = []) {
+  try {
+    return await sql`${queryString}`;
+  } catch (error) {
+    console.error('Database query error:', error);
     throw error;
   }
 }
@@ -330,4 +479,157 @@ export async function getAllModels() {
     console.error('Error fetching models:', error);
     throw error;
   }
-} 
+}
+
+/**
+ * Payment System Functions
+ */
+
+// Create or get customer
+export async function createOrGetCustomer(customerData) {
+  try {
+    const { stripe_customer_id, email, name, metadata = {} } = customerData;
+    
+    const result = await sql`
+      INSERT INTO customers (stripe_customer_id, email, name, metadata)
+      VALUES (${stripe_customer_id}, ${email}, ${name}, ${JSON.stringify(metadata)})
+      ON CONFLICT (stripe_customer_id) DO UPDATE SET
+        email = EXCLUDED.email,
+        name = EXCLUDED.name,
+        metadata = EXCLUDED.metadata,
+        updated_at = CURRENT_TIMESTAMP
+      RETURNING *;
+    `;
+    
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error creating/getting customer:', error);
+    throw error;
+  }
+}
+
+// Create order
+export async function createOrder(orderData) {
+  try {
+    const {
+      stripe_session_id,
+      stripe_payment_intent_id,
+      customer_id,
+      model_id,
+      model_slug,
+      amount,
+      currency = 'usd',
+      status = 'pending',
+      metadata = {}
+    } = orderData;
+    
+    // Set download expiry to 7 days from now
+    const downloadExpiresAt = new Date();
+    downloadExpiresAt.setDate(downloadExpiresAt.getDate() + 7);
+    
+    const result = await sql`
+      INSERT INTO orders (
+        stripe_session_id, stripe_payment_intent_id, customer_id, model_id, 
+        model_slug, amount, currency, status, download_expires_at, metadata
+      )
+      VALUES (
+        ${stripe_session_id}, ${stripe_payment_intent_id}, ${customer_id}, ${model_id},
+        ${model_slug}, ${amount}, ${currency}, ${status}, ${downloadExpiresAt}, ${JSON.stringify(metadata)}
+      )
+      RETURNING *;
+    `;
+    
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error creating order:', error);
+    throw error;
+  }
+}
+
+// Update order status
+export async function updateOrderStatus(sessionId, status, paymentIntentId = null) {
+  try {
+    const result = await sql`
+      UPDATE orders 
+      SET status = ${status}, 
+          stripe_payment_intent_id = COALESCE(${paymentIntentId}, stripe_payment_intent_id),
+          updated_at = CURRENT_TIMESTAMP
+      WHERE stripe_session_id = ${sessionId}
+      RETURNING *;
+    `;
+    
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error updating order status:', error);
+    throw error;
+  }
+}
+
+// Get order by session ID
+export async function getOrderBySessionId(sessionId) {
+  try {
+    const result = await sql`
+      SELECT o.*, m.title as model_title, m.file_url, c.email, c.name as customer_name
+      FROM orders o
+      LEFT JOIN models m ON o.model_id = m.id
+      LEFT JOIN customers c ON o.customer_id = c.id
+      WHERE o.stripe_session_id = ${sessionId};
+    `;
+    
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error fetching order by session ID:', error);
+    throw error;
+  }
+}
+
+// Get orders by customer
+export async function getOrdersByCustomer(customerId) {
+  try {
+    const result = await sql`
+      SELECT o.*, m.title as model_title, m.slug as model_slug
+      FROM orders o
+      LEFT JOIN models m ON o.model_id = m.id
+      WHERE o.customer_id = ${customerId} AND o.status = 'completed'
+      ORDER BY o.created_at DESC;
+    `;
+    
+    return result.rows;
+  } catch (error) {
+    console.error('Error fetching orders by customer:', error);
+    throw error;
+  }
+}
+
+// Increment download count
+export async function incrementDownloadCount(orderId) {
+  try {
+    const result = await sql`
+      UPDATE orders 
+      SET download_count = download_count + 1,
+          updated_at = CURRENT_TIMESTAMP
+      WHERE id = ${orderId} AND download_count < max_downloads AND download_expires_at > NOW()
+      RETURNING *;
+    `;
+    
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error incrementing download count:', error);
+    throw error;
+  }
+}
+
+// Get model by slug
+export async function getModelBySlug(slug) {
+  try {
+    const result = await sql`
+      SELECT * FROM models 
+      WHERE slug = ${slug} AND status = 'active';
+    `;
+    
+    return result.rows[0];
+  } catch (error) {
+    console.error('Error fetching model by slug:', error);
+    throw error;
+  }
+}

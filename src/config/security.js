@@ -1,376 +1,261 @@
-/**
- * @fileoverview Security configuration for Excel viewer and file uploads
- * @module config/security
- */
+// Central security configuration for Zenith Capital Advisors platform
+// Head of Security & Compliance - Critical security settings
 
-/**
- * Generate CSP header from directives
- * @param {Object} directives - CSP directives
- * @returns {string} CSP header value
- */
-function generateCSP(directives) {
-  return Object.entries(directives)
-    .map(([key, values]) => {
-      if (values.length === 0) return key;
-      return `${key} ${values.join(' ')}`;
-    })
-    .join('; ');
-}
-
-// Content Security Policy directives
-export const CSP_DIRECTIVES = {
-  // Base policy
-  'default-src': ["'self'"],
-  'script-src': ["'self'", "'unsafe-inline'", "'unsafe-eval'", "https://www.googletagmanager.com", "https://www.google-analytics.com"],
-  'style-src': ["'self'", "'unsafe-inline'", "https://fonts.googleapis.com"],
-  'font-src': ["'self'", "https://fonts.gstatic.com"],
-  'img-src': ["'self'", "data:", "https:", "blob:"],
-  'connect-src': ["'self'", "https://www.google-analytics.com"],
-  'frame-src': ["'none'"],
-  'object-src': ["'none'"],
-  'base-uri': ["'self'"],
-  'form-action': ["'self'"],
-  'frame-ancestors': ["'none'"],
-  'upgrade-insecure-requests': [],
-  
-  // Excel viewer specific
-  'worker-src': ["'self'", "blob:"],
-  'child-src': ["'self'", "blob:"]
-};
-
-// Security headers configuration
-export const SECURITY_HEADERS = {
-  // Prevent clickjacking
-  'X-Frame-Options': 'DENY',
-  'Content-Security-Policy-Report-Only': generateCSP(CSP_DIRECTIVES),
-  
-  // XSS protection
-  'X-XSS-Protection': '1; mode=block',
-  'X-Content-Type-Options': 'nosniff',
-  
-  // HTTPS enforcement
-  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
-  
-  // Referrer policy
-  'Referrer-Policy': 'strict-origin-when-cross-origin',
-  
-  // Permissions policy
-  'Permissions-Policy': 'camera=(), microphone=(), geolocation=(), payment=()',
-  
-  // CORS
-  'Access-Control-Allow-Credentials': 'true',
-  'Access-Control-Allow-Methods': 'GET, POST, PUT, DELETE, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization, X-Requested-With, X-CSRF-Token',
-  
-  // Cache control for sensitive data
-  'Cache-Control': 'no-store, no-cache, must-revalidate, proxy-revalidate',
-  'Pragma': 'no-cache',
-  'Expires': '0'
-};
-
-// File upload security configuration
 export const FILE_SECURITY = {
-  // Maximum file sizes
-  maxFileSize: 200 * 1024 * 1024, // 200MB
-  maxChunkSize: 10 * 1024 * 1024, // 10MB
+  // Maximum file size: 100MB for Excel models
+  maxFileSize: 100 * 1024 * 1024,
+  
+  // Allowed file extensions for uploads
+  allowedExtensions: ['.xlsx', '.xlsm', '.xls'],
   
   // Allowed MIME types
   allowedMimeTypes: [
-    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet', // .xlsx
-    'application/vnd.ms-excel', // .xls
-    'application/vnd.ms-excel.sheet.macroEnabled.12', // .xlsm
-    'application/vnd.ms-excel.sheet.binary.macroEnabled.12' // .xlsb
+    'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+    'application/vnd.ms-excel.sheet.macroEnabled.12',
+    'application/vnd.ms-excel'
   ],
   
-  // Allowed file extensions
-  allowedExtensions: ['.xlsx', '.xls', '.xlsm', '.xlsb'],
-  
-  // Magic numbers for file type validation
-  magicNumbers: {
-    xlsx: [0x50, 0x4B, 0x03, 0x04], // ZIP format (XLSX)
-    xls: [0xD0, 0xCF, 0x11, 0xE0, 0xA1, 0xB1, 0x1A, 0xE1], // OLE format
-    xlsb: [0x50, 0x4B, 0x03, 0x04] // ZIP format (XLSB)
-  },
-  
-  // Dangerous patterns to detect in Excel files
-  dangerousPatterns: [
-    // Macro indicators
-    /vbaProject\.bin/i,
-    /\.xlsm$/i,
-    /macroEnabled/i,
-    
-    // External references
-    /external\s*\(/i,
-    /WEBSERVICE\s*\(/i,
-    /FILTERXML\s*\(/i,
-    
-    // Shell commands
-    /cmd\.exe/i,
-    /powershell/i,
-    /bash/i,
-    /sh\s+-c/i,
-    
-    // Network calls
-    /http[s]?:\/\//i,
-    /ftp:\/\//i,
-    /file:\/\//i,
-    
-    // SQL injection patterns
-    /union\s+select/i,
-    /drop\s+table/i,
-    /exec\s*\(/i,
-    
-    // Script injection
-    /<script[^>]*>/i,
-    /javascript:/i,
-    /vbscript:/i,
-    /onload\s*=/i,
-    /onerror\s*=/i
-  ],
-  
-  // Formula validation rules
-  formulaRules: {
-    // Blocked functions
-    blockedFunctions: [
-      'CALL', 'REGISTER', 'EXEC', 'SYSTEM',
-      'SHELL', 'RUN', 'OPEN', 'SAVE',
-      'WEBSERVICE', 'FILTERXML', 'ENCODEURL'
-    ],
-    
-    // Maximum formula length
-    maxFormulaLength: 1000,
-    
-    // Maximum nested functions
-    maxNestedFunctions: 10
-  },
-  
-  // Virus scanning configuration
-  virusScan: {
+  // File scanning settings
+  virusScanning: {
     enabled: true,
-    provider: 'clamav', // or 'virustotal', 'windows-defender'
-    timeout: 30000, // 30 seconds
-    quarantinePath: '/var/quarantine/excel'
-  }
-};
-
-// Input sanitization rules
-export const SANITIZATION_RULES = {
-  // Cell content sanitization
-  cell: {
-    maxLength: 32767, // Excel cell limit
-    stripHtml: true,
-    stripScripts: true,
-    encodeSpecialChars: true,
-    
-    // Patterns to remove
-    removePatterns: [
-      /<[^>]*>/g, // HTML tags
-      /javascript:/gi, // JavaScript protocol
-      /vbscript:/gi, // VBScript protocol
-      /on\w+\s*=/gi // Event handlers
-    ]
+    quarantineOnDetection: true,
+    scanTimeout: 30000, // 30 seconds
+    maxScanSize: 50 * 1024 * 1024 // 50MB max for virus scanning
   },
   
-  // Formula sanitization
-  formula: {
-    maxLength: 8192,
-    validateStructure: true,
+  // Content analysis settings
+  contentAnalysis: {
+    scanFormulas: true,
     blockExternalReferences: true,
-    sanitizeStrings: true
-  },
-  
-  // Filename sanitization
-  filename: {
-    maxLength: 255,
-    allowedChars: /^[a-zA-Z0-9._-]+$/,
-    stripPath: true,
-    normalizeUnicode: true
+    blockActiveContent: true,
+    maxFormulaComplexity: 100,
+    suspiciousFunctions: [
+      'WEBSERVICE',
+      'HYPERLINK',
+      'EXEC',
+      'SHELL',
+      'CALL'
+    ]
   }
 };
 
-// Rate limiting configuration
-export const RATE_LIMITS = {
-  upload: {
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 10, // 10 uploads per hour per user
-    message: 'Upload limit exceeded. Please try again later.'
-  },
-  download: {
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 50, // 50 downloads per hour per user
-    message: 'Download limit exceeded. Please try again later.'
-  },
-  process: {
-    windowMs: 60 * 60 * 1000, // 1 hour
-    max: 20, // 20 processing requests per hour
-    message: 'Processing limit exceeded. Please try again later.'
-  }
-};
-
-// Audit logging configuration
-export const AUDIT_CONFIG = {
-  // Events to log
-  events: {
-    FILE_UPLOAD: { severity: 'info', retention: 90 },
-    FILE_DOWNLOAD: { severity: 'info', retention: 90 },
-    FILE_DELETE: { severity: 'warning', retention: 180 },
-    FILE_SHARE: { severity: 'info', retention: 90 },
-    MALWARE_DETECTED: { severity: 'critical', retention: 365 },
-    UNAUTHORIZED_ACCESS: { severity: 'warning', retention: 180 },
-    FORMULA_BLOCKED: { severity: 'warning', retention: 90 },
-    RATE_LIMIT_EXCEEDED: { severity: 'warning', retention: 30 },
-    LOGIN_SUCCESS: { severity: 'info', retention: 30 },
-    LOGIN_FAILED: { severity: 'warning', retention: 90 },
-    PERMISSION_DENIED: { severity: 'warning', retention: 90 },
-    DATA_EXPORT: { severity: 'info', retention: 180 },
-    DATA_DELETE: { severity: 'warning', retention: 365 },
-    ADMIN_ACTION: { severity: 'info', retention: 365 }
-  },
-  
-  // Storage configuration
-  storage: {
-    type: 'database', // or 'file', 'siem'
-    tableName: 'security_audit_logs',
-    compression: true,
-    encryption: true
-  },
-  
-  // GDPR compliance
-  gdpr: {
-    anonymizeUserData: true,
-    excludePII: true,
-    retentionDays: 365,
-    allowUserExport: true,
-    allowUserDeletion: true
-  }
-};
-
-// Role-based access control
-export const RBAC = {
-  roles: {
-    admin: {
-      permissions: [
-        'file:upload', 'file:download', 'file:delete', 'file:share',
-        'user:create', 'user:read', 'user:update', 'user:delete',
-        'model:create', 'model:read', 'model:update', 'model:delete',
-        'audit:read', 'settings:manage'
-      ]
-    },
-    user: {
-      permissions: [
-        'file:upload', 'file:download', 'file:delete:own',
-        'model:read', 'model:download:purchased',
-        'profile:read:own', 'profile:update:own'
-      ]
-    },
-    viewer: {
-      permissions: [
-        'file:download:shared', 'model:read',
-        'profile:read:own'
-      ]
-    }
-  },
-  
-  // Resource-based permissions
-  resources: {
-    file: {
-      actions: ['upload', 'download', 'delete', 'share', 'process'],
-      ownership: true,
-      sharing: true
-    },
-    model: {
-      actions: ['create', 'read', 'update', 'delete', 'download'],
-      ownership: false,
-      pricing: true
-    },
-    user: {
-      actions: ['create', 'read', 'update', 'delete'],
-      ownership: true,
-      adminOnly: ['create', 'delete']
-    }
-  }
-};
-
-// Session security configuration
-export const SESSION_CONFIG = {
-  // JWT configuration
+export const AUTHENTICATION = {
+  // JWT settings
   jwt: {
-    algorithm: 'RS256',
-    accessTokenExpiry: '15m',
-    refreshTokenExpiry: '7d',
-    issuer: 'zencap-api',
-    audience: 'zencap-client'
+    secret: process.env.JWT_SECRET || 'zenith-capital-jwt-secret-2025',
+    expiresIn: '24h',
+    refreshExpiresIn: '7d',
+    issuer: 'zenith-capital-advisors',
+    audience: 'zencap-platform'
+  },
+  
+  // Password requirements
+  password: {
+    minLength: 12,
+    requireUppercase: true,
+    requireLowercase: true,
+    requireNumbers: true,
+    requireSymbols: true,
+    maxAge: 90 * 24 * 60 * 60 * 1000, // 90 days
+    preventReuse: 5 // Last 5 passwords
   },
   
   // Session management
   session: {
-    rolling: true,
-    resave: false,
-    saveUninitialized: false,
-    cookie: {
-      secure: true, // HTTPS only
-      httpOnly: true,
-      sameSite: 'strict',
-      maxAge: 15 * 60 * 1000 // 15 minutes
+    timeout: 60 * 60 * 1000, // 1 hour
+    extendOnActivity: true,
+    maxConcurrentSessions: 3,
+    secureOnly: true,
+    sameSite: 'strict'
+  },
+  
+  // Rate limiting
+  rateLimit: {
+    upload: {
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 10, // 10 uploads per window
+      message: 'Too many upload attempts, please try again later'
+    },
+    api: {
+      windowMs: 60 * 1000, // 1 minute
+      max: 100, // 100 requests per minute
+      message: 'Too many API requests, please slow down'
+    },
+    auth: {
+      windowMs: 15 * 60 * 1000, // 15 minutes
+      max: 5, // 5 login attempts per window
+      message: 'Too many login attempts, please try again later'
     }
-  },
-  
-  // Multi-factor authentication
-  mfa: {
-    required: ['admin'],
-    methods: ['totp', 'sms', 'email'],
-    backupCodes: 10,
-    timeout: 300 // 5 minutes
   }
 };
 
-// GDPR compliance configuration
-export const GDPR_CONFIG = {
-  // Data retention policies
+export const ENCRYPTION = {
+  // File encryption settings
+  files: {
+    algorithm: 'aes-256-gcm',
+    keyLength: 32,
+    ivLength: 16,
+    tagLength: 16
+  },
+  
+  // Database encryption
+  database: {
+    sensitiveFields: [
+      'email',
+      'phone',
+      'address',
+      'financial_data',
+      'model_content'
+    ]
+  }
+};
+
+export const SECURITY_HEADERS = {
+  // HTTP Security Headers
+  'X-Content-Type-Options': 'nosniff',
+  'X-Frame-Options': 'DENY',
+  'X-XSS-Protection': '1; mode=block',
+  'Referrer-Policy': 'strict-origin-when-cross-origin',
+  'Permissions-Policy': 'geolocation=(), microphone=(), camera=(), payment=(), usb=()',
+  'Strict-Transport-Security': 'max-age=31536000; includeSubDomains; preload',
+  'Content-Security-Policy': `
+    default-src 'self';
+    script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.google-analytics.com;
+    style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+    font-src 'self' https://fonts.gstatic.com;
+    img-src 'self' data: https:;
+    connect-src 'self' https://www.google-analytics.com https://vitals.vercel-analytics.com;
+    frame-src 'none';
+    object-src 'none';
+    base-uri 'self';
+    form-action 'self';
+    upgrade-insecure-requests;
+  `.replace(/\s+/g, ' ').trim()
+};
+
+export const AUDIT_SETTINGS = {
+  // Audit logging configuration
+  events: {
+    highRisk: [
+      'FILE_UPLOAD',
+      'FILE_DOWNLOAD',
+      'LOGIN_SUCCESS',
+      'LOGIN_FAILURE',
+      'PASSWORD_CHANGE',
+      'ADMIN_ACCESS',
+      'DATA_EXPORT',
+      'MALWARE_DETECTED'
+    ],
+    mediumRisk: [
+      'FILE_ACCESS',
+      'SEARCH_QUERY',
+      'MODEL_VIEW',
+      'NEWSLETTER_SUBSCRIBE'
+    ],
+    lowRisk: [
+      'PAGE_VIEW',
+      'CONTACT_FORM'
+    ]
+  },
+  
   retention: {
-    userAccounts: 365 * 3, // 3 years
-    uploadedFiles: 90, // 90 days
-    auditLogs: 365, // 1 year
-    analyticsData: 180, // 6 months
-    backups: 30 // 30 days
+    highRisk: 7 * 365 * 24 * 60 * 60 * 1000, // 7 years
+    mediumRisk: 2 * 365 * 24 * 60 * 60 * 1000, // 2 years
+    lowRisk: 90 * 24 * 60 * 60 * 1000 // 90 days
   },
   
-  // User rights
-  rights: {
-    access: true,
-    rectification: true,
-    erasure: true,
-    portability: true,
-    restriction: true,
-    objection: true
-  },
-  
-  // Consent management
-  consent: {
-    required: ['marketing', 'analytics', 'cookies'],
-    granular: true,
-    withdrawable: true,
-    ageVerification: 16
-  },
-  
-  // Data processing
-  processing: {
-    minimization: true,
-    pseudonymization: true,
-    encryption: true,
-    accessLogging: true
+  alerting: {
+    enabled: true,
+    channels: ['email', 'slack'],
+    thresholds: {
+      malwareDetection: 1,
+      suspiciousLogins: 3,
+      massDeletion: 10
+    }
   }
 };
 
-// Export all configurations
-export default {
-  CSP_DIRECTIVES,
-  SECURITY_HEADERS,
-  FILE_SECURITY,
-  SANITIZATION_RULES,
-  RATE_LIMITS,
-  AUDIT_CONFIG,
-  RBAC,
-  SESSION_CONFIG,
-  GDPR_CONFIG
+export const GDPR_COMPLIANCE = {
+  // Data protection settings
+  dataMinimization: {
+    enabled: true,
+    autoDeleteAfter: 2 * 365 * 24 * 60 * 60 * 1000, // 2 years
+    excludeFields: ['audit_logs', 'security_events']
+  },
+  
+  consentManagement: {
+    required: true,
+    granular: true,
+    withdrawalEnabled: true,
+    trackingCookies: false // No tracking without consent
+  },
+  
+  dataPortability: {
+    enabled: true,
+    formats: ['json', 'csv'],
+    maxRequestsPerMonth: 2
+  },
+  
+  rightToErasure: {
+    enabled: true,
+    verificationRequired: true,
+    retentionOverrides: ['legal_hold', 'active_subscription']
+  }
+};
+
+export const MONITORING = {
+  // Security monitoring
+  alerts: {
+    failedLogins: 5,
+    uploadErrors: 10,
+    suspiciousActivity: 3,
+    memoryUsage: 85, // percentage
+    diskUsage: 90 // percentage
+  },
+  
+  healthChecks: {
+    interval: 5 * 60 * 1000, // 5 minutes
+    timeout: 10 * 1000, // 10 seconds
+    endpoints: [
+      '/api/health',
+      '/api/database-check',
+      '/api/storage-check'
+    ]
+  }
+};
+
+// Security utility functions
+export const SecurityUtils = {
+  // Generate cryptographically secure random strings
+  generateSecureToken: (length = 32) => {
+    return require('crypto').randomBytes(length).toString('hex');
+  },
+  
+  // Hash passwords with bcrypt
+  hashPassword: async (password) => {
+    const bcrypt = require('bcryptjs');
+    return await bcrypt.hash(password, 12);
+  },
+  
+  // Verify password hash
+  verifyPassword: async (password, hash) => {
+    const bcrypt = require('bcryptjs');
+    return await bcrypt.compare(password, hash);
+  },
+  
+  // Sanitize user input
+  sanitizeInput: (input) => {
+    if (typeof input !== 'string') return input;
+    return input
+      .replace(/[<>]/g, '') // Remove potential HTML
+      .replace(/javascript:/gi, '') // Remove JavaScript URLs
+      .replace(/on\w+=/gi, '') // Remove event handlers
+      .trim();
+  },
+  
+  // Validate file extension
+  isValidFileExtension: (filename, allowedExtensions) => {
+    const ext = require('path').extname(filename).toLowerCase();
+    return allowedExtensions.includes(ext);
+  }
 };

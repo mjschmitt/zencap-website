@@ -74,13 +74,34 @@ export default async function handler(req, res) {
       };
     }
 
-    // Check environment
+    // Check environment and deployment info
     health.services.environment = {
       status: 'healthy',
       nodeVersion: process.version,
       platform: process.platform,
-      env: process.env.NODE_ENV || 'development'
+      env: process.env.NODE_ENV || 'development',
+      vercelUrl: process.env.VERCEL_URL || 'local',
+      vercelRegion: process.env.VERCEL_REGION || 'local',
+      deploymentId: process.env.VERCEL_GIT_COMMIT_SHA ? 
+        process.env.VERCEL_GIT_COMMIT_SHA.substring(0, 7) : 'local'
     };
+
+    // Check critical services
+    const criticalEnvVars = [
+      'POSTGRES_URL',
+      'SENDGRID_API_KEY',
+      'NEXT_PUBLIC_GA_ID'
+    ];
+    
+    const missingEnvVars = criticalEnvVars.filter(varName => !process.env[varName]);
+    
+    if (missingEnvVars.length > 0) {
+      health.services.environment.status = 'warning';
+      health.services.environment.missingVars = missingEnvVars;
+      if (health.status === 'healthy') {
+        health.status = 'warning';
+      }
+    }
 
     // Return appropriate status code based on health
     const statusCode = health.status === 'healthy' ? 200 : 

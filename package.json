@@ -12,7 +12,14 @@
     "test:coverage": "jest --coverage",
     "test:e2e": "playwright test",
     "test:e2e:ui": "playwright test --ui",
-    "test:perf": "node scripts/performance-benchmarks.js"
+    "test:perf": "node scripts/performance-benchmarks.js",
+    "pre-deploy": "node scripts/pre-deploy-check.js",
+    "deploy:staging": "npm run pre-deploy && node scripts/deploy-staging.js",
+    "deploy:production": "npm run pre-deploy && node scripts/deploy-production.js",
+    "rollback": "node scripts/rollback.js",
+    "monitor": "node scripts/monitor-deployment.js",
+    "health-check": "curl -f http://localhost:3000/api/health || curl -f https://your-domain.com/api/health",
+    "status": "node scripts/deployment-status.js"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -54,9 +61,11 @@
     "jsonwebtoken": "^9.0.2",
     "lexical": "^0.33.1",
     "lowlight": "^3.3.0",
-    "luckysheet": "^2.1.13",
+    "luckysheet": "2.1.5",
     "multer": "^1.4.5-lts.1",
-    "next": "15.2.3",
+    "next": "15.4.5",
+    "next-auth": "^4.24.11",
+    "node-xlsx": "^0.24.0",
     "nodemailer": "^7.0.5",
     "pg": "^8.16.3",
     "react": "^19.0.0",
@@ -70,10 +79,10 @@
     "remark-gfm": "^4.0.1",
     "socket.io": "^4.7.5",
     "socket.io-client": "^4.7.5",
+    "stripe": "^18.4.0",
     "uuid": "^10.0.0",
     "web-vitals": "^4.2.4",
     "winston": "^3.14.2",
-    "xlsx": "^0.18.5",
     "xlsx-js-style": "^1.2.0"
   },
   "devDependencies": {

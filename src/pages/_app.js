@@ -1,5 +1,6 @@
 // src/pages/_app.js - With route-based transition customization
 import "@/styles/globals.css";
+import { SessionProvider } from 'next-auth/react';
 import { AnimatePresence } from 'framer-motion';
 import { Inter, Playfair_Display } from 'next/font/google';
 import PageTransition from '@/components/PageTransitions';
@@ -62,38 +63,40 @@ export default function App({ Component, pageProps, router }) {
   }
 
   return (
-    <main className={`${inter.variable} ${playfair.variable}`}>
-      <ErrorBoundary
-        fallback={
-          <div className="min-h-screen flex items-center justify-center">
-            <div className="text-center">
-              <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                Something went wrong
-              </h1>
-              <p className="text-gray-600 mb-6">
-                We apologize for the inconvenience. Please refresh the page or try again later.
-              </p>
-              <button
-                onClick={() => window.location.reload()}
-                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-              >
-                Refresh Page
-              </button>
+    <SessionProvider session={pageProps.session}>
+      <main className={`${inter.variable} ${playfair.variable}`}>
+        <ErrorBoundary
+          fallback={
+            <div className="min-h-screen flex items-center justify-center">
+              <div className="text-center">
+                <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                  Something went wrong
+                </h1>
+                <p className="text-gray-600 mb-6">
+                  We apologize for the inconvenience. Please refresh the page or try again later.
+                </p>
+                <button
+                  onClick={() => window.location.reload()}
+                  className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+                >
+                  Refresh Page
+                </button>
+              </div>
             </div>
-          </div>
-        }
-        errorContext={{ route: router.route }}
-      >
-        <AnimatePresence mode="wait">
-          <PageTransition 
-            key={router.route} 
-            variant={variant}
-            transitionPreset={transitionPreset}
-          >
-            <Component {...pageProps} />
-          </PageTransition>
-        </AnimatePresence>
-      </ErrorBoundary>
-    </main>
+          }
+          errorContext={{ route: router.route }}
+        >
+          <AnimatePresence mode="wait">
+            <PageTransition 
+              key={router.route} 
+              variant={variant}
+              transitionPreset={transitionPreset}
+            >
+              <Component {...pageProps} />
+            </PageTransition>
+          </AnimatePresence>
+        </ErrorBoundary>
+      </main>
+    </SessionProvider>
   );
 }

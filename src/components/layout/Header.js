@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
+import { useSession, signIn, signOut } from 'next-auth/react';
 import Navbar from './Navbar';
 import DarkModeToggle from '../ui/DarkModeToggle';
 import dynamic from 'next/dynamic';
@@ -20,7 +21,9 @@ const SearchComponent = dynamic(() => import('../ui/SearchComponent'), {
 
 export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [userMenuOpen, setUserMenuOpen] = useState(false);
   const router = useRouter();
+  const { data: session, status } = useSession();
   
   // Close mobile menu when route changes
   useEffect(() => {
