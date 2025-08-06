@@ -23,7 +23,7 @@ export default async function handler(req, res) {
     }
 
     // Create Checkout Sessions from body params
-    const session = await stripe.checkout.sessions.create({
+    const sessionConfig = {
       line_items: [
         {
           price_data: {
@@ -41,17 +41,26 @@ export default async function handler(req, res) {
       mode: 'payment',
       allow_promotion_codes: true,
       automatic_tax: {
-        enabled: false, // You can enable automatic tax calculation if needed
+        enabled: false,
       },
-      customer_email: customerEmail,
+      // Customer information collection
+      customer_creation: 'always',
+      billing_address_collection: 'required',
       metadata: {
         modelId: modelId.toString(),
         modelSlug: modelSlug || '',
         customerName: customerName || '',
       },
-      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/checkout/success?session_id={CHECKOUT_SESSION_ID}&modelTitle=${encodeURIComponent(modelTitle)}`,
-      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/checkout/cancel?modelTitle=${encodeURIComponent(modelTitle)}&modelSlug=${modelSlug}`,
-    });
+      success_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/purchase/success?session_id={CHECKOUT_SESSION_ID}&modelTitle=${encodeURIComponent(modelTitle)}`,
+      cancel_url: `${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/models/${modelSlug || ''}?checkout=cancelled`,
+    };
+
+    // Add customer email if provided, otherwise let Stripe collect it
+    if (customerEmail && customerEmail.trim()) {
+      sessionConfig.customer_email = customerEmail;
+    }
+
+    const session = await stripe.checkout.sessions.create(sessionConfig);
 
     res.status(200).json({ 
       url: session.url,
