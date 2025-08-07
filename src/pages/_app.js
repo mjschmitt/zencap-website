@@ -43,6 +43,23 @@ export default function App({ Component, pageProps, router }) {
     };
   }, []);
 
+  // Skip SessionProvider for pages that don't need authentication
+  const skipAuthPages = [
+    '/purchase/success',
+    '/checkout/success',
+    '/models',
+    '/insights',
+    '/contact',
+    '/about',
+    '/',
+    '/solutions',
+    '/404'
+  ];
+  
+  const shouldSkipAuth = skipAuthPages.some(page => 
+    router.pathname === page || router.pathname.startsWith(page + '/')
+  );
+
   // Define different transitions for different sections
   let variant = 'default';
   let transitionPreset = 'default';
@@ -62,41 +79,50 @@ export default function App({ Component, pageProps, router }) {
     transitionPreset = 'smooth';
   }
 
+  const AppContent = (
+    <main className={`${inter.variable} ${playfair.variable}`}>
+      <ErrorBoundary
+        fallback={
+          <div className="min-h-screen flex items-center justify-center">
+            <div className="text-center">
+              <h1 className="text-2xl font-bold text-gray-900 mb-4">
+                Something went wrong
+              </h1>
+              <p className="text-gray-600 mb-6">
+                We apologize for the inconvenience. Please refresh the page or try again later.
+              </p>
+              <button
+                onClick={() => window.location.reload()}
+                className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+              >
+                Refresh Page
+              </button>
+            </div>
+          </div>
+        }
+        errorContext={{ route: router.route }}
+      >
+        <AnimatePresence mode="wait">
+          <PageTransition 
+            key={router.route} 
+            variant={variant}
+            transitionPreset={transitionPreset}
+          >
+            <Component {...pageProps} />
+          </PageTransition>
+        </AnimatePresence>
+      </ErrorBoundary>
+    </main>
+  );
+
+  // Only wrap with SessionProvider if needed
+  if (shouldSkipAuth) {
+    return AppContent;
+  }
+
   return (
     <SessionProvider session={pageProps.session}>
-      <main className={`${inter.variable} ${playfair.variable}`}>
-        <ErrorBoundary
-          fallback={
-            <div className="min-h-screen flex items-center justify-center">
-              <div className="text-center">
-                <h1 className="text-2xl font-bold text-gray-900 mb-4">
-                  Something went wrong
-                </h1>
-                <p className="text-gray-600 mb-6">
-                  We apologize for the inconvenience. Please refresh the page or try again later.
-                </p>
-                <button
-                  onClick={() => window.location.reload()}
-                  className="px-6 py-3 bg-blue-600 text-white rounded-md hover:bg-blue-700"
-                >
-                  Refresh Page
-                </button>
-              </div>
-            </div>
-          }
-          errorContext={{ route: router.route }}
-        >
-          <AnimatePresence mode="wait">
-            <PageTransition 
-              key={router.route} 
-              variant={variant}
-              transitionPreset={transitionPreset}
-            >
-              <Component {...pageProps} />
-            </PageTransition>
-          </AnimatePresence>
-        </ErrorBoundary>
-      </main>
+      {AppContent}
     </SessionProvider>
   );
 }

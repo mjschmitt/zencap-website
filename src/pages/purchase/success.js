@@ -1,13 +1,11 @@
 // src/pages/purchase/success.js
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/router';
-import { useSession } from 'next-auth/react';
 import Layout from '@/components/layout/Layout';
 import { CheckCircleIcon, DocumentArrowDownIcon, ArrowPathIcon } from '@heroicons/react/24/outline';
 
 export default function PurchaseSuccess() {
   const router = useRouter();
-  const { data: session } = useSession();
   const { session_id } = router.query;
   const [order, setOrder] = useState(null);
   const [loading, setLoading] = useState(true);
