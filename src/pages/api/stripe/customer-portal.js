@@ -3,12 +3,15 @@ import Stripe from 'stripe';
 import { getSession } from 'next-auth/react';
 import { sql } from '@vercel/postgres';
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY);
-
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
+
+  // Initialize Stripe inside the handler with explicit API version
+  const stripe = new Stripe(process.env.STRIPE_SECRET_KEY, {
+    apiVersion: '2023-10-16',
+  });
 
   try {
     const session = await getSession({ req });
