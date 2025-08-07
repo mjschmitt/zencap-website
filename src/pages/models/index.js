@@ -26,6 +26,11 @@ export default function Models() {
       .then(data => {
         setModels(Array.isArray(data) ? data : []);
         setLoading(false);
+      })
+      .catch(error => {
+        console.error('Error fetching models:', error);
+        setModels([]);
+        setLoading(false);
       });
   }, []);
 
@@ -306,3 +311,10 @@ export default function Models() {
     </Layout>
   );
 }
+
+// Disable static generation to prevent build errors during prerendering
+export const getServerSideProps = async (context) => {
+  return {
+    props: {}
+  };
+};

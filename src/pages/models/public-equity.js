@@ -464,3 +464,10 @@ export default function PublicEquityModels() {
     </Layout>
   );
 }
+
+// Disable static generation to prevent build errors during prerendering
+export const getServerSideProps = async (context) => {
+  return {
+    props: {}
+  };
+};

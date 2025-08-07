@@ -1,6 +1,6 @@
 // src/components/ui/OptimizedImage.js
 import Image from 'next/image';
-import { useState } from 'react';
+import { useState, useRef, useEffect, useCallback } from 'react';
 
 const OptimizedImage = ({ 
   src, 
@@ -12,10 +12,17 @@ const OptimizedImage = ({
   sizes = '100vw',
   placeholder = 'blur',
   quality = 75,
+  lazy = true,
+  fadeIn = true,
+  onLoad,
+  onError,
   ...props 
 }) => {
   const [isLoading, setIsLoading] = useState(true);
   const [hasError, setHasError] = useState(false);
+  const [isVisible, setIsVisible] = useState(!lazy || priority);
+  const imgRef = useRef(null);
+  const observerRef = useRef(null);
 
   // Generate a simple blur placeholder based on dimensions
   const generateBlurDataURL = (w, h) => {
@@ -35,14 +42,62 @@ const OptimizedImage = ({
     return canvas.toDataURL('image/jpeg', 0.1);
   };
 
-  const handleLoad = () => {
-    setIsLoading(false);
-  };
+  // Intersection Observer for lazy loading
+  useEffect(() => {
+    if (!lazy || priority || isVisible) return;
 
-  const handleError = () => {
+    if ('IntersectionObserver' in window) {
+      observerRef.current = new IntersectionObserver(
+        ([entry]) => {
+          if (entry.isIntersecting) {
+            setIsVisible(true);
+            observerRef.current?.unobserve(entry.target);
+          }
+        },
+        {
+          rootMargin: '50px', // Load image 50px before it's visible
+          threshold: 0.1
+        }
+      );
+
+      if (imgRef.current) {
+        observerRef.current.observe(imgRef.current);
+      }
+    } else {
+      // Fallback for browsers without IntersectionObserver
+      setIsVisible(true);
+    }
+
+    return () => {
+      observerRef.current?.disconnect();
+    };
+  }, [lazy, priority, isVisible]);
+
+  const handleLoad = useCallback((e) => {
+    setIsLoading(false);
+    onLoad?.(e);
+  }, [onLoad]);
+
+  const handleError = useCallback((e) => {
     setHasError(true);
     setIsLoading(false);
-  };
+    onError?.(e);
+  }, [onError]);
+
+  // Optimized responsive sizes calculation
+  const getOptimizedSizes = useCallback(() => {
+    if (sizes !== '100vw') return sizes;
+    
+    // Auto-generate responsive sizes based on width
+    if (width) {
+      if (width <= 640) return '100vw';
+      if (width <= 768) return '(max-width: 640px) 100vw, 50vw';
+      if (width <= 1024) return '(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw';
+      return '(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw';
+    }
+    
+    return '100vw';
+  }, [sizes, width]);
 
   if (hasError) {
     return (
@@ -58,26 +113,41 @@ const OptimizedImage = ({
   }
 
   return (
-    <div className={`relative overflow-hidden ${className}`}>
-      <Image
-        src={src}
-        alt={alt}
-        width={width}
-        height={height}
-        className={`transition-opacity duration-500 ${isLoading ? 'opacity-0' : 'opacity-100'}`}
-        priority={priority}
-        quality={quality}
-        sizes={sizes}
-        placeholder={placeholder}
-        blurDataURL={typeof window !== 'undefined' ? generateBlurDataURL(20, 20) : undefined}
-        onLoad={handleLoad}
-        onError={handleError}
-        {...props}
-      />
+    <div ref={imgRef} className={`relative overflow-hidden ${className}`}>
+      {isVisible ? (
+        <Image
+          src={src}
+          alt={alt}
+          width={width}
+          height={height}
+          className={`transition-all duration-500 ${
+            fadeIn 
+              ? (isLoading ? 'opacity-0 scale-105' : 'opacity-100 scale-100')
+              : ''
+          }`}
+          priority={priority}
+          quality={quality}
+          sizes={getOptimizedSizes()}
+          placeholder={placeholder}
+          blurDataURL={typeof window !== 'undefined' ? generateBlurDataURL(20, 20) : undefined}
+          onLoad={handleLoad}
+          onError={handleError}
+          {...props}
+        />
+      ) : (
+        // Placeholder while waiting for intersection
+        <div 
+          className="bg-gradient-to-br from-gray-200 to-gray-300 dark:from-gray-700 dark:to-gray-800 animate-pulse"
+          style={{ width, height }}
+          aria-label={`Loading ${alt}`}
+        />
+      )}
       
-      {/* Loading skeleton */}
-      {isLoading && (
-        <div className="absolute inset-0 animate-pulse bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700" />
+      {/* Enhanced loading skeleton */}
+      {isVisible && isLoading && (
+        <div className="absolute inset-0 bg-gradient-to-r from-gray-200 via-gray-300 to-gray-200 dark:from-gray-700 dark:via-gray-600 dark:to-gray-700">
+          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white to-transparent dark:via-gray-600 opacity-30 animate-shimmer" />
+        </div>
       )}
     </div>
   );

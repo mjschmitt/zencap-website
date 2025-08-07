@@ -67,19 +67,87 @@ const nextConfig = {
       util: false,
     };
 
-    // Optimize ExcelJS bundle
+    // Advanced bundle optimization with code splitting
     config.optimization.splitChunks = {
       ...config.optimization.splitChunks,
+      maxSize: 250000, // 250KB chunks
       cacheGroups: {
         ...config.optimization.splitChunks?.cacheGroups,
+        // Excel processing libraries
         exceljs: {
           test: /[\\/]node_modules[\\/](exceljs)[\\/]/,
           name: 'exceljs',
-          priority: 10,
+          priority: 30,
+          chunks: 'async',
           enforce: true,
+        },
+        // Other Excel libraries
+        xlsxLibs: {
+          test: /[\\/]node_modules[\\/](xlsx|xlsx-js-style|node-xlsx)[\\/]/,
+          name: 'xlsx-libs',
+          priority: 25,
+          chunks: 'async',
+          enforce: true,
+        },
+        // Rich text editor libraries
+        textEditor: {
+          test: /[\\/]node_modules[\\/](@tiptap|@lexical|lexical)[\\/]/,
+          name: 'text-editor',
+          priority: 20,
+          chunks: 'async',
+          enforce: true,
+        },
+        // Chart and visualization libraries
+        charts: {
+          test: /[\\/]node_modules[\\/](recharts|luckysheet)[\\/]/,
+          name: 'charts',
+          priority: 15,
+          chunks: 'async',
+          enforce: true,
+        },
+        // UI and animation libraries
+        animations: {
+          test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
+          name: 'animations',
+          priority: 10,
+          chunks: 'all',
+        },
+        // React and core libraries
+        reactVendor: {
+          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
+          name: 'react-vendor',
+          priority: 40,
+          chunks: 'all',
+          enforce: true,
+        },
+        // Common vendor libraries
+        vendor: {
+          test: /[\\/]node_modules[\\/]/,
+          name: 'vendor',
+          priority: 5,
+          chunks: 'initial',
+          minChunks: 2,
         },
       },
     };
+
+    // Tree shaking optimizations
+    if (!dev) {
+      config.optimization.usedExports = true;
+      config.optimization.sideEffects = false;
+    }
+
+    // Bundle analyzer in development
+    if (dev && process.env.ANALYZE) {
+      const { BundleAnalyzerPlugin } = require('webpack-bundle-analyzer');
+      config.plugins.push(
+        new BundleAnalyzerPlugin({
+          analyzerMode: 'server',
+          openAnalyzer: false,
+          analyzerPort: 8888,
+        })
+      );
+    }
 
     return config;
   },

@@ -48,7 +48,18 @@
       "Bash(\"stripe-cli\\stripe.exe\" listen --forward-to localhost:3001/api/stripe/webhook --print-secret)",
       "Bash(start cmd /k \"stripe-cli\\stripe.exe\" listen --forward-to localhost:3005/api/stripe/webhook)",
       "Bash(\"stripe-cli\\stripe.exe\" listen --forward-to localhost:3005/api/stripe/webhook --print-secret)",
-      "Bash(vercel:*)"
+      "Bash(vercel:*)",
+      "Bash(git push:*)",
+      "Bash(BASE_URL=http://localhost:3002 node scripts/test-payment-flow.js)",
+      "Bash(for file in src/pages/solutions/research.js src/pages/solutions/infrastructure.js)",
+      "Bash(do echo \"=== $file ===\")",
+      "Bash(tail:*)",
+      "Bash(done)",
+      "WebFetch(domain:zencap-website-5ru9nplja-mjschmitts-projects.vercel.app)",
+      "Bash(pkill:*)",
+      "Bash(rg:*)",
+      "Bash(del \"C:\\Users\\maxim\\OneDrive\\Desktop\\zencap-website\\src\\pages\\api\\orders\\[session_id].js\")",
+      "Bash(del scriptsadd-vercel-env.bat)"
     ],
     "deny": []
   }

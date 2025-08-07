@@ -14,21 +14,23 @@ export default function BuyNowButton({
   const [loading, setLoading] = useState(false);
 
   const handlePurchase = async () => {
-    // No authentication required - direct to checkout
+    // Prevent multiple clicks
+    if (loading) return;
+    
     setLoading(true);
 
     try {
-      // Create checkout session without authentication
+      // Create checkout session directly - no authentication required
       const response = await fetch('/api/stripe/create-checkout-session', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          modelId: modelId,
-          modelSlug: modelSlug,
-          modelTitle: modelTitle,
-          modelPrice: modelPrice,
+          modelId: modelId || 'default',
+          modelSlug: modelSlug || 'model',
+          modelTitle: modelTitle || 'Financial Model',
+          modelPrice: modelPrice || 4985,
           customerEmail: '', // Will be collected at Stripe checkout
           customerName: '',  // Will be collected at Stripe checkout
         }),
@@ -36,17 +38,17 @@ export default function BuyNowButton({
 
       const data = await response.json();
 
-      if (response.ok) {
-        // Redirect to Stripe Checkout
+      if (response.ok && data.url) {
+        // Redirect directly to Stripe Checkout
         window.location.href = data.url;
       } else {
-        console.error('Checkout error:', data.error);
-        alert(data.error || 'Failed to create checkout session');
+        console.error('Checkout error:', data);
+        alert(data.error || 'Failed to create checkout session. Please try again.');
+        setLoading(false);
       }
     } catch (error) {
       console.error('Purchase error:', error);
-      alert('An error occurred. Please try again.');
-    } finally {
+      alert('An error occurred while processing your request. Please try again.');
       setLoading(false);
     }
   };

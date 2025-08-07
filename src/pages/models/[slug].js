@@ -3,6 +3,7 @@ import { useRouter } from 'next/router';
 import Link from 'next/link';
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
+import BuyNowButton from '@/components/ui/BuyNowButton';
 import Motion from '@/components/ui/Motion';
 import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
@@ -16,29 +17,35 @@ const ExcelPreview = dynamic(
   }
 );
 
-// Fetch models from database
+// Import database utilities directly for build time
+import { sql } from '@vercel/postgres';
+
+// Fetch models from database - direct database call for build time
 async function fetchModels() {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/models`);
-    if (!response.ok) {
-      console.error('Failed to fetch models');
-      return [];
+    // Direct database query during build time
+    if (process.env.POSTGRES_URL) {
+      const result = await sql`SELECT * FROM models WHERE status = 'active' ORDER BY published_at DESC`;
+      return result.rows || [];
     }
-    return await response.json();
+    return [];
   } catch (error) {
     console.error('Error fetching models:', error);
     return [];
   }
 }
 
-// Fetch single model by slug
+// Fetch single model by slug - direct database call for build time
 async function fetchModelBySlug(slug) {
   try {
-    const response = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000'}/api/models?slug=${slug}`);
-    if (!response.ok) {
-      return null;
+    // Direct database query during build time
+    if (process.env.POSTGRES_URL) {
+      const result = await sql`SELECT * FROM models WHERE slug = ${slug} AND status = 'active'`;
+      if (result.rows && result.rows.length > 0) {
+        return result.rows[0];
+      }
     }
-    return await response.json();
+    return null;
   } catch (error) {
     console.error('Error fetching model:', error);
     return null;
@@ -162,17 +169,19 @@ export default function ModelDetail({ model, relatedModels }) {
                 </div>
                 
                 <div className="flex flex-wrap gap-4">
-                  <Button 
-                    href={`/checkout?modelId=${model.id}&modelSlug=${model.slug}&modelTitle=${encodeURIComponent(model.title)}&modelPrice=${model.price}`} 
+                  <BuyNowButton 
+                    modelId={model.id}
+                    modelSlug={model.slug}
+                    modelTitle={model.title}
+                    modelPrice={model.price}
                     variant="accent" 
                     size="lg"
-                    className="flex items-center"
                   >
                     <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                     </svg>
                     Buy Now - ${model.price.toLocaleString()}
-                  </Button>
+                  </BuyNowButton>
                   <Button href="#faq" variant="secondary" size="lg">
                     Learn More
                   </Button>
@@ -394,17 +403,19 @@ export default function ModelDetail({ model, relatedModels }) {
           
           <Motion animation="fade" direction="up" delay={400}>
             <div className="flex flex-wrap justify-center gap-4">
-              <Button 
-                href={`/checkout?modelId=${model.id}&modelSlug=${model.slug}&modelTitle=${encodeURIComponent(model.title)}&modelPrice=${model.price}`} 
+              <BuyNowButton 
+                modelId={model.id}
+                modelSlug={model.slug}
+                modelTitle={model.title}
+                modelPrice={model.price}
                 variant="accent" 
                 size="lg"
-                className="flex items-center"
               >
                 <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
                 </svg>
                 Purchase for ${model.price.toLocaleString()}
-              </Button>
+              </BuyNowButton>
               <Button href="/contact" variant="secondary" size="lg">
                 Contact Sales
               </Button>
@@ -424,17 +435,19 @@ export default function ModelDetail({ model, relatedModels }) {
               {model.title}
             </div>
           </div>
-          <Button 
-            href={`/checkout?modelId=${model.id}&modelSlug=${model.slug}&modelTitle=${encodeURIComponent(model.title)}&modelPrice=${model.price}`} 
+          <BuyNowButton 
+            modelId={model.id}
+            modelSlug={model.slug}
+            modelTitle={model.title}
+            modelPrice={model.price}
             variant="accent" 
             size="lg"
-            className="flex items-center"
           >
             <svg className="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
             </svg>
             Buy Now
-          </Button>
+          </BuyNowButton>
         </div>
       </div>
     </Layout>
@@ -474,10 +487,25 @@ export async function getStaticProps({ params }) {
     const allModels = await fetchModels();
     const relatedModels = getRelatedModels(model, allModels);
 
+    // Serialize dates to strings to avoid Next.js serialization error
+    const serializedModel = {
+      ...model,
+      created_at: model.created_at ? new Date(model.created_at).toISOString() : null,
+      updated_at: model.updated_at ? new Date(model.updated_at).toISOString() : null,
+      published_at: model.published_at ? new Date(model.published_at).toISOString() : null,
+    };
+
+    const serializedRelatedModels = relatedModels.map(m => ({
+      ...m,
+      created_at: m.created_at ? new Date(m.created_at).toISOString() : null,
+      updated_at: m.updated_at ? new Date(m.updated_at).toISOString() : null,
+      published_at: m.published_at ? new Date(m.published_at).toISOString() : null,
+    }));
+
     return {
       props: {
-        model,
-        relatedModels,
+        model: serializedModel,
+        relatedModels: serializedRelatedModels,
       },
       // Re-generate the page at most once per hour
       revalidate: 3600,

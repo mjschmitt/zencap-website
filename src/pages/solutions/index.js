@@ -416,3 +416,10 @@ export default function Solutions() {
     </Layout>
   );
 }
+
+// Disable static generation to prevent build errors during prerendering  
+export const getServerSideProps = async (context) => {
+  return {
+    props: {}
+  };
+};

@@ -259,3 +259,19 @@ export const SecurityUtils = {
     return allowedExtensions.includes(ext);
   }
 };
+
+// Export aliases for backwards compatibility
+export const SANITIZATION_RULES = {
+  // File sanitization rules
+  maxFilenameLength: 255,
+  allowedFilenameChars: /^[a-zA-Z0-9_\-. ]+$/,
+  blockedExtensions: ['.exe', '.bat', '.cmd', '.com', '.scr', '.pif', '.vbs', '.js'],
+  
+  // Content sanitization
+  removeActiveContent: true,
+  stripMetadata: true,
+  validateFormulas: true
+};
+
+export const AUDIT_CONFIG = AUDIT_SETTINGS;
+export const GDPR_CONFIG = GDPR_COMPLIANCE;
