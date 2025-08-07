@@ -84,25 +84,31 @@ export default async function handler(req, res) {
     });
   } catch (error) {
     console.error('Stripe checkout session creation error:', error);
+    console.error('Error type:', error.type);
+    console.error('Error message:', error.message);
+    console.error('Error raw message:', error.raw?.message);
     
     // Provide more specific error messages
     if (error.type === 'StripeAuthenticationError') {
       return res.status(500).json({ 
         error: 'Payment configuration error. Please contact support.',
-        details: process.env.NODE_ENV === 'development' ? 'Invalid Stripe API key' : undefined
+        details: 'Invalid Stripe API key',
+        type: error.type
       });
     }
     
     if (error.type === 'StripeInvalidRequestError') {
       return res.status(400).json({ 
         error: 'Invalid request. Please try again.',
-        details: process.env.NODE_ENV === 'development' ? error.message : undefined
+        details: error.message,
+        type: error.type
       });
     }
     
     res.status(500).json({ 
       error: 'Error creating checkout session. Please try again.',
-      details: process.env.NODE_ENV === 'development' ? error.message : undefined
+      details: error.message || error.raw?.message || 'Unknown error',
+      type: error.type || 'unknown'
     });
   }
 }
