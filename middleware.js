@@ -18,8 +18,14 @@ export function middleware(request) {
     // Verify JWT token if present
     if (sessionToken) {
       try {
-        verify(sessionToken, process.env.JWT_SECRET || 'fallback-secret-key')
+        const jwtSecret = process.env.JWT_SECRET;
+        if (!jwtSecret) {
+          console.error('SECURITY ALERT: JWT_SECRET not configured');
+          return new NextResponse('Configuration error', { status: 500 })
+        }
+        verify(sessionToken, jwtSecret)
       } catch (error) {
+        console.warn('JWT verification failed:', error.message);
         return new NextResponse('Invalid session', { status: 401 })
       }
     }
@@ -47,11 +53,19 @@ export function middleware(request) {
     }
     
     try {
-      const payload = verify(sessionToken, process.env.JWT_SECRET || 'fallback-secret-key')
+      const jwtSecret = process.env.JWT_SECRET;
+      if (!jwtSecret) {
+        console.error('SECURITY ALERT: JWT_SECRET not configured for admin access');
+        return NextResponse.redirect(new URL('/error?code=config', request.url))
+      }
+      
+      const payload = verify(sessionToken, jwtSecret)
       if (!payload.isAdmin) {
+        console.warn('Non-admin user attempted admin access:', payload.userId);
         return NextResponse.redirect(new URL('/unauthorized', request.url))
       }
     } catch (error) {
+      console.warn('Admin JWT verification failed:', error.message);
       return NextResponse.redirect(new URL('/login', request.url))
     }
   }

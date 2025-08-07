@@ -52,34 +52,103 @@ const ModernCTA = dynamic(() => import('@/components/ui/ModernCTA'), {
 });
 
 export default function Home() {
-  // Structured data for rich search results
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "Organization",
-    "name": "Zenith Capital Advisors",
-    "url": "https://zencap.co",
-    "logo": "https://zencap.co/logo.png",
-    "description": "Financial modeling and investment advisory services for public and private equity investors.",
-    "address": {
-      "@type": "PostalAddress",
-      "streetAddress": "123 Finance Street",
-      "addressLocality": "New York",
-      "addressRegion": "NY",
-      "postalCode": "10001",
-      "addressCountry": "US"
+  // Comprehensive structured data for rich search results
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "Zenith Capital Advisors",
+      "alternateName": "ZenCap",
+      "url": "https://zencap-website.vercel.app",
+      "logo": {
+        "@type": "ImageObject",
+        "url": "https://zencap-website.vercel.app/images/logo/zenith-capital-logo.png",
+        "width": 400,
+        "height": 100
+      },
+      "description": "Professional financial modeling and investment advisory services for private equity, real estate, and public equity investors. Excel-based models ranging from $2,985 to $4,985.",
+      "foundingDate": "2023",
+      "industry": "Financial Services",
+      "numberOfEmployees": "2-10",
+      "address": {
+        "@type": "PostalAddress",
+        "addressCountry": "US"
+      },
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "customer service",
+        "availableLanguage": "English",
+        "email": "contact@zencap-website.vercel.app"
+      },
+      "sameAs": [
+        "https://www.linkedin.com/company/zenith-capital-advisors",
+        "https://twitter.com/zenithcapital"
+      ],
+      "service": [
+        {
+          "@type": "Service",
+          "name": "Financial Modeling",
+          "description": "Custom Excel financial models for investment analysis"
+        },
+        {
+          "@type": "Service",
+          "name": "Investment Advisory",
+          "description": "Professional investment advisory services for institutional clients"
+        },
+        {
+          "@type": "Service",
+          "name": "Private Equity Models",
+          "description": "Specialized financial models for real estate and private equity investments"
+        }
+      ]
     },
-    "contactPoint": {
-      "@type": "ContactPoint",
-      "telephone": "+1-555-123-4567",
-      "contactType": "customer service"
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "Zenith Capital Advisors",
+      "url": "https://zencap-website.vercel.app",
+      "description": "Professional financial modeling and investment advisory services",
+      "publisher": {
+        "@type": "Organization",
+        "name": "Zenith Capital Advisors"
+      },
+      "potentialAction": {
+        "@type": "SearchAction",
+        "target": {
+          "@type": "EntryPoint",
+          "urlTemplate": "https://zencap-website.vercel.app/models?search={search_term_string}"
+        },
+        "query-input": "required name=search_term_string"
+      }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Product",
+      "@id": "https://zencap-website.vercel.app/models",
+      "name": "Financial Model Collection",
+      "description": "Professional Excel-based financial models for private equity, real estate, and public equity analysis",
+      "category": "Financial Software",
+      "brand": {
+        "@type": "Brand",
+        "name": "Zenith Capital Advisors"
+      },
+      "offers": {
+        "@type": "AggregateOffer",
+        "priceCurrency": "USD",
+        "lowPrice": "2985",
+        "highPrice": "4985",
+        "offerCount": "13"
+      }
     }
-  };
+  ];
 
   return (
     <Layout>
       <SEO
-        title="Financial Modeling & Investment Advisory"
-        description="Precision financial modeling and advisory solutions for public and private equity investors."
+        title="Financial Modeling & Investment Advisory Services"
+        description="Professional financial models and investment advisory services for private equity, real estate, and public equity. Excel-based models $2,985-$4,985. Institutional-grade tools for sophisticated investors."
+        keywords="financial modeling, investment analysis, private equity models, real estate financial models, DCF valuation, Excel financial models, investment advisory, institutional finance tools"
+        ogImage="/images/og/zenith-capital-homepage.jpg"
         structuredData={structuredData}
       />
       

@@ -115,25 +115,79 @@ export default function ModelDetail({ model, relatedModels }) {
   const features = parseFeatures(model.tags);
   const faq = generateFAQ(model);
   
-  // Structured data for rich search results
+  // Enhanced structured data for rich search results
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Product",
+    "@id": `https://zencap-website.vercel.app/models/${model.slug}`,
     "name": model.title,
-    "description": model.description,
-    "category": model.category,
+    "description": model.description ? model.description.replace(/<[^>]*>/g, '') : `Professional ${model.category} financial model`,
+    "category": `Financial Software > ${model.category} Models`,
+    "brand": {
+      "@type": "Brand",
+      "name": "Zenith Capital Advisors"
+    },
+    "manufacturer": {
+      "@type": "Organization",
+      "name": "Zenith Capital Advisors"
+    },
+    "image": model.thumbnail_url || "https://zencap-website.vercel.app/images/models/default-model.jpg",
+    "sku": model.slug,
     "offers": {
       "@type": "Offer",
+      "url": `https://zencap-website.vercel.app/models/${model.slug}`,
       "price": model.price,
-      "priceCurrency": "USD"
-    }
+      "priceCurrency": "USD",
+      "availability": "https://schema.org/InStock",
+      "itemCondition": "https://schema.org/NewCondition",
+      "seller": {
+        "@type": "Organization",
+        "name": "Zenith Capital Advisors"
+      }
+    },
+    "review": {
+      "@type": "Review",
+      "reviewRating": {
+        "@type": "Rating",
+        "ratingValue": "5",
+        "bestRating": "5"
+      },
+      "author": {
+        "@type": "Organization",
+        "name": "Zenith Capital Advisors"
+      }
+    },
+    "additionalProperty": [
+      {
+        "@type": "PropertyValue",
+        "name": "File Format",
+        "value": "Excel (.xlsx)"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Support",
+        "value": "30 days email support included"
+      },
+      {
+        "@type": "PropertyValue",
+        "name": "Customizable",
+        "value": "Yes, fully unlocked"
+      }
+    ]
   };
 
   return (
     <Layout>
       <SEO
-        title={model.title}
-        description={model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 160) : ''}
+        title={`${model.title} - ${model.category} Financial Model`}
+        description={model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 155) : `Professional ${model.category} financial model for $${model.price.toLocaleString()}. Excel-based investment analysis tool with 30-day support.`}
+        keywords={`${model.title}, ${model.category} model, financial model, Excel model, investment analysis, ${model.category.toLowerCase()} modeling, DCF model, financial modeling template`}
+        ogImage={model.thumbnail_url || "/images/og/financial-model-default.jpg"}
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: "Financial Models", path: "/models" },
+          { name: model.title, path: `/models/${model.slug}` }
+        ]}
         structuredData={structuredData}
       />
       

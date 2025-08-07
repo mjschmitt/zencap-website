@@ -1,6 +1,7 @@
 // src/pages/models/index.js - with larger hero background
 import { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 import Layout from '@/components/layout/Layout';
 import Button from '@/components/ui/Button';
 import Motion from '@/components/ui/Motion';
@@ -49,39 +50,90 @@ export default function Models() {
   const featuredModels = filteredModels.slice(0, 2);
   const regularModels = filteredModels.slice(2);
   
-  // Structured data for rich search results
+  // Enhanced structured data for rich search results
   const structuredData = {
     "@context": "https://schema.org",
-    "@type": "ProductCatalog",
-    "name": "Zenith Capital Financial Models",
-    "description": "Professional financial models for private equity real estate and public equity analysis.",
+    "@type": "CollectionPage",
+    "name": "Financial Models Catalog - Zenith Capital Advisors",
+    "description": "Professional Excel financial models for private equity real estate and public equity analysis. Models range from $2,985 to $4,985.",
+    "url": "https://zencap-website.vercel.app/models",
+    "mainEntity": {
+      "@type": "ItemList",
+      "name": "Financial Models Collection",
+      "description": "Institutional-grade financial models for investment professionals",
+      "numberOfItems": models.length,
+      "itemListElement": filteredModels.slice(0, 10).map((model, index) => ({
+        "@type": "Product",
+        "position": index + 1,
+        "name": model.title,
+        "description": model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 200) : 'Professional financial model',
+        "category": model.category,
+        "offers": {
+          "@type": "Offer",
+          "price": model.price,
+          "priceCurrency": "USD",
+          "availability": "https://schema.org/InStock"
+        }
+      }))
+    },
     "publisher": {
       "@type": "Organization",
       "name": "Zenith Capital Advisors",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://zencap.co/logo.png"
+        "url": "https://zencap-website.vercel.app/images/logo/zenith-capital-logo.png"
       }
+    },
+    "breadcrumb": {
+      "@type": "BreadcrumbList",
+      "itemListElement": [
+        {
+          "@type": "ListItem",
+          "position": 1,
+          "name": "Home",
+          "item": "https://zencap-website.vercel.app"
+        },
+        {
+          "@type": "ListItem",
+          "position": 2,
+          "name": "Financial Models",
+          "item": "https://zencap-website.vercel.app/models"
+        }
+      ]
     }
   };
 
   return (
     <Layout>
       <SEO
-        title="Financial Models"
-        description="Professional financial models for private equity real estate and public equity analysis. Excel-based models with comprehensive documentation."
+        title="Financial Models - Excel-Based Investment Analysis Tools"
+        description="Professional Excel financial models for private equity real estate and public equity analysis. Institutional-grade models $2,985-$4,985. DCF models, real estate models, and investment tools for sophisticated investors."
+        keywords="financial models, Excel models, DCF valuation, private equity models, real estate financial models, investment analysis tools, LBO models, financial modeling templates"
+        ogImage="/images/og/financial-models-catalog.jpg"
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: "Financial Models", path: "/models" }
+        ]}
         structuredData={structuredData}
       />
       
       {/* Hero Section with Background Image */}
-      <section 
-        className="relative bg-navy-700 text-white bg-cover bg-center bg-no-repeat min-h-[calc(80vh-48px)] flex items-center"
-        style={{ backgroundImage: 'url(/images/models/models-hero.jpg)' }}
-      >
+      <section className="relative bg-navy-700 text-white min-h-[calc(80vh-48px)] flex items-center overflow-hidden">
+        <div className="absolute inset-0">
+          <Image
+            src="/images/models/models-hero.jpg"
+            alt="Financial Models Background"
+            fill
+            className="object-cover"
+            priority
+            sizes="100vw"
+            quality={85}
+          />
+        </div>
         {/* Gradient overlay for better text readability */}
-        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60"></div>
+        <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60 z-10"></div>
         
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-10 w-full">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16 text-center relative z-20 w-full">
           <Motion animation="fade" direction="down" duration={800}>
             <h1 className="text-4xl md:text-5xl font-bold font-serif tracking-tight mb-6 text-white">
               Financial Models
@@ -139,15 +191,19 @@ export default function Models() {
                   <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
                     <Link href={`/models/${model.slug}`}>
                       {model.thumbnail_url ? (
-                        <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-                          <img 
+                        <div className="relative aspect-w-16 aspect-h-9 overflow-hidden h-48">
+                          <Image 
                             src={model.thumbnail_url} 
                             alt={model.title}
-                            className="w-full h-48 object-cover"
+                            fill
+                            className="object-cover transition-transform duration-300 hover:scale-105"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            quality={75}
+                            loading="lazy"
                           />
                         </div>
                       ) : (
-                        <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                        <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500 h-48">
                           [{model.title} Preview]
                         </div>
                       )}
@@ -215,15 +271,19 @@ export default function Models() {
                   <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
                     <Link href={`/models/${model.slug}`}>
                       {model.thumbnail_url ? (
-                        <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-                          <img 
+                        <div className="relative aspect-w-16 aspect-h-9 overflow-hidden h-48">
+                          <Image 
                             src={model.thumbnail_url} 
                             alt={model.title}
-                            className="w-full h-48 object-cover"
+                            fill
+                            className="object-cover transition-transform duration-300 hover:scale-105"
+                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                            quality={75}
+                            loading="lazy"
                           />
                         </div>
                       ) : (
-                        <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500">
+                        <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500 h-48">
                           [{model.title} Preview]
                         </div>
                       )}

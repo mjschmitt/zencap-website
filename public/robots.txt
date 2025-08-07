@@ -2,11 +2,22 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://zencap.co/sitemap.xml
+Sitemap: https://zencap-website.vercel.app/sitemap.xml
 
-# Disallow admin or private areas (if any)
+# Disallow admin or private areas
 Disallow: /api/
 Disallow: /_next/
+Disallow: /admin/
+Disallow: /account/
+Disallow: /checkout/
+Disallow: /purchase/
 
-# Crawl delay (optional)
-Crawl-delay: 1 
+# Allow important pages
+Allow: /models/
+Allow: /insights/
+Allow: /solutions/
+Allow: /about/
+Allow: /contact/
+
+# Crawl delay (optional, 1 second)
+Crawl-delay: 1

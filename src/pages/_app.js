@@ -43,8 +43,8 @@ export default function App({ Component, pageProps, router }) {
     };
   }, []);
 
-  // Skip SessionProvider for pages that don't need authentication
-  const skipAuthPages = [
+  // Always use SessionProvider but with different session handling
+  const publicPages = [
     '/purchase/success',
     '/checkout/success',
     '/models',
@@ -56,7 +56,7 @@ export default function App({ Component, pageProps, router }) {
     '/404'
   ];
   
-  const shouldSkipAuth = skipAuthPages.some(page => 
+  const isPublicPage = publicPages.some(page => 
     router.pathname === page || router.pathname.startsWith(page + '/')
   );
 
@@ -115,11 +115,7 @@ export default function App({ Component, pageProps, router }) {
     </main>
   );
 
-  // Only wrap with SessionProvider if needed
-  if (shouldSkipAuth) {
-    return AppContent;
-  }
-
+  // Always wrap with SessionProvider for consistent authentication state
   return (
     <SessionProvider session={pageProps.session}>
       {AppContent}

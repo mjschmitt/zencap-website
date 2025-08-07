@@ -95,10 +95,20 @@ export default function Footer() {
         </div>
         
         <div className="mt-8 pt-8 border-t border-gray-700">
-          <div className="flex justify-between items-center">
-            <p className="text-gray-400 text-xs">
-              All rights reserved. Zenith Capital Advisors LLC.
-            </p>
+          <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0">
+            <div className="flex flex-col md:flex-row items-center space-y-2 md:space-y-0 md:space-x-8">
+              <p className="text-gray-400 text-xs">
+                All rights reserved. Zenith Capital Advisors LLC.
+              </p>
+              <div className="flex space-x-6 text-xs">
+                <Link href="/terms" className="text-gray-400 hover:text-white cursor-pointer transition-colors">
+                  Terms of Service
+                </Link>
+                <Link href="/privacy" className="text-gray-400 hover:text-white cursor-pointer transition-colors">
+                  Privacy Policy
+                </Link>
+              </div>
+            </div>
             <div className="flex space-x-6">
               <a href="#" className="text-gray-400 hover:text-white">
                 <span className="sr-only">LinkedIn</span>

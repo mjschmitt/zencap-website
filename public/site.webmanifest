@@ -1,16 +1,45 @@
 {
-  "name": "ZenCap Financial Models",
+  "name": "Zenith Capital Advisors - Financial Modeling",
   "short_name": "ZenCap",
-  "description": "Professional financial modeling and investment analysis platform",
+  "description": "Professional financial modeling and investment advisory services for private equity, real estate, and public equity",
   "start_url": "/",
   "display": "standalone",
-  "background_color": "#ffffff",
-  "theme_color": "#0f766e",
+  "background_color": "#1e3a8a",
+  "theme_color": "#1e3a8a",
+  "categories": ["finance", "business", "productivity"],
+  "lang": "en",
+  "dir": "ltr",
+  "orientation": "any",
   "icons": [
     {
       "src": "/favicon.ico",
       "sizes": "any",
       "type": "image/x-icon"
+    },
+    {
+      "src": "/favicon-16x16.png",
+      "sizes": "16x16",
+      "type": "image/png"
+    },
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    },
+    {
+      "src": "/apple-touch-icon.png",
+      "sizes": "180x180",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-192x192.png",
+      "sizes": "192x192",
+      "type": "image/png"
+    },
+    {
+      "src": "/android-chrome-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png"
     }
   ]
-} 
+}

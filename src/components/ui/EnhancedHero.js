@@ -1,6 +1,7 @@
 // src/components/ui/EnhancedHero.js - Updated with better button strategy
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
+import Image from 'next/image';
 import Link from 'next/link';
 
 // Array of hero text options to cycle through
@@ -56,11 +57,17 @@ export default function EnhancedHero() {
 
   return (
     <section className="hero-section relative overflow-hidden">
-      {/* Background image with CSS background approach */}
-      <div 
-        className="absolute inset-0 bg-cover bg-center bg-no-repeat z-0"
-        style={{ backgroundImage: 'url(/images/home/home-hero.jpg)' }}
-      >
+      {/* Background image with optimized Next.js Image */}
+      <div className="absolute inset-0 z-0">
+        <Image
+          src="/images/home/home-hero.jpg"
+          alt="Financial Advisory Background"
+          fill
+          className="object-cover"
+          priority
+          sizes="100vw"
+          quality={90}
+        />
         {/* Gradient overlay for better text readability */}
         <div className="absolute inset-0 bg-gradient-to-r from-navy-900/80 to-navy-900/60 z-10"></div>
       </div>

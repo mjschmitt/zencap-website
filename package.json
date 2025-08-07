@@ -19,7 +19,14 @@
     "rollback": "node scripts/rollback.js",
     "monitor": "node scripts/monitor-deployment.js",
     "health-check": "curl -f http://localhost:3000/api/health || curl -f https://your-domain.com/api/health",
-    "status": "node scripts/deployment-status.js"
+    "status": "node scripts/deployment-status.js",
+    "test:email": "curl -s 'http://localhost:3001/api/test-email?testType=all' | node -e 'console.log(JSON.stringify(JSON.parse(require(\"fs\").readFileSync(0)), null, 2))'",
+    "test:email:status": "curl -s 'http://localhost:3001/api/test-email?action=status'",
+    "security:audit": "npm audit --audit-level moderate",
+    "security:validate": "node scripts/security-validation.js",
+    "security:check": "npm run security:audit && npm run security:validate",
+    "prod:secure": "node scripts/secure-production.js",
+    "prod:deploy": "npm run security:check && npm run build"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",

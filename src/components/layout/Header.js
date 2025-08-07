@@ -23,7 +23,12 @@ export default function Header() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [userMenuOpen, setUserMenuOpen] = useState(false);
   const router = useRouter();
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSession({
+    required: false,
+    onUnauthenticated() {
+      // Handle unauthenticated state gracefully
+    },
+  }) || {};
   
   // Close mobile menu when route changes
   useEffect(() => {

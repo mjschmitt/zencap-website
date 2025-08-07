@@ -5,7 +5,12 @@ import Layout from '@/components/layout/Layout';
 import { DocumentArrowDownIcon, ClockIcon, ExclamationTriangleIcon } from '@heroicons/react/24/outline';
 
 export default function Purchases() {
-  const { data: session, status } = useSession();
+  const { data: session, status } = useSession({
+    required: true,
+    onUnauthenticated() {
+      signIn();
+    },
+  });
   const [orders, setOrders] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
@@ -217,4 +222,11 @@ export default function Purchases() {
       </div>
     </Layout>
   );
+}
+
+// Prevent static generation for auth-protected page
+export async function getServerSideProps() {
+  return {
+    props: {}
+  };
 }

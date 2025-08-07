@@ -2,6 +2,7 @@ import formidable from 'formidable';
 import fs from 'fs/promises';
 import path from 'path';
 import crypto from 'crypto';
+import { withRateLimit } from '@/middleware/rate-limit';
 
 export const config = {
   api: {
@@ -20,7 +21,7 @@ const uploadDir = path.join(process.cwd(), 'public', 'uploads', 'excel');
   }
 })();
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ error: 'Method not allowed' });
   }
@@ -137,3 +138,15 @@ export default async function handler(req, res) {
     });
   }
 }
+
+// Apply rate limiting - 5 uploads per hour per IP
+export default withRateLimit(handler, {
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5, // 5 requests per window
+  message: 'Too many file upload attempts, please try again later',
+  keyGenerator: (req) => {
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = forwarded ? forwarded.split(',')[0] : req.socket.remoteAddress;
+    return `upload-simple:${ip}`;
+  }
+});

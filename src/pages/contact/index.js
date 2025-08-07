@@ -43,33 +43,63 @@ export default function Contact() {
     // Here you would typically send the data to your backend
   };
 
-  // Structured data for rich search results
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "ContactPage",
-    "name": "Contact Zenith Capital Advisors",
-    "description": "Get in touch with our team to discuss your financial modeling and investment advisory needs.",
-    "mainEntity": {
-      "@type": "Organization",
-      "name": "Zenith Capital Advisors",
-      "telephone": "+1-555-123-4567",
-      "email": "info@zencap.co",
-      "address": {
-        "@type": "PostalAddress",
-        "streetAddress": "123 Finance Street",
-        "addressLocality": "New York",
-        "addressRegion": "NY",
-        "postalCode": "10001",
-        "addressCountry": "US"
+  // Enhanced structured data for rich search results
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "ContactPage",
+      "name": "Contact Zenith Capital Advisors",
+      "description": "Get in touch with our team to discuss your financial modeling and investment advisory needs.",
+      "url": "https://zencap-website.vercel.app/contact",
+      "mainEntity": {
+        "@type": "Organization",
+        "name": "Zenith Capital Advisors",
+        "email": "contact@zencap-website.vercel.app",
+        "address": {
+          "@type": "PostalAddress",
+          "addressCountry": "US"
+        },
+        "contactPoint": [
+          {
+            "@type": "ContactPoint",
+            "contactType": "customer service",
+            "availableLanguage": "English",
+            "email": "contact@zencap-website.vercel.app"
+          },
+          {
+            "@type": "ContactPoint",
+            "contactType": "sales",
+            "availableLanguage": "English",
+            "email": "contact@zencap-website.vercel.app"
+          }
+        ]
       }
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "FAQPage",
+      "mainEntity": faqItems.map(item => ({
+        "@type": "Question",
+        "name": item.title,
+        "acceptedAnswer": {
+          "@type": "Answer",
+          "text": item.content
+        }
+      }))
     }
-  };
+  ];
 
   return (
     <Layout>
       <SEO
-        title="Contact Us"
-        description="Get in touch with our team to discuss your financial modeling and investment advisory needs."
+        title="Contact Zenith Capital Advisors - Financial Modeling Consultants"
+        description="Get in touch with our financial modeling experts. Custom models, investment advisory, and financial analysis services. Professional consultation for private equity and investment firms."
+        keywords="contact Zenith Capital, financial modeling consultants, investment advisory consultation, custom financial models, private equity modeling services, financial analysis experts"
+        ogImage="/images/og/contact-zenith-capital.jpg"
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: "Contact", path: "/contact" }
+        ]}
         structuredData={structuredData}
       />
       

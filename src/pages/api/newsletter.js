@@ -2,8 +2,9 @@
 import { insertNewsletterSubscriber, logFormSubmission } from '@/utils/database';
 import { sendNewsletterWelcome } from '@/utils/email';
 import { sql } from '@vercel/postgres';
+import { withRateLimit } from '@/middleware/rate-limit';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method === 'GET') {
     try {
       // Fetch all newsletter subscribers
@@ -108,4 +109,16 @@ export default async function handler(req, res) {
       success: false
     });
   }
-} 
+}
+
+// Apply rate limiting - 5 subscriptions per 15 minutes per IP
+export default withRateLimit(handler, {
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 5, // 5 requests per window
+  message: 'Too many newsletter subscription attempts, please try again later',
+  keyGenerator: (req) => {
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = forwarded ? forwarded.split(',')[0] : req.socket.remoteAddress;
+    return `newsletter:${ip}`;
+  }
+});

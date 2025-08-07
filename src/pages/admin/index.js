@@ -3,11 +3,28 @@ import { motion } from 'framer-motion';
 import Head from 'next/head';
 import Layout from '../../components/layout/Layout';
 
-// Chart components
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar, PieChart, Pie, Cell } from 'recharts';
-
 // ZenCap brand colors
 const COLORS = ['#046B4E', '#3e6792', '#6187ad', '#8ba8c2', '#bccddc'];
+
+// Dynamically import heavy chart components
+const DashboardCharts = dynamic(
+  () => import('@/components/admin/DashboardCharts'),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="bg-white rounded-lg shadow p-6">
+            <div className="animate-pulse">
+              <div className="h-4 bg-gray-300 rounded w-3/4 mb-4"></div>
+              <div className="h-32 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
+);
 
 import dynamic from 'next/dynamic';
 
@@ -15,7 +32,7 @@ const RichTextEditor = dynamic(
   () => import('@/components/ui/RichTextEditor'),
   { 
     ssr: false,
-    loading: () => <div className="p-4 text-center text-gray-500">Loading editor...</div>
+    loading: () => <div className="p-4 text-center text-gray-500 animate-pulse">Loading editor...</div>
   }
 );
 
@@ -23,9 +40,11 @@ const ExcelPreview = dynamic(
   () => import('@/components/ui/ExcelPreview'),
   { 
     ssr: false,
-    loading: () => <div className="p-4 text-center text-gray-500">Loading Excel preview...</div>
+    loading: () => <div className="p-4 text-center text-gray-500 animate-pulse">Loading Excel preview...</div>
   }
 );
+
+// AdminTabs component removed for now - can be added later if needed
 
 function InsightsAdmin() {
   const [isClient, setIsClient] = useState(false);

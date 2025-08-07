@@ -322,8 +322,12 @@ export async function getDbConnection() {
   // Return a mock connection object for health checks
   return {
     query: async (queryString) => {
-      // Use the sql template for actual queries
-      return await sql`${queryString}`;
+      // For health checks, just run a simple query
+      if (queryString === 'SELECT 1') {
+        return await sql`SELECT 1`;
+      }
+      // For other queries, you'd need to use proper sql template literals
+      throw new Error('getDbConnection only supports health check queries');
     },
     end: async () => {
       // Connection pooling handled by Vercel
@@ -333,11 +337,31 @@ export async function getDbConnection() {
 }
 
 /**
- * Query function for backward compatibility
+ * DEPRECATED: Unsafe query function - DO NOT USE
+ * This function has been deprecated due to SQL injection vulnerabilities.
+ * Use specific database functions or prepared statements instead.
  */
 export async function query(queryString, params = []) {
+  // Log usage for security monitoring
+  console.warn('SECURITY WARNING: Deprecated unsafe query function called', {
+    query: queryString?.substring(0, 100) + '...',
+    stack: new Error().stack?.split('\n')[2]?.trim()
+  });
+  
+  throw new Error(
+    'Unsafe query function is disabled. Use sql`` template literals or specific database functions instead.'
+  );
+}
+
+/**
+ * Safe query function using parameterized queries
+ * @param {TemplateStringsArray} strings - SQL template strings
+ * @param {...any} values - Parameter values
+ * @returns {Promise<Object>} Query results
+ */
+export async function safeQuery(strings, ...values) {
   try {
-    return await sql`${queryString}`;
+    return await sql(strings, ...values);
   } catch (error) {
     console.error('Database query error:', error);
     throw error;

@@ -9,27 +9,71 @@ import Link from 'next/link';
 import { getImageWithVersion } from '@/utils/imageUtils';
 
 export default function Solutions() {
-  // Structured data for rich search results
+  // Enhanced structured data for rich search results
   const structuredData = {
     "@context": "https://schema.org",
     "@type": "Service",
-    "name": "Zenith Capital Advisory Solutions",
-    "description": "Financial modeling, investment infrastructure, and industry research services for institutional investors.",
+    "name": "Investment Advisory Solutions - Zenith Capital",
+    "description": "Comprehensive financial modeling, investment infrastructure, and industry research services for institutional investors and private equity firms.",
+    "url": "https://zencap-website.vercel.app/solutions",
     "provider": {
       "@type": "Organization",
       "name": "Zenith Capital Advisors",
       "logo": {
         "@type": "ImageObject",
-        "url": "https://zencap.co/logo.png"
+        "url": "https://zencap-website.vercel.app/images/logo/zenith-capital-logo.png"
       }
+    },
+    "serviceType": [
+      "Financial Modeling",
+      "Investment Infrastructure",
+      "Industry Research",
+      "Investment Advisory"
+    ],
+    "areaServed": "United States",
+    "hasOfferCatalog": {
+      "@type": "OfferCatalog",
+      "name": "Investment Advisory Services",
+      "itemListElement": [
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Custom Financial Modeling",
+            "description": "Bespoke financial models for investment analysis"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Investment Infrastructure",
+            "description": "End-to-end systems for investment operations"
+          }
+        },
+        {
+          "@type": "Offer",
+          "itemOffered": {
+            "@type": "Service",
+            "name": "Industry Research",
+            "description": "Specialized research for investment strategy"
+          }
+        }
+      ]
     }
   };
 
   return (
     <Layout>
       <SEO
-        title="Solutions"
-        description="Comprehensive financial modeling, investment infrastructure, and industry research services for institutional investors."
+        title="Investment Advisory Solutions - Financial Modeling & Research"
+        description="Comprehensive investment advisory solutions including custom financial modeling, infrastructure development, and industry research for institutional investors and private equity firms."
+        keywords="investment advisory solutions, financial modeling services, investment infrastructure, industry research, institutional investors, private equity advisory, financial consulting services"
+        ogImage="/images/og/solutions-zenith-capital.jpg"
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: "Solutions", path: "/solutions" }
+        ]}
         structuredData={structuredData}
       />
       

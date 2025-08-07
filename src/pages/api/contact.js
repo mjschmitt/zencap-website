@@ -1,8 +1,9 @@
 // src/pages/api/contact.js - Production-ready contact form API endpoint
 import { insertLead, logFormSubmission } from '@/utils/database';
 import { sendContactNotification, sendContactConfirmation } from '@/utils/email';
+import { withRateLimit } from '@/middleware/rate-limit';
 
-export default async function handler(req, res) {
+async function handler(req, res) {
   if (req.method !== 'POST') {
     return res.status(405).json({ message: 'Method not allowed' });
   }
@@ -97,4 +98,17 @@ export default async function handler(req, res) {
       success: false 
     });
   }
-} 
+}
+
+// Apply rate limiting - 10 submissions per 15 minutes
+export default withRateLimit(handler, {
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // 10 requests per window
+  message: 'Too many contact form submissions, please try again later',
+  keyGenerator: (req) => {
+    // Rate limit by IP address
+    const forwarded = req.headers['x-forwarded-for'];
+    const ip = forwarded ? forwarded.split(',')[0] : req.socket.remoteAddress;
+    return `contact:${ip}`;
+  }
+});

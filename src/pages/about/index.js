@@ -6,19 +6,41 @@ import SEO from '@/components/SEO';
 import Image from 'next/image';
 
 export default function About() {
-  // Structured data for rich search results
-  const structuredData = {
-    "@context": "https://schema.org",
-    "@type": "AboutPage",
-    "name": "About Zenith Capital Advisors",
-    "description": "Learn about Zenith Capital Advisors' mission, values, and our expert team dedicated to providing financial modeling and advisory services."
-  };
+  // Enhanced structured data for rich search results
+  const structuredData = [
+    {
+      "@context": "https://schema.org",
+      "@type": "AboutPage",
+      "name": "About Zenith Capital Advisors",
+      "description": "Learn about Zenith Capital Advisors' mission, values, and our expert team dedicated to providing financial modeling and advisory services.",
+      "url": "https://zencap-website.vercel.app/about"
+    },
+    {
+      "@context": "https://schema.org",
+      "@type": "Person",
+      "name": "Max Schmitt",
+      "jobTitle": "Founder & CEO",
+      "worksFor": {
+        "@type": "Organization",
+        "name": "Zenith Capital Advisors"
+      },
+      "description": "Max has over 10 years of experience in public and private equity investing, with senior research roles at Evercore ISI and Macquarie Capital.",
+      "alumniOf": "University of Florida",
+      "expertise": ["Financial Modeling", "Private Equity", "Investment Analysis", "Real Estate Finance"]
+    }
+  ];
 
   return (
     <Layout>
       <SEO
-        title="About Us"
-        description="Learn about Zenith Capital Advisors' mission, values, and our expert team dedicated to providing financial modeling and advisory services."
+        title="About Zenith Capital Advisors - Expert Financial Modeling Team"
+        description="Learn about Zenith Capital Advisors' mission, values, and expert team. Founded by Max Schmitt with 10+ years in private and public equity. Institutional-grade financial modeling services."
+        keywords="Zenith Capital Advisors, Max Schmitt, financial modeling team, investment advisory, private equity experience, Evercore ISI, Macquarie Capital, financial services team"
+        ogImage="/images/og/about-zenith-capital.jpg"
+        breadcrumbs={[
+          { name: "Home", path: "/" },
+          { name: "About", path: "/about" }
+        ]}
         structuredData={structuredData}
       />
       
