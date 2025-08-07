@@ -3,29 +3,45 @@ import { useState, useEffect, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 
-// Sample testimonial data - replace with your actual testimonials
+// Platform achievements and value propositions - rotating showcase
 const TESTIMONIALS = [
   {
     id: 1,
-    quote: "Zenith's financial models gave us the analytical edge we needed to close our latest acquisition. Their attention to detail is unmatched.",
-    name: "Sarah Johnson",
-    title: "Investment Director, Artemis Partners",
-    avatar: null, // In a real implementation, add an image path here
+    quote: "Save 100+ hours per deal with institutional-grade financial models that are ready to use out of the box.",
+    name: "Time Efficiency",
+    title: "Average time saved per transaction",
+    avatar: null,
     rating: 5
   },
   {
     id: 2,
-    quote: "The custom model Zenith built for our portfolio valuation has become an essential part of our investment process. Worth every penny.",
-    name: "Michael Chen",
-    title: "Managing Partner, Horizon Capital",
+    quote: "Professional models used for transactions totaling over $500M in real estate and private equity deals.",
+    name: "Proven Track Record",
+    title: "Cumulative deal value analyzed",
     avatar: null,
     rating: 5
   },
   {
     id: 3,
-    quote: "Working with Zenith transformed our approach to deal evaluation. Their team delivered exactly what we needed, on time and on budget.",
-    name: "David Rodriguez",
-    title: "VP of Acquisitions, Summit Equity",
+    quote: "One-time purchase with lifetime updates. No subscriptions, no hidden fees. Full model ownership.",
+    name: "Transparent Pricing",
+    title: "100% ownership of your models",
+    avatar: null,
+    rating: 5
+  },
+  {
+    id: 4,
+    quote: "Built by finance professionals with experience at top investment banks and private equity firms.",
+    name: "Industry Expertise",
+    title: "Created by Wall Street veterans",
+    avatar: null,
+    rating: 5
+  },
+  {
+    id: 5,
+    quote: "7-day money-back guarantee. If our models don't meet your expectations, get a full refund.",
+    name: "Risk-Free Purchase",
+    title: "100% satisfaction guarantee",
     avatar: null,
     rating: 5
   }
@@ -92,10 +108,10 @@ export default function EnhancedTestimonials() {
           transition={{ duration: 0.7 }}
         >
           <h2 className="text-3xl font-bold font-serif text-navy-700 dark:text-white mb-4 text-center">
-            What Our Clients Say
+            Why Choose Zenith Capital
           </h2>
           <p className="text-lg text-gray-600 dark:text-gray-300 mb-12 text-center max-w-2xl mx-auto">
-            Trusted by investment professionals worldwide to deliver analytical precision and strategic insight
+            Professional financial models designed to accelerate your investment success
           </p>
         </motion.div>
         
@@ -143,21 +159,9 @@ export default function EnhancedTestimonials() {
                   
                   <div className="flex items-center mt-auto">
                     <div className="h-12 w-12 bg-teal-100 dark:bg-teal-900 rounded-full flex items-center justify-center mr-3">
-                      {testimonial.avatar ? (
-                        <div className="relative h-10 w-10 rounded-full overflow-hidden">
-                          <Image 
-                            src={testimonial.avatar} 
-                            alt={testimonial.name} 
-                            fill
-                            sizes="40px"
-                            className="object-cover"
-                          />
-                        </div>
-                      ) : (
-                        <span className="text-teal-700 dark:text-teal-300 font-semibold text-lg">
-                          {testimonial.name.charAt(0)}
-                        </span>
-                      )}
+                      <svg className="w-6 h-6 text-teal-700 dark:text-teal-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                      </svg>
                     </div>
                     <div>
                       <p className="font-bold text-navy-700 dark:text-white text-lg">
@@ -215,24 +219,24 @@ export default function EnhancedTestimonials() {
           ))}
         </div>
         
-        {/* Client logos */}
+        {/* Key metrics */}
         <div className="mt-16">
-          <p className="text-center text-gray-500 dark:text-gray-400 text-sm mb-6">
-            TRUSTED BY LEADING INVESTMENT FIRMS
-          </p>
-          <div className="flex flex-wrap justify-center gap-8 items-center opacity-70">
-            {/* In a real implementation, replace these divs with actual client logos */}
-            <div className="h-12 w-32 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-              <span className="text-gray-500 dark:text-gray-400 text-xs">CLIENT LOGO</span>
+          <div className="grid grid-cols-2 md:grid-cols-4 gap-8 max-w-4xl mx-auto">
+            <div className="text-center">
+              <div className="text-3xl font-bold text-teal-600 dark:text-teal-400 mb-2">13+</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Professional Models</div>
             </div>
-            <div className="h-12 w-32 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-              <span className="text-gray-500 dark:text-gray-400 text-xs">CLIENT LOGO</span>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-teal-600 dark:text-teal-400 mb-2">100+</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Hours Saved Per Deal</div>
             </div>
-            <div className="h-12 w-32 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-              <span className="text-gray-500 dark:text-gray-400 text-xs">CLIENT LOGO</span>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-teal-600 dark:text-teal-400 mb-2">$500M+</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Deals Analyzed</div>
             </div>
-            <div className="h-12 w-32 bg-gray-200 dark:bg-gray-700 rounded flex items-center justify-center">
-              <span className="text-gray-500 dark:text-gray-400 text-xs">CLIENT LOGO</span>
+            <div className="text-center">
+              <div className="text-3xl font-bold text-teal-600 dark:text-teal-400 mb-2">7-Day</div>
+              <div className="text-sm text-gray-600 dark:text-gray-400">Money-Back Guarantee</div>
             </div>
           </div>
         </div>

@@ -324,3 +324,149 @@ h6 span[data-custom-color="true"],
   outline: 2px solid rgb(55, 65, 81) !important; /* gray-700 */
   outline-offset: 2px !important;
 }
+
+/* Enhanced Form Focus States */
+input:focus,
+textarea:focus,
+select:focus {
+  outline: none !important;
+  box-shadow: 0 0 0 3px rgba(13, 148, 136, 0.15) !important; /* teal-500 with alpha */
+  border-color: rgb(13, 148, 136) !important; /* teal-500 */
+  transform: translateY(-1px);
+  transition: all 0.2s ease-out;
+}
+
+/* Enhanced Button Focus States */
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid rgb(13, 148, 136) !important; /* teal-500 */
+  outline-offset: 2px !important;
+  box-shadow: 0 0 0 4px rgba(13, 148, 136, 0.15) !important;
+}
+
+/* Smooth transitions for interactive elements */
+button,
+input,
+textarea,
+select,
+a {
+  transition: all 0.2s ease-out;
+}
+
+/* Enhanced hover states for interactive elements */
+button:hover:not(:disabled),
+a:hover {
+  transform: translateY(-1px);
+}
+
+/* Loading states */
+.loading-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.4), transparent);
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+}
+
+.dark .loading-shimmer {
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent);
+  background-size: 200% 100%;
+}
+
+@keyframes shimmer {
+  0% { background-position: -200% 0; }
+  100% { background-position: 200% 0; }
+}
+
+/* Pulse animation for loading states */
+.pulse-loading {
+  animation: pulse-loading 1.5s infinite;
+}
+
+@keyframes pulse-loading {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.6; }
+}
+
+/* Enhanced card hover effects */
+.card-hover {
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.card-hover:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+}
+
+/* Toast notification styles */
+.toast-enter {
+  opacity: 0;
+  transform: translateY(-50px) scale(0.95);
+}
+
+.toast-enter-active {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.toast-exit {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.toast-exit-active {
+  opacity: 0;
+  transform: translateY(-50px) scale(0.95);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Improved accessibility styles */
+.sr-only {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+/* High contrast mode support */
+@media (prefers-contrast: high) {
+  .bg-teal-500 {
+    background-color: #00695c !important;
+  }
+  
+  .text-teal-500 {
+    color: #00695c !important;
+  }
+  
+  .border-teal-500 {
+    border-color: #00695c !important;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  ::before,
+  ::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Print styles */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  
+  body {
+    print-color-adjust: exact;
+    -webkit-print-color-adjust: exact;
+  }
+}

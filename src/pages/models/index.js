@@ -7,6 +7,9 @@ import Button from '@/components/ui/Button';
 import Motion from '@/components/ui/Motion';
 import Card from '@/components/ui/Card';
 import SEO from '@/components/SEO';
+import LoadingSkeleton, { ModelCardSkeleton } from '@/components/ui/LoadingSkeleton';
+import { useToast } from '@/components/ui/Toast';
+import ModelCard from '@/components/ui/ModelCard';
 
 
 // Categories for filtering
@@ -20,22 +23,63 @@ export default function Models() {
   const [activeCategory, setActiveCategory] = useState('all');
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetch('/api/models')
-      .then(res => res.json())
+      .then(res => {
+        if (!res.ok) {
+          throw new Error('Failed to fetch models');
+        }
+        return res.json();
+      })
       .then(data => {
         setModels(Array.isArray(data) ? data : []);
         setLoading(false);
       })
       .catch(error => {
         console.error('Error fetching models:', error);
+        setError('Failed to load models. Please try again later.');
         setModels([]);
         setLoading(false);
       });
   }, []);
 
-  if (loading) return <div className="py-16 text-center text-gray-500">Loading models...</div>;
+  if (loading) {
+    return (
+      <Layout>
+        <div className="py-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <ModelCardSkeleton count={6} />
+          </div>
+        </div>
+      </Layout>
+    );
+  }
+
+  if (error) {
+    return (
+      <Layout>
+        <div className="py-16 text-center">
+          <div className="max-w-md mx-auto">
+            <div className="text-red-500 mb-4">
+              <svg className="w-12 h-12 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
+              </svg>
+            </div>
+            <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">Unable to Load Models</h3>
+            <p className="text-gray-500 dark:text-gray-400 mb-4">{error}</p>
+            <Button 
+              onClick={() => window.location.reload()} 
+              variant="primary"
+            >
+              Try Again
+            </Button>
+          </div>
+        </div>
+      </Layout>
+    );
+  }
 
   // Filter models based on selected category
   const filteredModels = activeCategory === 'all'
@@ -186,68 +230,18 @@ export default function Models() {
             </Motion>
             
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-              {featuredModels.map((model) => (
-                <Motion key={model.id} animation="fade" direction="up" delay={200} className="h-full">
-                  <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                    <Link href={`/models/${model.slug}`}>
-                      {model.thumbnail_url ? (
-                        <div className="relative aspect-w-16 aspect-h-9 overflow-hidden h-48">
-                          <Image 
-                            src={model.thumbnail_url} 
-                            alt={model.title}
-                            fill
-                            className="object-cover transition-transform duration-300 hover:scale-105"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                            quality={75}
-                            loading="lazy"
-                          />
-                        </div>
-                      ) : (
-                        <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500 h-48">
-                          [{model.title} Preview]
-                        </div>
-                      )}
-                    </Link>
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
-                          {model.category}
-                        </span>
-                        <span className="text-lg font-bold text-teal-500">
-                          ${model.price?.toLocaleString() || 'Contact'}
-                        </span>
-                      </div>
-                      <Link href={`/models/${model.slug}`}>
-                        <h3 className="text-xl font-bold text-navy-700 dark:text-white mb-3 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer">
-                          {model.title}
-                        </h3>
-                      </Link>
-                      <p className="text-gray-600 dark:text-gray-300 mb-4">
-                        {model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 150) + '...' : 'Professional financial model for investment analysis.'}
-                      </p>
-                      <div className="flex items-center justify-between gap-3">
-                        <Button
-                          href={`/models/${model.slug}`}
-                          variant="ghost"
-                          size="sm"
-                          className="text-sm"
-                        >
-                          View Details
-                        </Button>
-                        <Button
-                          href={`/checkout?modelId=${model.id}&modelSlug=${model.slug}&modelTitle=${encodeURIComponent(model.title)}&modelPrice=${model.price}`}
-                          variant="accent"
-                          size="sm"
-                          className="flex items-center"
-                        >
-                          <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                          </svg>
-                          Buy Now
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
+              {featuredModels.map((model, index) => (
+                <Motion 
+                  key={model.id} 
+                  animation="fade" 
+                  direction="up" 
+                  delay={200 + (index * 100)} 
+                  className="h-full"
+                >
+                  <ModelCard 
+                    model={model} 
+                    featured={true}
+                  />
                 </Motion>
               ))}
             </div>
@@ -266,75 +260,39 @@ export default function Models() {
           
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
             {regularModels.length > 0 ? (
-              regularModels.map((model) => (
-                <Motion key={model.id} animation="fade" direction="up" delay={200} className="h-full">
-                  <Card className="h-full overflow-hidden hover:shadow-lg transition-shadow duration-300 bg-white dark:bg-navy-800">
-                    <Link href={`/models/${model.slug}`}>
-                      {model.thumbnail_url ? (
-                        <div className="relative aspect-w-16 aspect-h-9 overflow-hidden h-48">
-                          <Image 
-                            src={model.thumbnail_url} 
-                            alt={model.title}
-                            fill
-                            className="object-cover transition-transform duration-300 hover:scale-105"
-                            sizes="(max-width: 768px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                            quality={75}
-                            loading="lazy"
-                          />
-                        </div>
-                      ) : (
-                        <div className="aspect-w-16 aspect-h-9 bg-gray-200 dark:bg-navy-700 flex items-center justify-center text-gray-400 dark:text-gray-500 h-48">
-                          [{model.title} Preview]
-                        </div>
-                      )}
-                    </Link>
-                    <div className="p-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="inline-block px-2 py-1 bg-blue-100 dark:bg-blue-900 text-navy-700 dark:text-blue-300 rounded-full text-xs font-medium">
-                          {model.category}
-                        </span>
-                        <span className="text-lg font-bold text-teal-500">
-                          ${model.price?.toLocaleString() || 'Contact'}
-                        </span>
-                      </div>
-                      <Link href={`/models/${model.slug}`}>
-                        <h3 className="text-lg font-bold text-navy-700 dark:text-white mb-2 hover:text-teal-600 dark:hover:text-teal-400 cursor-pointer">
-                          {model.title}
-                        </h3>
-                      </Link>
-                      <p className="text-gray-600 dark:text-gray-300 text-sm mb-4">
-                        {model.description ? model.description.replace(/<[^>]*>/g, '').substring(0, 120) + '...' : 'Professional financial model for investment analysis.'}
-                      </p>
-                      <div className="flex items-center justify-between gap-2 mt-auto">
-                        <Button
-                          href={`/models/${model.slug}`}
-                          variant="ghost"
-                          size="sm"
-                          className="text-xs"
-                        >
-                          View Details
-                        </Button>
-                        <Button
-                          href={`/checkout?modelId=${model.id}&modelSlug=${model.slug}&modelTitle=${encodeURIComponent(model.title)}&modelPrice=${model.price}`}
-                          variant="accent"
-                          size="sm"
-                          className="flex items-center text-xs"
-                        >
-                          <svg className="w-3 h-3 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
-                          </svg>
-                          Buy Now
-                        </Button>
-                      </div>
-                    </div>
-                  </Card>
+              regularModels.map((model, index) => (
+                <Motion 
+                  key={model.id} 
+                  animation="fade" 
+                  direction="up" 
+                  delay={100 + (index * 50)} 
+                  className="h-full"
+                >
+                  <ModelCard 
+                    model={model} 
+                    featured={false}
+                  />
                 </Motion>
               ))
             ) : (
               <div className="col-span-1 md:col-span-3 py-12 text-center">
-                <p className="text-gray-500 dark:text-gray-400">
-                  No models found in this category. Please check back later or select a different category.
-                </p>
+                <div className="max-w-md mx-auto">
+                  <div className="text-gray-400 mb-4">
+                    <svg className="w-16 h-16 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 00-2-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
+                    </svg>
+                  </div>
+                  <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-2">No Models Available</h3>
+                  <p className="text-gray-500 dark:text-gray-400 mb-4">
+                    No models found in this category. Please check back later or select a different category.
+                  </p>
+                  <Button 
+                    href="/contact" 
+                    variant="primary"
+                  >
+                    Request Custom Model
+                  </Button>
+                </div>
               </div>
             )}
           </div>
