@@ -59,7 +59,8 @@
       "Bash(pkill:*)",
       "Bash(rg:*)",
       "Bash(del \"C:\\Users\\maxim\\OneDrive\\Desktop\\zencap-website\\src\\pages\\api\\orders\\[session_id].js\")",
-      "Bash(del scriptsadd-vercel-env.bat)"
+      "Bash(del scriptsadd-vercel-env.bat)",
+      "Bash(start https://zencap-website.vercel.app/models)"
     ],
     "deny": []
   }
