@@ -102,6 +102,15 @@ const ExcelJSViewer = ({
   const { startMeasure, endMeasure, logPerformanceWarning } = usePerformanceMonitor('ExcelJSViewer');
   const { theme } = useTheme(darkMode);
   const { memoryInfo, isWarning, isCritical } = useMemoryMonitor();
+  
+  // CRITICAL FIX: Memory monitoring and alerts
+  useEffect(() => {
+    if (isCritical) {
+      showToast('Critical memory usage detected. Performance may be affected. Consider closing other browser tabs.', 'error');
+    } else if (isWarning) {
+      showToast('High memory usage detected. Performance may be affected.', 'warning');
+    }
+  }, [isCritical, isWarning, showToast]);
 
   // Handle print - defined after showToast
   const handlePrint = useCallback(() => {
@@ -344,6 +353,15 @@ const ExcelJSViewer = ({
 
         setLoadingProgress(30);
         const arrayBuffer = await response.arrayBuffer();
+        
+        // CRITICAL FIX: File size validation to prevent browser crashes
+        const MAX_FILE_SIZE = 100 * 1024 * 1024; // 100MB limit
+        if (arrayBuffer.byteLength > MAX_FILE_SIZE) {
+          throw new Error(`File size (${(arrayBuffer.byteLength / (1024 * 1024)).toFixed(1)}MB) exceeds maximum limit of 100MB. Please use a smaller file or contact support for assistance with large models.`);
+        }
+        
+        // Log file size for monitoring
+        console.log(`[ExcelJSViewer] File size: ${(arrayBuffer.byteLength / (1024 * 1024)).toFixed(2)}MB`);
         const loadDuration = endMeasure('file-load');
         logPerformanceWarning('File loading', loadDuration, 2000);
 

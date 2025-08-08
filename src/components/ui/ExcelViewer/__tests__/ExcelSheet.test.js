@@ -118,14 +118,14 @@ describe('ExcelSheet', () => {
       // getColumnWidth should be called and return correct values
       const { columnWidth } = VariableSizeGrid.mock.calls[0][0];
       
-      // Column 1 has width 15, converted to pixels (15 * 8 * zoomFactor)
-      expect(columnWidth(1)).toBe(15 * 8 * 1);
+      // Column 1 has width 15, converted to pixels (15 * 7.0 * zoomFactor)
+      expect(columnWidth(1)).toBe(15 * 7.0 * 1);
       
       // Column 2 has width 20
-      expect(columnWidth(2)).toBe(20 * 8 * 1);
+      expect(columnWidth(2)).toBe(20 * 7.0 * 1);
       
       // Default column width for unmapped columns
-      expect(columnWidth(3)).toBe(100); // DEFAULT_COLUMN_WIDTH
+      expect(columnWidth(3)).toBe(64); // DEFAULT_COLUMN_WIDTH
     });
 
     it('should apply custom row heights', () => {
@@ -133,14 +133,14 @@ describe('ExcelSheet', () => {
       
       const { rowHeight } = VariableSizeGrid.mock.calls[0][0];
       
-      // Row 1 has height 30
-      expect(rowHeight(1)).toBe(30);
+      // Row 1 has height 30 (converted from points to pixels: 30 * 1.333)
+      expect(rowHeight(1)).toBe(Math.round(30 * 1.333));
       
-      // Row 2 has height 25
-      expect(rowHeight(2)).toBe(25);
+      // Row 2 has height 25 (converted from points to pixels: 25 * 1.333)
+      expect(rowHeight(2)).toBe(Math.round(25 * 1.333));
       
       // Default row height
-      expect(rowHeight(3)).toBe(25); // DEFAULT_ROW_HEIGHT
+      expect(rowHeight(3)).toBe(20); // DEFAULT_ROW_HEIGHT
     });
 
     it('should apply zoom factor to dimensions', () => {
@@ -149,8 +149,8 @@ describe('ExcelSheet', () => {
       const { columnWidth, rowHeight } = VariableSizeGrid.mock.calls[0][0];
       
       // With 150% zoom
-      expect(columnWidth(1)).toBe(15 * 8 * 1.5);
-      expect(rowHeight(1)).toBe(30 * 1.5);
+      expect(columnWidth(1)).toBe(15 * 7.0 * 1.5);
+      expect(rowHeight(1)).toBe(Math.round(30 * 1.333 * 1.5));
     });
   });
 

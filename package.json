@@ -26,7 +26,10 @@
     "security:validate": "node scripts/security-validation.js",
     "security:check": "npm run security:audit && npm run security:validate",
     "prod:secure": "node scripts/secure-production.js",
-    "prod:deploy": "npm run security:check && npm run build"
+    "prod:deploy": "npm run security:check && npm run build",
+    "security:monitor": "node scripts/security-monitor.js start",
+    "security:health": "node scripts/security-monitor.js health-check",
+    "security:report": "node scripts/security-monitor.js report"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -68,7 +71,7 @@
     "jsonwebtoken": "^9.0.2",
     "lexical": "^0.33.1",
     "lowlight": "^3.3.0",
-    "luckysheet": "2.1.5",
+    "luckysheet": "^2.1.5",
     "micro": "^10.0.1",
     "multer": "^1.4.5-lts.1",
     "next": "15.4.5",

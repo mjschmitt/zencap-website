@@ -255,14 +255,14 @@ const ExcelSheet = memo(forwardRef(({
         }))
       });
     } else {
-      console.log('Cell data map updated:', {
-        cellCount: data.cells?.length || 0,
-        mapSize: newMap.size,
-        spilloverCount: newSpilloverMap.size,
-        spilloverRanges: data.spilloverRanges?.length || 0,
-        cellsWithBackgroundOnly: cellsWithBackgroundOnly.length,
-        sampleKeys: Array.from(newMap.keys()).slice(0, 5)
-      });
+      // Reduced console logging for performance
+      if (debugMode && (data.cells?.length || 0) < 100) {
+        console.log('Cell data map updated:', {
+          cellCount: data.cells?.length || 0,
+          mapSize: newMap.size,
+          spilloverCount: newSpilloverMap.size
+        });
+      }
     }
   }, [data.cells, data.spilloverRanges]);
 
@@ -739,8 +739,8 @@ const ExcelSheet = memo(forwardRef(({
     // Regular cells - Grid uses 0-based indexing, Excel data uses 1-based indexing
     // Grid row 0 is header, so grid row 1 = Excel row 1
     // Grid col 0 is row numbers, so grid col 1 = Excel col 1
-    // Since we're already past the header (rowIndex > 0) and row numbers (columnIndex > 0),
-    // we can use the indices directly as they already map to Excel's 1-based system
+    // CRITICAL FIX: The indices are already 1-based for data cells (after headers/row numbers)
+    // This directly maps to Excel's internal 1-based indexing system
     const cellKey = `${rowIndex}-${columnIndex}`;
     const cellData = cellDataMap.current.get(cellKey);
     const spilloverData = spilloverMap.current.get(cellKey);

@@ -84,15 +84,15 @@ const OptimizedImage = ({
     onError?.(e);
   }, [onError]);
 
-  // Optimized responsive sizes calculation
+  // Optimized responsive sizes calculation with mobile-first approach
   const getOptimizedSizes = useCallback(() => {
     if (sizes !== '100vw') return sizes;
     
-    // Auto-generate responsive sizes based on width
+    // Mobile-first responsive sizes for better bandwidth usage
     if (width) {
-      if (width <= 640) return '100vw';
-      if (width <= 768) return '(max-width: 640px) 100vw, 50vw';
-      if (width <= 1024) return '(max-width: 640px) 100vw, (max-width: 768px) 50vw, 33vw';
+      if (width <= 640) return '100vw'; // Full width on mobile
+      if (width <= 768) return '(max-width: 640px) 100vw, (max-width: 768px) 80vw'; // Mobile optimization
+      if (width <= 1024) return '(max-width: 640px) 100vw, (max-width: 768px) 50vw, 40vw';
       return '(max-width: 640px) 100vw, (max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw';
     }
     

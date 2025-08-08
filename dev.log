@@ -1,15 +1,23 @@
 
 > zencap-website@0.1.0 dev
-> next dev -p 3001
+> next dev
 
- ⨯ Failed to start server
-Error: listen EADDRINUSE: address already in use :::3001
-    at <unknown> (Error: listen EADDRINUSE: address already in use :::3001)
-    at new Promise (<anonymous>) {
-  code: 'EADDRINUSE',
-  errno: -4091,
-  syscall: 'listen',
-  address: '::',
-  port: 3001
-}
-[?25h
+   ▲ Next.js 15.4.5
+   - Local:        http://localhost:3000
+   - Network:      http://172.20.57.252:3000
+   - Environments: .env.development.local, .env.local
+   - Experiments (use with caution):
+     ✓ optimizeCss
+     ✓ webpackBuildWorker
+
+ ✓ Starting...
+ ⚠ Invalid next.config.mjs options detected: 
+ ⚠     Unrecognized key(s) in object: 'swcMinify'
+ ⚠ See more info here: https://nextjs.org/docs/messages/invalid-next-config
+ ⚠ Duplicate page detected. src\pages\checkout.js and src\pages\checkout\index.js resolve to /checkout
+ ⚠ Duplicate page detected. src\pages\checkout.js and src\pages\checkout\index.js resolve to /checkout
+ ✓ Ready in 1988ms
+ ○ Compiling /api/health ...
+ ✓ Compiled /api/health in 2.4s (140 modules)
+ GET /api/health 200 in 3167ms
+ ⚠ Duplicate page detected. src\pages\checkout.js and src\pages\checkout\index.js resolve to /checkout

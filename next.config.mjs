@@ -22,7 +22,12 @@ const nextConfig = {
   // Performance optimizations
   compiler: {
     removeConsole: process.env.NODE_ENV === 'production',
+    reactRemoveProperties: process.env.NODE_ENV === 'production',
+    styledComponents: true,
   },
+  
+  // Enable SWC minification for better performance
+  swcMinify: true,
 
   images: {
     domains: ['localhost'],
@@ -117,67 +122,150 @@ const nextConfig = {
       util: false,
     };
 
-    // Advanced bundle optimization with code splitting
-    config.optimization.splitChunks = {
-      ...config.optimization.splitChunks,
-      maxSize: 250000, // 250KB chunks
-      cacheGroups: {
-        ...config.optimization.splitChunks?.cacheGroups,
-        // Excel processing libraries
-        exceljs: {
-          test: /[\\/]node_modules[\\/](exceljs)[\\/]/,
-          name: 'exceljs',
-          priority: 30,
-          chunks: 'async',
-          enforce: true,
+    // CRITICAL: Aggressive bundle optimization for sub-2s load times
+    config.optimization = {
+      ...config.optimization,
+      
+      // Advanced code splitting configuration
+      splitChunks: {
+        chunks: 'all',
+        maxSize: 200000, // 200KB max chunk size (reduced from 250KB)
+        minSize: 20000,  // 20KB minimum chunk size
+        maxAsyncRequests: 30,
+        maxInitialRequests: 25,
+        enforceSizeThreshold: 150000, // 150KB threshold
+        
+        cacheGroups: {
+          // CRITICAL: Excel processing (load only when needed)
+          exceljs: {
+            test: /[\\/]node_modules[\\/](exceljs)[\\/]/,
+            name: 'excel-engine',
+            priority: 50,
+            chunks: 'async',
+            enforce: true,
+            reuseExistingChunk: true,
+          },
+          
+          // Excel utilities (smaller bundle)
+          xlsxLibs: {
+            test: /[\\/]node_modules[\\/](xlsx|xlsx-js-style|node-xlsx)[\\/]/,
+            name: 'excel-utils',
+            priority: 45,
+            chunks: 'async',
+            enforce: true,
+            reuseExistingChunk: true,
+          },
+          
+          // Rich text editor (admin only)
+          textEditor: {
+            test: /[\\/]node_modules[\\/](@tiptap|@lexical|lexical)[\\/]/,
+            name: 'rich-editor',
+            priority: 40,
+            chunks: 'async',
+            enforce: true,
+            reuseExistingChunk: true,
+          },
+          
+          // Charts and visualizations
+          charts: {
+            test: /[\\/]node_modules[\\/](recharts|luckysheet|chart\.js)[\\/]/,
+            name: 'charts-viz',
+            priority: 35,
+            chunks: 'async',
+            enforce: true,
+            reuseExistingChunk: true,
+          },
+          
+          // Animations (critical for UX but lazy loaded)
+          animations: {
+            test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
+            name: 'animations',
+            priority: 30,
+            chunks: 'async', // Changed to async
+            enforce: true,
+            reuseExistingChunk: true,
+          },
+          
+          // React ecosystem (essential)
+          react: {
+            test: /[\\/]node_modules[\\/](react|react-dom|react-router)[\\/]/,
+            name: 'react-core',
+            priority: 60,
+            chunks: 'all',
+            enforce: true,
+            reuseExistingChunk: true,
+          },
+          
+          // Next.js framework
+          nextjs: {
+            test: /[\\/]node_modules[\\/](next)[\\/]/,
+            name: 'nextjs-framework',
+            priority: 55,
+            chunks: 'all',
+            enforce: true,
+            reuseExistingChunk: true,
+          },
+          
+          // Utility libraries
+          utils: {
+            test: /[\\/]node_modules[\\/](lodash|date-fns|uuid|classnames)[\\/]/,
+            name: 'utils',
+            priority: 25,
+            chunks: 'all',
+            minChunks: 2,
+            reuseExistingChunk: true,
+          },
+          
+          // CSS and styling
+          styles: {
+            test: /\.(css|scss|sass|less)$/,
+            name: 'styles',
+            priority: 20,
+            chunks: 'all',
+            enforce: true,
+            reuseExistingChunk: true,
+          },
+          
+          // Common vendor chunk (fallback)
+          vendor: {
+            test: /[\\/]node_modules[\\/]/,
+            name: 'vendor',
+            priority: 10,
+            chunks: 'initial',
+            minChunks: 2,
+            maxSize: 150000, // 150KB max for vendor chunks
+            reuseExistingChunk: true,
+          },
+          
+          // Default chunk
+          default: {
+            minChunks: 2,
+            priority: 5,
+            reuseExistingChunk: true,
+            maxSize: 100000, // 100KB max for default chunks
+          },
         },
-        // Other Excel libraries
-        xlsxLibs: {
-          test: /[\\/]node_modules[\\/](xlsx|xlsx-js-style|node-xlsx)[\\/]/,
-          name: 'xlsx-libs',
-          priority: 25,
-          chunks: 'async',
-          enforce: true,
-        },
-        // Rich text editor libraries
-        textEditor: {
-          test: /[\\/]node_modules[\\/](@tiptap|@lexical|lexical)[\\/]/,
-          name: 'text-editor',
-          priority: 20,
-          chunks: 'async',
-          enforce: true,
-        },
-        // Chart and visualization libraries
-        charts: {
-          test: /[\\/]node_modules[\\/](recharts|luckysheet)[\\/]/,
-          name: 'charts',
-          priority: 15,
-          chunks: 'async',
-          enforce: true,
-        },
-        // UI and animation libraries
-        animations: {
-          test: /[\\/]node_modules[\\/](framer-motion)[\\/]/,
-          name: 'animations',
-          priority: 10,
-          chunks: 'all',
-        },
-        // React and core libraries
-        reactVendor: {
-          test: /[\\/]node_modules[\\/](react|react-dom)[\\/]/,
-          name: 'react-vendor',
-          priority: 40,
-          chunks: 'all',
-          enforce: true,
-        },
-        // Common vendor libraries
-        vendor: {
-          test: /[\\/]node_modules[\\/]/,
-          name: 'vendor',
-          priority: 5,
-          chunks: 'initial',
-          minChunks: 2,
-        },
+      },
+      
+      // Module concatenation for better performance
+      concatenateModules: true,
+      
+      // Minimize configuration
+      minimize: !dev,
+      minimizer: dev ? [] : [
+        // Add Terser options for better compression
+        '...',
+      ],
+      
+      // Remove empty chunks
+      removeEmptyChunks: true,
+      
+      // Merge duplicate chunks
+      mergeDuplicateChunks: true,
+      
+      // Better runtime chunk
+      runtimeChunk: {
+        name: 'runtime',
       },
     };
 
