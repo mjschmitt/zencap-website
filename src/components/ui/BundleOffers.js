@@ -87,7 +87,7 @@ export default function BundleOffers() {
               }`}
             >
               {bundle.mostPopular && (
-                <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-teal-500 to-blue-600 text-white text-center py-2 font-medium">
+                <div className="absolute top-0 left-0 right-0 bg-gradient-to-r from-teal-500 to-navy-700 text-white text-center py-2 font-medium">
                   MOST POPULAR - BEST VALUE
                 </div>
               )}
@@ -150,7 +150,7 @@ export default function BundleOffers() {
                   href={`/contact?bundle=${bundle.id}`}
                   className={`block w-full text-center py-3 px-6 rounded-lg font-medium transition-all duration-300 ${
                     bundle.mostPopular
-                      ? 'bg-gradient-to-r from-teal-500 to-blue-600 text-white hover:from-teal-600 hover:to-blue-700 transform hover:-translate-y-1 shadow-lg'
+                      ? 'bg-gradient-to-r from-teal-500 to-navy-700 text-white hover:from-teal-600 hover:to-navy-800 transform hover:-translate-y-1 shadow-lg'
                       : 'bg-navy-700 text-white hover:bg-navy-800'
                   }`}
                 >

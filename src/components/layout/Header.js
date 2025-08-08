@@ -109,7 +109,7 @@ export default function Header() {
                   onClick={() => setUserMenuOpen(!userMenuOpen)}
                   className="flex items-center text-sm rounded-full focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500"
                 >
-                  <div className="h-8 w-8 rounded-full bg-blue-600 flex items-center justify-center">
+                  <div className="h-8 w-8 rounded-full bg-navy-700 flex items-center justify-center">
                     <span className="text-white font-medium">
                       {session.user?.name?.charAt(0) || session.user?.email?.charAt(0) || 'U'}
                     </span>
@@ -144,7 +144,7 @@ export default function Header() {
             ) : (
               <button
                 onClick={() => signIn()}
-                className="bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition-colors"
+                className="bg-navy-700 text-white px-4 py-2 rounded-lg hover:bg-navy-800 transition-colors"
               >
                 Sign In
               </button>
@@ -318,7 +318,7 @@ export default function Header() {
                   </div>
                   <Link 
                     href="/account/purchases" 
-                    className="block w-full px-4 py-3 text-center rounded-md shadow bg-blue-600 text-white font-medium hover:bg-blue-700 transition duration-150 ease-in-out"
+                    className="block w-full px-4 py-3 text-center rounded-md shadow bg-navy-700 text-white font-medium hover:bg-navy-800 transition duration-150 ease-in-out"
                   >
                     My Purchases
                   </Link>

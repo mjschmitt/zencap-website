@@ -442,8 +442,8 @@ export default function Home() {
       {/* Bundle Offers Section */}
       <BundleOffers />
       
-      {/* Money Back Guarantee */}
-      <section className="py-8">
+      {/* Satisfaction Guarantee - Moved below Bundle Offers */}
+      <section className="py-12">
         <div className="max-w-4xl mx-auto px-4">
           <MoneyBackGuarantee />
         </div>
