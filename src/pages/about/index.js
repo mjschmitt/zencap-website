@@ -234,7 +234,7 @@ export default function About() {
                   </h3>
                   <p className="text-teal-500 font-medium mb-4">Founder & CEO</p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Max has over 10 years of experience in public and private equity investing, bringing a comprehensive perspective to financial modeling. His career spans senior research roles at Evercore ISI and Macquarie Group, where he developed innovative analytical frameworks for equity valuation and investment decision-making. Prior to Wall Street, Max underwrote over $1 billion of CRE transactions and helped manage a 2,000 unit multifamily portfolio while working in private equity.
+                    Max has over 10 years of experience in public and private equity investing, bringing a comprehensive perspective to investment underwriting, research, and infrastructure. His career spans senior research roles at Evercore ISI and Macquarie Group, where he developed innovative analytical frameworks for equity valuation and investment decision-making. Prior to Wall Street, Max underwrote over $1 billion of CRE transactions and helped manage a 2,000 unit multifamily portfolio while working in private equity.
                   </p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
                     His multidisciplinary background in both buy-side and sell-side roles provides Zenith with unique insights into the analytical needs across the investment spectrum. Max holds a bachelor&apos;s degree in Finance and master&apos;s degrees in Entrepreneurship and Real Estate from the University of Florida.
