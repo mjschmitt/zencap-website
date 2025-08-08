@@ -34,7 +34,7 @@ export default defineConfig({
   // Global setup
   use: {
     // Base URL
-    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3001',
+    baseURL: process.env.PLAYWRIGHT_BASE_URL || 'http://localhost:3003',
     
     // Trace on failure
     trace: 'on-first-retry',
@@ -90,7 +90,7 @@ export default defineConfig({
   // Web server configuration
   webServer: {
     command: 'npm run dev',
-    port: 3001,
+    port: 3003,
     reuseExistingServer: !process.env.CI,
     timeout: 120 * 1000,
   },

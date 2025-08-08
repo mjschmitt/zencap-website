@@ -1,0 +1,370 @@
+# Page snapshot
+
+```yaml
+- main:
+  - link "Zenith Capital Advisors":
+    - /url: /
+  - textbox "Search models, insights, and solutions..."
+  - img
+  - button "Switch to dark mode":
+    - img
+  - navigation:
+    - link "Home":
+      - /url: /
+    - link "About":
+      - /url: /about
+    - link "Models":
+      - /url: /models
+      - text: Models
+      - img
+    - menu:
+      - menuitem "Private Equity Models"
+      - menuitem "Public Equity Models"
+    - link "Solutions":
+      - /url: /solutions
+      - text: Solutions
+      - img
+    - link "Insights":
+      - /url: /insights
+    - link "Contact":
+      - /url: /contact
+  - button "Sign In"
+  - main:
+    - img
+    - text: LAUNCH SPECIAL
+    - img
+    - paragraph: Save 40% on All Models - Limited Time Only!
+    - paragraph: Original price $4,985 → Launch price $2,985
+    - text: "Ends in: 6d 23h 59m 47s"
+    - img "Financial Advisory Background"
+    - heading "Strategic Investment Clarity" [level=1]
+    - paragraph: Transform complex financial data into actionable intelligence.
+    - link "See Our Models":
+      - /url: /models
+      - text: See Our Models
+      - img
+    - link "Schedule Consultation":
+      - /url: /contact
+    - img
+    - heading "Our Models" [level=2]
+    - paragraph: Institutional-grade financial models designed for sophisticated investment analysis
+    - link "Private Equity Models Private Equity 8 Models Private Equity Models Real estate development, acquisition, and investment analysis across all major property types. Multifamily & Commercial Development & Acquisition Explore Models":
+      - /url: /models/private-equity
+      - img "Private Equity Models"
+      - text: Private Equity 8 Models
+      - heading "Private Equity Models" [level=3]
+      - paragraph: Real estate development, acquisition, and investment analysis across all major property types.
+      - img
+      - text: Multifamily & Commercial
+      - img
+      - text: Development & Acquisition Explore Models
+      - img
+    - link "Public Equity Models Public Equity 5 Models Public Equity Models Valuation models and analytical tools for public company analysis and portfolio management. 3-Statement Models DCF & Portfolio Analysis Explore Models":
+      - /url: /models/public-equity
+      - img "Public Equity Models"
+      - text: Public Equity 5 Models
+      - heading "Public Equity Models" [level=3]
+      - paragraph: Valuation models and analytical tools for public company analysis and portfolio management.
+      - img
+      - text: 3-Statement Models
+      - img
+      - text: DCF & Portfolio Analysis Explore Models
+      - img
+    - link "Browse All Models":
+      - /url: /models
+      - text: Browse All Models
+      - img
+    - heading "Our Solutions" [level=2]
+    - paragraph: Comprehensive advisory services designed to enhance your investment capabilities
+    - link "Financial modeling spreadsheet with charts Financial Modeling Custom financial models that provide deep analytical insights and support better investment decisions. Learn more":
+      - /url: /solutions/financial-modeling
+      - img "Financial modeling spreadsheet with charts"
+      - heading "Financial Modeling" [level=3]
+      - paragraph: Custom financial models that provide deep analytical insights and support better investment decisions.
+      - text: Learn more
+      - img
+    - link "Modern investment office with multiple screens displaying data Investment Infrastructure End-to-end systems to streamline your investment operations, improve data management, and enhance decision-making. Learn more":
+      - /url: /solutions/infrastructure
+      - img "Modern investment office with multiple screens displaying data"
+      - heading "Investment Infrastructure" [level=3]
+      - paragraph: End-to-end systems to streamline your investment operations, improve data management, and enhance decision-making.
+      - text: Learn more
+      - img
+    - link "Researcher analyzing market data and reports Industry Research Specialized research to inform your investment strategy, identify opportunities, and navigate market complexities. Learn more":
+      - /url: /solutions/research
+      - img "Researcher analyzing market data and reports"
+      - heading "Industry Research" [level=3]
+      - paragraph: Specialized research to inform your investment strategy, identify opportunities, and navigate market complexities.
+      - text: Learn more
+      - img
+    - img
+    - text: 500+ Happy Clients
+    - img
+    - text: $2.4B+ Deals Modeled
+    - img
+    - text: 24-Hour Delivery
+    - heading "Trusted by Leading Investment Firms" [level=2]
+    - paragraph: Join 500+ investment professionals who rely on our models for institutional-quality analysis.
+    - text: Goldman Sachs Blackstone KKR Apollo Brookfield CBRE JLL PIMCO SM
+    - img
+    - img
+    - img
+    - img
+    - img
+    - heading "Sarah Mitchell" [level=3]
+    - paragraph: Managing Partner
+    - paragraph: Meridian Capital Partners
+    - text: Verified Purchase - December 2024
+    - blockquote: "\"The multifamily acquisition model saved us 3 weeks of modeling work and helped us identify a $2.3M value-add opportunity we initially missed. The ROI was immediate.\""
+    - img
+    - paragraph: "Result: Closed $125M deal 3 weeks ahead of schedule"
+    - paragraph: "Deal: $125M Multifamily Portfolio"
+    - button
+    - button
+    - button
+    - button
+    - text: DR
+    - img
+    - img
+    - img
+    - img
+    - img
+    - blockquote: "\"These models are institutional quality. We use them for due diligence on major acquisitions. The hospitality model helpe...\""
+    - paragraph: David Rodriguez
+    - paragraph: Senior Vice President, Blackstone Real Estate
+    - text: JP
+    - img
+    - img
+    - img
+    - img
+    - img
+    - blockquote: "\"The build quality and attention to detail in these models rivals what we build internally. Michael's Wall Street experie...\""
+    - paragraph: Jennifer Park
+    - paragraph: Director of Investments, Goldman Sachs Asset Management
+    - text: MC
+    - img
+    - text: CFA MBA Finance 15+ Years
+    - heading "Meet Your Financial Modeling Expert" [level=3]
+    - paragraph:
+      - strong: Michael Chen, CFA
+      - text: brings over 15 years of Wall Street experience to every model. Former Senior VP at Goldman Sachs Real Estate Division and Portfolio Manager at Blackstone.
+    - img
+    - paragraph: $2.4B+ Deals Modeled
+    - paragraph: Across 200+ transactions
+    - img
+    - paragraph: 500+ Happy Clients
+    - paragraph: PE funds & institutions
+    - img
+    - paragraph: 98.2% Accuracy Rate
+    - paragraph: Independent audit verified
+    - img
+    - paragraph: 24/7 Support
+    - paragraph: Direct access to creator
+    - heading "Save Big with Bundle Packages" [level=2]
+    - paragraph: Get multiple models at significant discounts. Perfect for institutions and serious investors.
+    - text: MOST POPULAR - BEST VALUE
+    - heading "Private Equity Starter Pack" [level=3]
+    - paragraph: Perfect for getting started with PE real estate modeling
+    - text: Was $14,955 $8,985 Save $5,970
+    - heading "Includes:" [level=4]
+    - img
+    - text: Multifamily Development
+    - img
+    - text: Multifamily Acquisition
+    - img
+    - text: Commercial Acquisition
+    - heading "Bundle Benefits:" [level=4]
+    - img
+    - text: Three complete PE models
+    - img
+    - text: Detailed instruction guides
+    - img
+    - text: Sample data sets
+    - img
+    - text: 90-day email support
+    - img
+    - text: Free updates for 1 year
+    - link "Get This Bundle":
+      - /url: /contact?bundle=pe-starter
+    - text: 🔥 Limited time offer - Save 69%!
+    - heading "Complete Financial Modeling Suite" [level=3]
+    - paragraph: Everything you need for comprehensive investment analysis
+    - text: Was $64,805 $19,985 Save $44,820
+    - heading "Includes:" [level=4]
+    - img
+    - text: All 8 Private Equity Models
+    - img
+    - text: All 5 Public Equity Models
+    - heading "Bundle Benefits:" [level=4]
+    - img
+    - text: All 13 premium models
+    - img
+    - text: Comprehensive documentation
+    - img
+    - text: Video tutorials library
+    - img
+    - text: Priority email & phone support
+    - img
+    - text: Lifetime free updates
+    - img
+    - text: Custom model consultation (1 hour)
+    - img
+    - text: Exclusive investor community access
+    - link "Get This Bundle":
+      - /url: /contact?bundle=complete-suite
+    - heading "Hospitality Investment Bundle" [level=3]
+    - paragraph: Specialized models for hotel and resort investments
+    - text: Was $14,955 $9,985 Save $4,970
+    - heading "Includes:" [level=4]
+    - img
+    - text: Hospitality Development
+    - img
+    - text: Hospitality Acquisition
+    - img
+    - text: Mixed-Use with Hotel
+    - heading "Bundle Benefits:" [level=4]
+    - img
+    - text: Three hospitality-focused models
+    - img
+    - text: Industry-specific metrics
+    - img
+    - text: RevPAR analysis tools
+    - img
+    - text: 60-day email support
+    - img
+    - text: Quarterly model updates
+    - link "Get This Bundle":
+      - /url: /contact?bundle=hospitality-focus
+    - heading "Need a Custom Bundle?" [level=3]
+    - paragraph: Contact us for enterprise pricing or custom model combinations tailored to your specific needs.
+    - link "Request Custom Quote":
+      - /url: /contact?type=custom-bundle
+      - text: Request Custom Quote
+      - img
+    - img
+    - heading "100% Money-Back Guarantee" [level=3]
+    - paragraph: Not satisfied? Get a full refund within 30 days. No questions asked.
+    - img
+    - text: 30-Day Guarantee
+    - img
+    - text: Zero Risk
+    - img
+    - text: Instant Refund
+    - heading "Ready to transform your investment capabilities?" [level=2]
+    - paragraph: Learn more about our work and get in touch.
+    - link "Our Insights":
+      - /url: /insights
+      - button "Our Insights":
+        - text: Our Insights
+        - img
+    - link "Contact Us":
+      - /url: /contact
+    - paragraph: 95%
+    - paragraph: Client retention rate
+    - paragraph: 50+
+    - paragraph: Asset managers served
+    - paragraph: 24hr
+    - paragraph: Average response time
+    - paragraph: $2T+
+    - paragraph: Assets modeled
+  - heading "Trusted by Investment Professionals" [level=3]
+  - img
+  - text: SSL Secured 256-bit encryption
+  - img
+  - text: Secure Payment Powered by Stripe
+  - img
+  - text: Instant Download Immediate access
+  - img
+  - text: 30-Day Support Expert assistance Zenith Capital
+  - paragraph: Elevate Your Investment Decisions
+  - paragraph: We provide institutional-grade financial models and investment analysis tools to help sophisticated investors make data-driven decisions. Our Excel-based models range from $2,985 to $4,985 and cover private equity real estate and public equity analysis.
+  - paragraph:
+    - img
+    - text: SEC Compliant Financial Models
+  - paragraph:
+    - img
+    - text: GAAP Accounting Standards
+  - paragraph:
+    - img
+    - text: CFA Institute Best Practices
+  - link "Models":
+    - /url: /models
+    - heading "Models" [level=3]
+  - list:
+    - listitem:
+      - link "Private Equity Models":
+        - /url: /models/private-equity
+        - img
+        - text: Private Equity Models
+    - listitem:
+      - link "Public Equity Models":
+        - /url: /models/public-equity
+        - img
+        - text: Public Equity Models
+    - listitem:
+      - link "Market Insights":
+        - /url: /insights
+        - img
+        - text: Market Insights
+  - link "Services":
+    - /url: /solutions
+    - heading "Services" [level=3]
+  - list:
+    - listitem:
+      - link "Financial Modeling":
+        - /url: /solutions/financial-modeling
+        - img
+        - text: Financial Modeling
+    - listitem:
+      - link "Investment Infrastructure":
+        - /url: /solutions/infrastructure
+        - img
+        - text: Investment Infrastructure
+    - listitem:
+      - link "Industry Research":
+        - /url: /solutions/research
+        - img
+        - text: Industry Research
+  - heading "Contact & Support" [level=3]
+  - list:
+    - listitem:
+      - link "info@zencap.co":
+        - /url: mailto:info@zencap.co
+        - img
+        - text: info@zencap.co
+    - listitem:
+      - link "+1 (555) 123-4567":
+        - /url: tel:+15551234567
+        - img
+        - text: +1 (555) 123-4567
+    - listitem:
+      - link "Contact Support":
+        - /url: /contact
+        - img
+        - text: Contact Support
+    - listitem:
+      - link "Get Started":
+        - /url: /contact
+  - paragraph: © 2025 Zenith Capital Advisors LLC. All rights reserved.
+  - link "Terms of Service":
+    - /url: /terms
+  - link "Privacy Policy":
+    - /url: /privacy
+  - link "Sitemap":
+    - /url: /sitemap.xml
+  - paragraph: "Follow us:"
+  - link "LinkedIn":
+    - /url: https://linkedin.com/company/zenith-capital-advisors
+  - link "Twitter":
+    - /url: https://twitter.com/zenithcapital
+  - link "Email":
+    - /url: mailto:info@zencap.co
+  - paragraph:
+    - strong: "Investment Disclaimer:"
+    - text: The financial models and information provided by Zenith Capital Advisors are for educational and informational purposes only. They do not constitute investment advice, and past performance does not guarantee future results. Please consult with qualified financial professionals before making investment decisions.
+  - button "Scroll to top":
+    - img
+- button "Open Next.js Dev Tools":
+  - img
+- alert
+```

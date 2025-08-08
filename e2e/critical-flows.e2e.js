@@ -9,7 +9,7 @@ test.describe('CRITICAL USER FLOWS - LAUNCH READY', () => {
   test('CRITICAL: Homepage loads and navigation works', async ({ page }) => {
     // Verify homepage loads
     await expect(page.locator('h1')).toBeVisible();
-    await expect(page.locator('text=Zenith Capital')).toBeVisible();
+    await expect(page.locator('text=Zenith Capital').first()).toBeVisible();
     
     // Test main navigation
     await page.click('text=Models');

@@ -70,7 +70,8 @@
       "WebFetch(domain:www.zencap.co)",
       "Bash(timeout 30 npm run dev)",
       "Bash(npx playwright test:*)",
-      "Bash(npx playwright:*)"
+      "Bash(npx playwright:*)",
+      "Bash(npx vercel:*)"
     ],
     "deny": []
   }
