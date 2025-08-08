@@ -36,47 +36,42 @@ export default function LaunchUrgencyBanner() {
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gradient-to-r from-green-700 to-green-600 text-white"
+      className="bg-gradient-to-r from-emerald-900 to-emerald-800 text-white border-b border-emerald-700"
     >
-      <div className="max-w-7xl mx-auto px-4 py-4 text-center">
-        <div className="flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-6">
-          <div className="flex items-center space-x-2">
-            <div className="animate-pulse">
-              <svg className="w-6 h-6 text-yellow-300" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
-            </div>
-            <span className="font-bold text-lg">LAUNCH SPECIAL</span>
-            <div className="animate-pulse">
-              <svg className="w-6 h-6 text-yellow-300" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-              </svg>
-            </div>
+      <div className="max-w-7xl mx-auto px-4 py-3">
+        <div className="flex flex-col md:flex-row items-center justify-between space-y-2 md:space-y-0">
+          {/* Left: Professional Label */}
+          <div className="flex items-center space-x-3">
+            <span className="text-emerald-300 text-xs uppercase tracking-wider font-semibold">Limited Offer</span>
+            <div className="hidden md:block h-4 w-px bg-emerald-600"></div>
+            <span className="text-sm font-medium">Launch pricing ends soon</span>
           </div>
           
-          <div className="text-center">
-            <p className="text-lg font-medium">
-              Save 40% on All Models - Limited Time Only!
-            </p>
-            <p className="text-sm opacity-90">
-              Private Equity: $9,875 → <span className="font-bold text-yellow-300">$5,925</span> | Public Equity: $14,750 → <span className="font-bold text-yellow-300">$8,850</span>
-            </p>
+          {/* Center: Pricing Info */}
+          <div className="flex items-center space-x-4 text-sm">
+            <span className="text-emerald-200">40% off all models</span>
+            <span className="text-emerald-400">•</span>
+            <span className="hidden lg:inline text-emerald-100">
+              PE: <span className="line-through opacity-60">$9,875</span> <span className="font-semibold">$5,925</span>
+            </span>
+            <span className="hidden lg:inline text-emerald-400">•</span>
+            <span className="hidden lg:inline text-emerald-100">
+              Public: <span className="line-through opacity-60">$14,750</span> <span className="font-semibold">$8,850</span>
+            </span>
           </div>
           
-          <div className="flex items-center space-x-4 text-sm font-medium">
-            <span>Ends in:</span>
-            <div className="flex space-x-2">
-              <div className="bg-white/20 rounded px-2 py-1">
-                <span className="font-bold">{timeLeft.days}d</span>
-              </div>
-              <div className="bg-white/20 rounded px-2 py-1">
-                <span className="font-bold">{timeLeft.hours}h</span>
-              </div>
-              <div className="bg-white/20 rounded px-2 py-1">
-                <span className="font-bold">{timeLeft.minutes}m</span>
-              </div>
-              <div className="bg-white/20 rounded px-2 py-1">
-                <span className="font-bold">{timeLeft.seconds}s</span>
+          {/* Right: Countdown Timer */}
+          <div className="flex items-center space-x-3 text-sm">
+            <div className="flex items-center space-x-1 bg-emerald-950/50 rounded px-3 py-1">
+              <svg className="w-4 h-4 text-emerald-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <div className="flex space-x-1 font-mono">
+                <span className="text-emerald-100">{String(timeLeft.days).padStart(2, '0')}d</span>
+                <span className="text-emerald-400">:</span>
+                <span className="text-emerald-100">{String(timeLeft.hours).padStart(2, '0')}h</span>
+                <span className="text-emerald-400">:</span>
+                <span className="text-emerald-100">{String(timeLeft.minutes).padStart(2, '0')}m</span>
               </div>
             </div>
           </div>

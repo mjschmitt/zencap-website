@@ -8,7 +8,7 @@ import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { getImageWithVersion } from '@/utils/imageUtils';
 import LaunchUrgencyBanner from '@/components/ui/LaunchUrgencyBanner';
-import FounderCredibility from '@/components/ui/FounderCredibility';
+// import FounderCredibility from '@/components/ui/FounderCredibility'; // Removed fake analyst section
 import MoneyBackGuarantee from '@/components/ui/MoneyBackGuarantee';
 import BundleOffers from '@/components/ui/BundleOffers';
 // import SocialProofTestimonials from '@/components/ui/SocialProofTestimonials'; // Temporarily removed
@@ -436,8 +436,8 @@ export default function Home() {
       {/* Enhanced Social Proof Testimonials - TEMPORARILY REMOVED UNTIL WE HAVE REAL TESTIMONIALS */}
       {/* <SocialProofTestimonials /> */}
       
-      {/* Founder Credibility Section */}
-      <FounderCredibility />
+      {/* Founder Credibility Section - REMOVED (was fake analyst) */}
+      {/* <FounderCredibility /> */}
       
       {/* Bundle Offers Section */}
       <BundleOffers />

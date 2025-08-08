@@ -15,28 +15,28 @@ export default function MoneyBackGuarantee() {
           </svg>
         </div>
         <div className="text-center">
-          <h3 className="text-2xl font-bold mb-2">100% Money-Back Guarantee</h3>
+          <h3 className="text-2xl font-bold mb-2">Satisfaction Guarantee</h3>
           <p className="text-lg opacity-90">
-            Not satisfied? Get a full refund within 30 days. No questions asked.
+            If the model doesn't match its description, we'll work with you to make it right.
           </p>
           <div className="mt-3 flex items-center justify-center space-x-4 text-sm opacity-80">
             <span className="flex items-center">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              30-Day Guarantee
+              Quality Assured
             </span>
             <span className="flex items-center">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Zero Risk
+              Email Support
             </span>
             <span className="flex items-center">
               <svg className="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
               </svg>
-              Instant Refund
+              Professional Service
             </span>
           </div>
         </div>
