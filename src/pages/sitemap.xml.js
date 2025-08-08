@@ -37,7 +37,7 @@ async function generateSiteMap() {
     <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
             xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
       
-      <!-- Homepage -->
+      <!-- Homepage - Financial Models & Investment Advisory -->
       <url>
         <loc>${SITE_URL}</loc>
         <lastmod>${currentDate}</lastmod>
@@ -45,7 +45,8 @@ async function generateSiteMap() {
         <priority>1.0</priority>
         <image:image>
           <image:loc>${SITE_URL}/images/home/home-hero.jpg</image:loc>
-          <image:title>Zenith Capital Advisors - Financial Modeling Services</image:title>
+          <image:title>Financial Models & Investment Advisory - Zenith Capital</image:title>
+          <image:caption>Professional Excel financial models for private equity and real estate investments</image:caption>
         </image:image>
       </url>
 
@@ -65,15 +66,16 @@ async function generateSiteMap() {
         <priority>0.8</priority>
       </url>
 
-      <!-- Models Pages -->
+      <!-- Financial Models Catalog - High Priority -->
       <url>
         <loc>${SITE_URL}/models</loc>
         <lastmod>${currentDate}</lastmod>
         <changefreq>daily</changefreq>
-        <priority>0.9</priority>
+        <priority>0.95</priority>
         <image:image>
           <image:loc>${SITE_URL}/images/models/models-hero.jpg</image:loc>
-          <image:title>Financial Models Catalog</image:title>
+          <image:title>Excel Financial Models Catalog - Investment Analysis Tools</image:title>
+          <image:caption>Professional financial models for private equity, real estate, and public equity analysis</image:caption>
         </image:image>
       </url>
 

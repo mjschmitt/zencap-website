@@ -1,0 +1,189 @@
+# Page snapshot
+
+```yaml
+- main:
+  - link "Zenith Capital Advisors":
+    - /url: /
+  - textbox "Search models, insights, and solutions..."
+  - img
+  - button "Switch to dark mode":
+    - img
+  - navigation:
+    - link "Home":
+      - /url: /
+    - link "About":
+      - /url: /about
+    - link "Models":
+      - /url: /models
+      - text: Models
+      - img
+    - menu:
+      - menuitem "Private Equity Models"
+      - menuitem "Public Equity Models"
+    - link "Solutions":
+      - /url: /solutions
+      - text: Solutions
+      - img
+    - link "Insights":
+      - /url: /insights
+    - link "Contact":
+      - /url: /contact
+  - button "Sign In"
+  - main:
+    - heading "Contact Us" [level=1]
+    - paragraph: Have a complex investment challenge? Tell us about your project and we'll construct a plan of action.
+    - heading "Send Us a Message" [level=2]
+    - text: Full Name*
+    - textbox "Full Name*"
+    - text: Email Address*
+    - textbox "Email Address*"
+    - text: Company
+    - textbox "Company"
+    - text: I'm interested in
+    - combobox "I'm interested in":
+      - option "General Inquiry" [selected]
+      - option "Financial Models"
+      - option "Custom Services"
+      - option "Partnership Opportunity"
+    - text: Message*
+    - textbox "Message*"
+    - button "Send Message"
+    - heading "Contact Information" [level=3]
+    - img
+    - heading "Email" [level=4]
+    - link "info@zencap.co":
+      - /url: mailto:info@zencap.co
+    - img
+    - heading "Phone" [level=4]
+    - link "+1 (555) 123-4567":
+      - /url: tel:+15551234567
+    - img
+    - heading "Address" [level=4]
+    - paragraph: West Palm Beach, FL 33480
+    - link "Schedule a Meeting":
+      - /url: https://calendly.com
+    - heading "Follow Us" [level=3]
+    - link:
+      - /url: "#"
+    - link:
+      - /url: "#"
+    - heading "Frequently Asked Questions" [level=2]
+    - button "What is the typical turnaround time for custom services?":
+      - text: What is the typical turnaround time for custom services?
+      - img
+    - text: Our turnaround time varies based on the complexity of the project. For standard custom models, we typically deliver initial drafts within 1-2 weeks. For comprehensive infrastructure projects, the timeline is generally 4-8 weeks. During our initial consultation, we'll provide a specific estimate for your project.
+    - button "Do you offer implementation support for your models?":
+      - text: Do you offer implementation support for your models?
+      - img
+    - text: Yes, we provide comprehensive implementation support for all our models. This includes personalized training, documentation, and ongoing support to ensure your team can effectively use the models. For custom projects, we also offer extended support packages to help with integration into your existing systems.
+    - button "Can you work with our existing templates and systems?":
+      - text: Can you work with our existing templates and systems?
+      - img
+    - text: Absolutely. We often work with clients to enhance or integrate with their existing financial models and systems. Our team is adept at adapting to your workflows and building solutions that complement your current processes.
+    - button "How do you handle confidential financial information?":
+      - text: How do you handle confidential financial information?
+      - img
+    - text: We take data security very seriously. All client information is handled with strict confidentiality protocols. We use secure file sharing systems, sign NDAs when required, and can work with anonymized data when appropriate. Our team follows industry best practices for data protection throughout our engagement.
+    - iframe
+    - paragraph: "Our Home Base: West Palm Beach, FL 33480"
+  - heading "Trusted by Investment Professionals" [level=3]
+  - img
+  - text: SSL Secured 256-bit encryption
+  - img
+  - text: Secure Payment Powered by Stripe
+  - img
+  - text: Instant Download Immediate access
+  - img
+  - text: 30-Day Support Expert assistance Zenith Capital
+  - paragraph: Elevate Your Investment Decisions
+  - paragraph: We provide institutional-grade financial models and investment analysis tools to help sophisticated investors make data-driven decisions. Our Excel-based models range from $2,985 to $4,985 and cover private equity real estate and public equity analysis.
+  - paragraph:
+    - img
+    - text: SEC Compliant Financial Models
+  - paragraph:
+    - img
+    - text: GAAP Accounting Standards
+  - paragraph:
+    - img
+    - text: CFA Institute Best Practices
+  - link "Models":
+    - /url: /models
+    - heading "Models" [level=3]
+  - list:
+    - listitem:
+      - link "Private Equity Models":
+        - /url: /models/private-equity
+        - img
+        - text: Private Equity Models
+    - listitem:
+      - link "Public Equity Models":
+        - /url: /models/public-equity
+        - img
+        - text: Public Equity Models
+    - listitem:
+      - link "Market Insights":
+        - /url: /insights
+        - img
+        - text: Market Insights
+  - link "Services":
+    - /url: /solutions
+    - heading "Services" [level=3]
+  - list:
+    - listitem:
+      - link "Financial Modeling":
+        - /url: /solutions/financial-modeling
+        - img
+        - text: Financial Modeling
+    - listitem:
+      - link "Investment Infrastructure":
+        - /url: /solutions/infrastructure
+        - img
+        - text: Investment Infrastructure
+    - listitem:
+      - link "Industry Research":
+        - /url: /solutions/research
+        - img
+        - text: Industry Research
+  - heading "Contact & Support" [level=3]
+  - list:
+    - listitem:
+      - link "info@zencap.co":
+        - /url: mailto:info@zencap.co
+        - img
+        - text: info@zencap.co
+    - listitem:
+      - link "+1 (555) 123-4567":
+        - /url: tel:+15551234567
+        - img
+        - text: +1 (555) 123-4567
+    - listitem:
+      - link "Contact Support":
+        - /url: /contact
+        - img
+        - text: Contact Support
+    - listitem:
+      - link "Get Started":
+        - /url: /contact
+  - paragraph: © 2025 Zenith Capital Advisors LLC. All rights reserved.
+  - link "Terms of Service":
+    - /url: /terms
+  - link "Privacy Policy":
+    - /url: /privacy
+  - link "Sitemap":
+    - /url: /sitemap.xml
+  - paragraph: "Follow us:"
+  - link "LinkedIn":
+    - /url: https://linkedin.com/company/zenith-capital-advisors
+  - link "Twitter":
+    - /url: https://twitter.com/zenithcapital
+  - link "Email":
+    - /url: mailto:info@zencap.co
+  - paragraph:
+    - strong: "Investment Disclaimer:"
+    - text: The financial models and information provided by Zenith Capital Advisors are for educational and informational purposes only. They do not constitute investment advice, and past performance does not guarantee future results. Please consult with qualified financial professionals before making investment decisions.
+  - button "Scroll to top":
+    - img
+- button "Open Next.js Dev Tools":
+  - img
+- alert: About Zenith Capital Advisors - Expert Financial Modeling Team | Zenith Capital Advisors
+```

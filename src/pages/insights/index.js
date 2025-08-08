@@ -106,8 +106,9 @@ export default function InsightsPage() {
   return (
     <Layout>
       <SEO 
-        title="Insights | Zenith Capital Advisors"
-        description="Expert insights on investment strategies, market analysis, and financial modeling from Zenith Capital Advisors."
+        title="Investment Insights & Market Analysis | Zenith Capital"
+        description="Expert investment insights, market analysis & financial modeling research. Professional investment strategies for private equity, real estate & public equity. Get institutional research."
+        keywords="investment insights, market analysis, investment research, financial modeling insights, private equity research, real estate market analysis, investment strategies"
       />
 
       {/* Hero Section */}

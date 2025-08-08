@@ -264,6 +264,26 @@ export async function initializeDatabase() {
       );
     `;
 
+    // Create A/B test events table for testing framework
+    await sql`
+      CREATE TABLE IF NOT EXISTS ab_test_events (
+        id SERIAL PRIMARY KEY,
+        event_type VARCHAR(50) NOT NULL, -- 'ab_test_exposure' or 'ab_conversion'
+        test_id VARCHAR(100), -- Test identifier
+        variant VARCHAR(50), -- Variant name
+        goal VARCHAR(100), -- Conversion goal name
+        value NUMERIC, -- Conversion value (e.g., revenue)
+        session_id VARCHAR(128) NOT NULL, -- User session identifier
+        user_segment VARCHAR(50), -- User segment for analysis
+        page VARCHAR(500), -- Page where event occurred
+        test_assignments JSONB, -- All test assignments for this session
+        client_ip VARCHAR(45),
+        user_agent TEXT,
+        additional_data JSONB, -- Extra event data
+        created_at TIMESTAMP WITH TIME ZONE DEFAULT CURRENT_TIMESTAMP
+      );
+    `;
+
     // Create indexes for better performance (one at a time)
     await sql`CREATE INDEX IF NOT EXISTS idx_event_type ON security_audit_logs(event_type);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_user_id ON security_audit_logs(user_id);`;
@@ -287,6 +307,13 @@ export async function initializeDatabase() {
     await sql`CREATE INDEX IF NOT EXISTS idx_sessions_user_id ON sessions(user_id);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_sessions_token ON sessions(session_token);`;
     await sql`CREATE INDEX IF NOT EXISTS idx_users_email ON users(email);`;
+    
+    // A/B testing indexes
+    await sql`CREATE INDEX IF NOT EXISTS idx_ab_test_id ON ab_test_events(test_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_ab_session_id ON ab_test_events(session_id);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_ab_event_type ON ab_test_events(event_type);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_ab_created_at ON ab_test_events(created_at);`;
+    await sql`CREATE INDEX IF NOT EXISTS idx_ab_variant ON ab_test_events(variant);`;
 
     console.log('Database tables initialized successfully');
   } catch (error) {

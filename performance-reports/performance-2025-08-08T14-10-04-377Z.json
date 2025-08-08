@@ -1,0 +1,413 @@
+{
+  "timestamp": "2025-08-08T14:09:59.512Z",
+  "hostname": "Max_Laptop",
+  "nodeVersion": "v22.14.0",
+  "metrics": {
+    "coreWebVitals": {
+      "LCP": null,
+      "FID": 54.73649277876949,
+      "CLS": 0.001837095401792932,
+      "TTI": null,
+      "FCP": null,
+      "TBT": 88.0800019362713,
+      "responseTime": {
+        "duration": 242,
+        "statusCode": 200,
+        "contentLength": 73216,
+        "serverTiming": "none",
+        "headers": {
+          "accept-ranges": "bytes",
+          "access-control-allow-origin": "*",
+          "age": "35394",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-disposition": "inline",
+          "content-length": "73216",
+          "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.google-analytics.com https://vitals.vercel-analytics.com https://api.stripe.com; frame-src 'self' https://js.stripe.com https://hooks.stripe.com; media-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Fri, 08 Aug 2025 14:10:00 GMT",
+          "etag": "\"d35af8c742277bb745e0980b522c339a\"",
+          "last-modified": "Fri, 08 Aug 2025 04:20:05 GMT",
+          "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "server": "Vercel",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY",
+          "x-matched-path": "/",
+          "x-vercel-cache": "HIT",
+          "x-vercel-id": "iad1::sqzgw-1754662200267-11608715e7ce",
+          "x-xss-protection": "1; mode=block"
+        },
+        "bodySize": 73215
+      }
+    }
+  },
+  "bundleAnalysis": {
+    "totalBundles": 34,
+    "totalSize": 11098674,
+    "totalSizeKB": 10838.55,
+    "largestBundles": [
+      {
+        "name": "react-core-node_modules_react-dom_cjs_react-dom-client_development_js-a6105988.js",
+        "size": 2472749,
+        "sizeKB": 2414.79,
+        "type": "React Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_compiled_next-devtools_index_js-e3272238.js",
+        "size": 1931858,
+        "sizeKB": 1886.58,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "vendors-_pages-dir-browser_node_modules_framer-motion_dist_es_projection_node_group_mjs-_page-116bc6.js",
+        "size": 663609,
+        "sizeKB": 648.06,
+        "type": "Animations",
+        "critical": false
+      },
+      {
+        "name": "vendors-_pages-dir-browser_node_modules_framer-motion_dist_es_animation_hooks_use-animate-sty-1e32d9.js",
+        "size": 491064,
+        "sizeKB": 479.55,
+        "type": "Animations",
+        "critical": false
+      },
+      {
+        "name": "styles.js",
+        "size": 478469,
+        "sizeKB": 467.25,
+        "type": "Stylesheets",
+        "critical": false
+      },
+      {
+        "name": "vendors-_pages-dir-browser_node_modules_motion-dom_dist_es_index_mjs-_pages-dir-browser_node_-32aaec.js",
+        "size": 447981,
+        "sizeKB": 437.48,
+        "type": "Animations",
+        "critical": false
+      },
+      {
+        "name": "vendors-_pages-dir-browser_node_modules_motion-dom_dist_es_animation_AsyncMotionValueAnimatio-1edfc0.js",
+        "size": 418415,
+        "sizeKB": 408.61,
+        "type": "Animations",
+        "critical": false
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_client_i.js",
+        "size": 365114,
+        "sizeKB": 356.56,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_client_n.js",
+        "size": 340750,
+        "sizeKB": 332.76,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_shared_lib_r.js",
+        "size": 335789,
+        "sizeKB": 327.92,
+        "type": "Next.js Framework",
+        "critical": true
+      }
+    ],
+    "criticalBundles": [
+      {
+        "name": "react-core-node_modules_react-dom_cjs_react-dom-client_development_js-a6105988.js",
+        "size": 2472749,
+        "sizeKB": 2414.79,
+        "type": "React Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_compiled_next-devtools_index_js-e3272238.js",
+        "size": 1931858,
+        "sizeKB": 1886.58,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_client_i.js",
+        "size": 365114,
+        "sizeKB": 356.56,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_client_n.js",
+        "size": 340750,
+        "sizeKB": 332.76,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_shared_lib_r.js",
+        "size": 335789,
+        "sizeKB": 327.92,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_shared_lib_ro.js",
+        "size": 313943,
+        "sizeKB": 306.58,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_b.js",
+        "size": 283730,
+        "sizeKB": 277.08,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_shared_lib_router_a.js",
+        "size": 273625,
+        "sizeKB": 267.21,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "react-core-node_modules_react-.js",
+        "size": 246192,
+        "sizeKB": 240.42,
+        "type": "React Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_se.js",
+        "size": 226476,
+        "sizeKB": 221.17,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_l.js",
+        "size": 196643,
+        "sizeKB": 192.03,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_shared_lib_h.js",
+        "size": 155860,
+        "sizeKB": 152.21,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_compiled_n.js",
+        "size": 146973,
+        "sizeKB": 143.53,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "polyfills.js",
+        "size": 112594,
+        "sizeKB": 109.96,
+        "type": "Polyfills",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_client_index_js-ca5e2fd4.js",
+        "size": 109020,
+        "sizeKB": 106.46,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_d.js",
+        "size": 103105,
+        "sizeKB": 100.69,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "vendors-_pages-dir-browser_node_modules_babel_runtime_helpers_asyncToGenerator_js-_pages-dir--35822e.js",
+        "size": 95325,
+        "sizeKB": 93.09,
+        "type": "Third-party Libraries",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_client_link_js-bddb387e.js",
+        "size": 72364,
+        "sizeKB": 70.67,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_client_s.js",
+        "size": 55117,
+        "sizeKB": 53.83,
+        "type": "Next.js Framework",
+        "critical": true
+      },
+      {
+        "name": "runtime.js",
+        "size": 51591,
+        "sizeKB": 50.38,
+        "type": "Runtime",
+        "critical": true
+      },
+      {
+        "name": "main.js",
+        "size": 46523,
+        "sizeKB": 45.43,
+        "type": "Application Code",
+        "critical": true
+      },
+      {
+        "name": "nextjs-framework-node_modules_next_dist_shared_lib_m.js",
+        "size": 38469,
+        "sizeKB": 37.57,
+        "type": "Next.js Framework",
+        "critical": true
+      }
+    ],
+    "bundlesByType": {
+      "React Framework": {
+        "count": 2,
+        "totalSize": 2718941,
+        "bundles": [
+          "react-core-node_modules_react-dom_cjs_react-dom-client_development_js-a6105988.js",
+          "react-core-node_modules_react-.js"
+        ]
+      },
+      "Next.js Framework": {
+        "count": 16,
+        "totalSize": 4948836,
+        "bundles": [
+          "nextjs-framework-node_modules_next_dist_compiled_next-devtools_index_js-e3272238.js",
+          "nextjs-framework-node_modules_next_dist_client_i.js",
+          "nextjs-framework-node_modules_next_dist_client_n.js",
+          "nextjs-framework-node_modules_next_dist_shared_lib_r.js",
+          "nextjs-framework-node_modules_next_dist_shared_lib_ro.js",
+          "nextjs-framework-node_modules_next_dist_b.js",
+          "nextjs-framework-node_modules_next_dist_shared_lib_router_a.js",
+          "nextjs-framework-node_modules_next_dist_se.js",
+          "nextjs-framework-node_modules_next_dist_l.js",
+          "nextjs-framework-node_modules_next_dist_shared_lib_h.js",
+          "nextjs-framework-node_modules_next_dist_compiled_n.js",
+          "nextjs-framework-node_modules_next_dist_client_index_js-ca5e2fd4.js",
+          "nextjs-framework-node_modules_next_d.js",
+          "nextjs-framework-node_modules_next_dist_client_link_js-bddb387e.js",
+          "nextjs-framework-node_modules_next_dist_client_s.js",
+          "nextjs-framework-node_modules_next_dist_shared_lib_m.js"
+        ]
+      },
+      "Animations": {
+        "count": 6,
+        "totalSize": 2346552,
+        "bundles": [
+          "vendors-_pages-dir-browser_node_modules_framer-motion_dist_es_projection_node_group_mjs-_page-116bc6.js",
+          "vendors-_pages-dir-browser_node_modules_framer-motion_dist_es_animation_hooks_use-animate-sty-1e32d9.js",
+          "vendors-_pages-dir-browser_node_modules_motion-dom_dist_es_index_mjs-_pages-dir-browser_node_-32aaec.js",
+          "vendors-_pages-dir-browser_node_modules_motion-dom_dist_es_animation_AsyncMotionValueAnimatio-1edfc0.js",
+          "vendors-_pages-dir-browser_node_modules_framer-motion_dist_es_index_mjs-_pages-dir-browser_no-1054b4.js",
+          "vendors-_pages-dir-browser_node_modules_framer-motion_dist_es_utils_delay_mjs-_pages-dir-brow-f10579.js"
+        ]
+      },
+      "Stylesheets": {
+        "count": 1,
+        "totalSize": 478469,
+        "bundles": [
+          "styles.js"
+        ]
+      },
+      "Third-party Libraries": {
+        "count": 2,
+        "totalSize": 221361,
+        "bundles": [
+          "vendors-_pages-dir-browser_node_modules_next-auth_react_index_js.js",
+          "vendors-_pages-dir-browser_node_modules_babel_runtime_helpers_asyncToGenerator_js-_pages-dir--35822e.js"
+        ]
+      },
+      "Polyfills": {
+        "count": 1,
+        "totalSize": 112594,
+        "bundles": [
+          "polyfills.js"
+        ]
+      },
+      "Application Code": {
+        "count": 5,
+        "totalSize": 220330,
+        "bundles": [
+          "default-_pages-dir-browser_src_components_Analytics_js-_pages-dir-browser_src_components_Perf-94ca5e.js",
+          "_pages-dir-browser_src_components_ui_SearchComponent_js.js",
+          "main.js",
+          "_pages-dir-browser_node_modules_web-vitals_dist_web-vitals_js.js",
+          "react-refresh.js"
+        ]
+      },
+      "Runtime": {
+        "count": 1,
+        "totalSize": 51591,
+        "bundles": [
+          "runtime.js"
+        ]
+      }
+    }
+  },
+  "apiPerformance": {
+    "/api/models": {
+      "responseTime": 1542,
+      "statusCode": 200,
+      "contentLength": 26804,
+      "performance": "POOR"
+    },
+    "/api/insights": {
+      "responseTime": 209,
+      "statusCode": 200,
+      "contentLength": 551145,
+      "performance": "GOOD"
+    },
+    "/api/contact": {
+      "responseTime": 1150,
+      "statusCode": 405,
+      "contentLength": 32,
+      "performance": "POOR"
+    },
+    "/api/newsletter": {
+      "responseTime": 1180,
+      "statusCode": 200,
+      "contentLength": 382,
+      "performance": "POOR"
+    },
+    "/api/health": {
+      "responseTime": 516,
+      "statusCode": 503,
+      "contentLength": 563,
+      "performance": "GOOD"
+    }
+  },
+  "memoryUsage": {
+    "rss": 53.36,
+    "heapTotal": 10.18,
+    "heapUsed": 6.32,
+    "external": 1.96,
+    "arrayBuffers": 0.13,
+    "timestamp": "2025-08-08T14:10:04.376Z"
+  },
+  "errors": [],
+  "warnings": [
+    "API /api/models response time 1542ms exceeds budget of 1000ms",
+    "API /api/contact response time 1150ms exceeds budget of 1000ms",
+    "API /api/newsletter response time 1180ms exceeds budget of 1000ms"
+  ],
+  "recommendations": [
+    "Consider aggressive code splitting - total bundle size exceeds 1MB",
+    "Animation bundles are heavy - consider using CSS animations for simple effects",
+    "Optimize API endpoints: /api/models, /api/contact, /api/newsletter, /api/health - consider caching, database indexing, or CDN"
+  ]
+}

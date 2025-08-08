@@ -1,0 +1,125 @@
+{
+  "timestamp": "2025-08-08T14:14:14.520Z",
+  "hostname": "Max_Laptop",
+  "nodeVersion": "v22.14.0",
+  "metrics": {
+    "coreWebVitals": {
+      "LCP": null,
+      "FID": 76.18670127157749,
+      "CLS": 0.036309019128421806,
+      "TTI": null,
+      "FCP": null,
+      "TBT": 89.78340850580855,
+      "responseTime": {
+        "duration": 200,
+        "statusCode": 200,
+        "contentLength": 73216,
+        "serverTiming": "none",
+        "headers": {
+          "accept-ranges": "bytes",
+          "access-control-allow-origin": "*",
+          "age": "35649",
+          "cache-control": "public, max-age=0, must-revalidate",
+          "content-disposition": "inline",
+          "content-length": "73216",
+          "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.google-analytics.com https://vitals.vercel-analytics.com https://api.stripe.com; frame-src 'self' https://js.stripe.com https://hooks.stripe.com; media-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content",
+          "content-type": "text/html; charset=utf-8",
+          "date": "Fri, 08 Aug 2025 14:14:15 GMT",
+          "etag": "\"d35af8c742277bb745e0980b522c339a\"",
+          "last-modified": "Fri, 08 Aug 2025 04:20:05 GMT",
+          "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()",
+          "referrer-policy": "strict-origin-when-cross-origin",
+          "server": "Vercel",
+          "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+          "x-content-type-options": "nosniff",
+          "x-frame-options": "DENY",
+          "x-matched-path": "/",
+          "x-vercel-cache": "HIT",
+          "x-vercel-id": "iad1::6gg6h-1754662455227-7ccb58ec046a",
+          "x-xss-protection": "1; mode=block"
+        },
+        "bodySize": 73215
+      }
+    }
+  },
+  "bundleAnalysis": {
+    "totalBundles": 1,
+    "totalSize": 112594,
+    "totalSizeKB": 109.96,
+    "largestBundles": [
+      {
+        "name": "polyfills.js",
+        "size": 112594,
+        "sizeKB": 109.96,
+        "type": "Polyfills",
+        "critical": true
+      }
+    ],
+    "criticalBundles": [
+      {
+        "name": "polyfills.js",
+        "size": 112594,
+        "sizeKB": 109.96,
+        "type": "Polyfills",
+        "critical": true
+      }
+    ],
+    "bundlesByType": {
+      "Polyfills": {
+        "count": 1,
+        "totalSize": 112594,
+        "bundles": [
+          "polyfills.js"
+        ]
+      }
+    }
+  },
+  "apiPerformance": {
+    "/api/models": {
+      "responseTime": 212,
+      "statusCode": 200,
+      "contentLength": 26804,
+      "performance": "GOOD"
+    },
+    "/api/insights": {
+      "responseTime": 153,
+      "statusCode": 200,
+      "contentLength": 551145,
+      "performance": "GOOD"
+    },
+    "/api/contact": {
+      "responseTime": 1301,
+      "statusCode": 405,
+      "contentLength": 32,
+      "performance": "POOR"
+    },
+    "/api/newsletter": {
+      "responseTime": 2709,
+      "statusCode": 200,
+      "contentLength": 382,
+      "performance": "POOR"
+    },
+    "/api/health": {
+      "responseTime": 59,
+      "statusCode": 503,
+      "contentLength": 566,
+      "performance": "GOOD"
+    }
+  },
+  "memoryUsage": {
+    "rss": 51.95,
+    "heapTotal": 10.43,
+    "heapUsed": 6.6,
+    "external": 2.14,
+    "arrayBuffers": 0.32,
+    "timestamp": "2025-08-08T14:14:19.166Z"
+  },
+  "errors": [],
+  "warnings": [
+    "API /api/contact response time 1301ms exceeds budget of 1000ms",
+    "API /api/newsletter response time 2709ms exceeds budget of 1000ms"
+  ],
+  "recommendations": [
+    "Optimize API endpoints: /api/contact, /api/newsletter - consider caching, database indexing, or CDN"
+  ]
+}

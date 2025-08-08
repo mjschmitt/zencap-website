@@ -17,9 +17,6 @@
       - /url: /models
       - text: Models
       - img
-    - menu:
-      - menuitem "Private Equity Models"
-      - menuitem "Public Equity Models"
     - link "Solutions":
       - /url: /solutions
       - text: Solutions
@@ -35,10 +32,10 @@
     - img
     - paragraph: Save 40% on All Models - Limited Time Only!
     - paragraph: Original price $4,985 → Launch price $2,985
-    - text: "Ends in: 6d 23h 59m 47s"
+    - text: "Ends in: 0d 0h 0m 0s"
     - img "Financial Advisory Background"
-    - heading "Strategic Investment Clarity" [level=1]
-    - paragraph: Transform complex financial data into actionable intelligence.
+    - heading "Elevate Your Investment Decisions" [level=1]
+    - paragraph: Precision financial modeling and advisory solutions for investors.
     - link "See Our Models":
       - /url: /models
       - text: See Our Models

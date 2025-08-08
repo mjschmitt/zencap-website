@@ -153,9 +153,9 @@ export default function Home() {
       <LaunchUrgencyBanner />
       
       <SEO
-        title="Financial Modeling & Investment Advisory Services"
-        description="Professional financial models and investment advisory services for private equity, real estate, and public equity. Excel-based models $2,985-$4,985. Institutional-grade tools for sophisticated investors."
-        keywords="financial modeling, investment analysis, private equity models, real estate financial models, DCF valuation, Excel financial models, investment advisory, institutional finance tools"
+        title="Financial Models & Investment Advisory | Zenith Capital"
+        description="Professional Excel financial models for private equity & real estate. DCF valuation tools $2,985-$4,985. Institutional-grade investment analysis models. Get premium financial modeling services."
+        keywords="financial models, investment models, Excel financial models, DCF valuation, private equity models, real estate financial models, investment advisory, financial modeling services"
         ogImage="/images/og/zenith-capital-homepage.jpg"
         structuredData={structuredData}
       />

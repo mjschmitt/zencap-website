@@ -1,0 +1,70 @@
+{
+  "metadata": {
+    "dashboardVersion": "1.0.0",
+    "startTime": "2025-08-08T14:14:14.517Z",
+    "monitoringDuration": 12420,
+    "reportCount": 1
+  },
+  "currentStatus": {
+    "overallHealth": "HEALTHY",
+    "performanceScore": 77,
+    "siteResponseTime": 59,
+    "coreWebVitals": {
+      "LCP": 1200,
+      "FID": 81,
+      "CLS": 0,
+      "TTI": 2000,
+      "FCP": 800,
+      "TBT": 127,
+      "SI": 1500
+    },
+    "bundleSize": "N/A",
+    "excelPerformance": 100,
+    "memoryUsage": 5.39,
+    "activeAlerts": 4,
+    "lastUpdated": "2025-08-08T14:14:26.936Z"
+  },
+  "performanceTrends": {},
+  "criticalAlerts": [
+    {
+      "source": "Hourly",
+      "level": "HIGH",
+      "type": "API_ERROR",
+      "message": "API /api/health returning 503 status code",
+      "timestamp": "2025-08-08T14:14:19.318Z"
+    },
+    {
+      "source": "Hourly",
+      "level": "HIGH",
+      "type": "API_ERROR",
+      "message": "API /api/contact returning 405 status code",
+      "timestamp": "2025-08-08T14:14:22.598Z"
+    }
+  ],
+  "recommendations": [
+    {
+      "source": "General",
+      "recommendation": "Optimize API endpoints: /api/contact, /api/newsletter - consider caching, database indexing, or CDN"
+    },
+    {
+      "source": "Excel",
+      "recommendation": "Consider adding lazy loading to Excel viewer components for better performance."
+    },
+    {
+      "source": "Hourly",
+      "recommendation": "Optimize slow APIs: /api/health, /api/contact, /api/newsletter"
+    }
+  ],
+  "monitoringHistory": [
+    {
+      "timestamp": "2025-08-08T14:14:26.936Z",
+      "performanceScore": 77,
+      "responseTime": 59,
+      "bundleSize": "N/A",
+      "alerts": 4
+    }
+  ],
+  "performanceInsights": [
+    "⚡ Excellent response time. CDN and caching working well."
+  ]
+}

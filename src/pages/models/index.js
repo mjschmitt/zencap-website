@@ -150,9 +150,9 @@ export default function Models() {
   return (
     <Layout>
       <SEO
-        title="Financial Models - Excel-Based Investment Analysis Tools"
-        description="Professional Excel financial models for private equity real estate and public equity analysis. Institutional-grade models $2,985-$4,985. DCF models, real estate models, and investment tools for sophisticated investors."
-        keywords="financial models, Excel models, DCF valuation, private equity models, real estate financial models, investment analysis tools, LBO models, financial modeling templates"
+        title="Financial Models | Excel Investment Analysis Tools"
+        description="Professional Excel financial models for private equity, real estate & public equity. Premium DCF models $2,985-$4,985. Institutional-grade investment analysis tools for professionals."
+        keywords="financial models, investment models, Excel financial models, DCF valuation, private equity models, real estate financial models, LBO models, investment analysis tools"
         ogImage="/images/og/financial-models-catalog.jpg"
         breadcrumbs={[
           { name: "Home", path: "/" },

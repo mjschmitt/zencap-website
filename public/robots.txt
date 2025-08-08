@@ -4,20 +4,35 @@ Allow: /
 # Sitemap
 Sitemap: https://zencap-website.vercel.app/sitemap.xml
 
-# Disallow admin or private areas
-Disallow: /api/
-Disallow: /_next/
-Disallow: /admin/
-Disallow: /account/
-Disallow: /checkout/
-Disallow: /purchase/
-
-# Allow important pages
+# Priority crawling for SEO-critical pages
 Allow: /models/
 Allow: /insights/
 Allow: /solutions/
 Allow: /about/
 Allow: /contact/
 
-# Crawl delay (optional, 1 second)
+# Block admin, private areas, and duplicate pages
+Disallow: /api/
+Disallow: /_next/
+Disallow: /admin/
+Disallow: /account/
+Disallow: /checkout/
+Disallow: /purchase/
+Disallow: /auth/
+Disallow: /customer-portal
+Disallow: /debug-*
+
+# Block specific files that don't need crawling
+Disallow: *.json$
+Disallow: *.log$
+Disallow: /uploads/
+
+# Allow important dynamic pages
+Allow: /models/*
+Allow: /insights/*
+
+# Crawl delay for respectful crawling
 Crawl-delay: 1
+
+# Additional sitemap for financial models (future)
+# Sitemap: https://zencap-website.vercel.app/models-sitemap.xml

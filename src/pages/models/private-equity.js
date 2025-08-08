@@ -168,8 +168,9 @@ export default function PrivateEquityModels() {
       <LaunchUrgencyBanner />
       
       <SEO
-        title="Private Equity Models"
-        description="Professional financial models for private equity real estate investments. Multifamily, commercial, hospitality development and acquisition models."
+        title="Private Equity Financial Models | Real Estate Excel Models"
+        description="Professional Excel financial models for private equity real estate. Multifamily, commercial & hospitality models $4,985. Development & acquisition analysis tools for investors."
+        keywords="private equity models, real estate financial models, Excel investment models, multifamily models, commercial real estate models, hospitality models, private equity analysis"
         structuredData={structuredData}
       />
       

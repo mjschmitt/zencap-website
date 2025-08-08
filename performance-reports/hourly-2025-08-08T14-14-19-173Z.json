@@ -1,0 +1,156 @@
+{
+  "metadata": {
+    "timestamp": "2025-08-08T14:14:19.173Z",
+    "hour": 10,
+    "date": "Fri Aug 08 2025",
+    "hostname": "Max_Laptop",
+    "nodeVersion": "v22.14.0",
+    "reportVersion": "1.0.0"
+  },
+  "siteHealth": {
+    "status": "HEALTHY",
+    "responseTime": 59,
+    "statusCode": 200,
+    "contentLength": 14192,
+    "sslValid": null,
+    "headers": {
+      "accept-ranges": "bytes",
+      "access-control-allow-origin": "*",
+      "age": "35654",
+      "cache-control": "public, max-age=0, must-revalidate",
+      "content-disposition": "inline",
+      "content-encoding": "br",
+      "content-length": "14192",
+      "content-security-policy": "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://www.googletagmanager.com https://www.google-analytics.com https://js.stripe.com; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; img-src 'self' data: https: blob:; connect-src 'self' https://www.google-analytics.com https://vitals.vercel-analytics.com https://api.stripe.com; frame-src 'self' https://js.stripe.com https://hooks.stripe.com; media-src 'self' data: blob:; object-src 'none'; base-uri 'self'; form-action 'self' https://checkout.stripe.com; frame-ancestors 'none'; upgrade-insecure-requests; block-all-mixed-content",
+      "content-type": "text/html; charset=utf-8",
+      "date": "Fri, 08 Aug 2025 14:14:19 GMT",
+      "etag": "\"d35af8c742277bb745e0980b522c339a\"",
+      "last-modified": "Fri, 08 Aug 2025 04:20:05 GMT",
+      "permissions-policy": "camera=(), microphone=(), geolocation=(), payment=(), usb=(), magnetometer=(), gyroscope=(), accelerometer=()",
+      "referrer-policy": "strict-origin-when-cross-origin",
+      "server": "Vercel",
+      "strict-transport-security": "max-age=31536000; includeSubDomains; preload",
+      "x-content-type-options": "nosniff",
+      "x-frame-options": "DENY",
+      "x-matched-path": "/",
+      "x-vercel-cache": "HIT",
+      "x-vercel-id": "iad1::xb4cw-1754662459737-16c7e798187c",
+      "x-xss-protection": "1; mode=block"
+    },
+    "uptime": "99.9%"
+  },
+  "coreWebVitals": {
+    "LCP": 1200,
+    "FID": 81,
+    "CLS": 0,
+    "TTI": 2000,
+    "FCP": 800,
+    "TBT": 127,
+    "SI": 1500
+  },
+  "apiHealth": {
+    "/api/health": {
+      "status": "UNHEALTHY",
+      "responseTime": 84,
+      "statusCode": 503,
+      "contentLength": 566,
+      "performance": "GOOD"
+    },
+    "/api/models": {
+      "status": "HEALTHY",
+      "responseTime": 78,
+      "statusCode": 200,
+      "contentLength": 26804,
+      "performance": "GOOD"
+    },
+    "/api/insights": {
+      "status": "HEALTHY",
+      "responseTime": 172,
+      "statusCode": 200,
+      "contentLength": 551049,
+      "performance": "GOOD"
+    },
+    "/api/contact": {
+      "status": "UNHEALTHY",
+      "responseTime": 3030,
+      "statusCode": 405,
+      "contentLength": 32,
+      "performance": "POOR"
+    },
+    "/api/newsletter": {
+      "status": "HEALTHY",
+      "responseTime": 4333,
+      "statusCode": 200,
+      "contentLength": 382,
+      "performance": "POOR"
+    }
+  },
+  "bundleMetrics": {
+    "totalBundles": 1,
+    "totalSize": 112594,
+    "totalSizeMB": 0.11,
+    "largestBundle": {
+      "name": "polyfills.js",
+      "size": 112594,
+      "sizeKB": 109.96
+    },
+    "averageBundleSize": 109.96,
+    "bundlesOver100KB": 1,
+    "bundlesOver500KB": 0
+  },
+  "memoryMetrics": {
+    "rss": 49.91,
+    "heapTotal": 7.18,
+    "heapUsed": 5.39,
+    "external": 1.84,
+    "heapUtilization": 75,
+    "timestamp": "2025-08-08T14:14:26.932Z"
+  },
+  "performanceAlerts": [
+    {
+      "level": "HIGH",
+      "type": "API_ERROR",
+      "message": "API /api/health returning 503 status code",
+      "timestamp": "2025-08-08T14:14:19.318Z"
+    },
+    {
+      "level": "MEDIUM",
+      "type": "API_SLOW",
+      "message": "API /api/contact response time 3030ms exceeds 1000ms",
+      "timestamp": "2025-08-08T14:14:22.598Z"
+    },
+    {
+      "level": "HIGH",
+      "type": "API_ERROR",
+      "message": "API /api/contact returning 405 status code",
+      "timestamp": "2025-08-08T14:14:22.598Z"
+    },
+    {
+      "level": "MEDIUM",
+      "type": "API_SLOW",
+      "message": "API /api/newsletter response time 4333ms exceeds 1000ms",
+      "timestamp": "2025-08-08T14:14:26.931Z"
+    }
+  ],
+  "recommendations": [
+    "Optimize slow APIs: /api/health, /api/contact, /api/newsletter"
+  ],
+  "summary": {
+    "overallHealth": "HEALTHY",
+    "performanceScore": 50,
+    "alertCounts": {
+      "critical": 0,
+      "high": 2,
+      "medium": 2,
+      "total": 4
+    },
+    "keyMetrics": {
+      "siteResponseTime": 59,
+      "lcp": 1200,
+      "bundleSize": 0.11,
+      "memoryUsage": 5.39
+    },
+    "recommendations": 1,
+    "reportGeneratedAt": "2025-08-08T14:14:26.933Z"
+  }
+}

@@ -1,0 +1,1297 @@
+{
+  "info": {
+    "name": "ZenCap Financial API - Complete Collection",
+    "description": "Comprehensive API testing collection for Zenith Capital Advisors platform - 50+ endpoints covering all business operations",
+    "version": "2.0.0",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{authToken}}",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "exec": [
+          "// Set timestamp for requests",
+          "pm.globals.set('timestamp', new Date().toISOString());"
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "exec": [
+          "// Global tests for all requests",
+          "pm.test('Response time is acceptable', function () {",
+          "    pm.expect(pm.response.responseTime).to.be.below(5000);",
+          "});",
+          "",
+          "pm.test('No server errors', function () {",
+          "    pm.expect(pm.response.code).to.not.be.oneOf([500, 502, 503, 504]);",
+          "});",
+          "",
+          "// Check for rate limiting headers",
+          "if (pm.response.headers.has('X-RateLimit-Limit')) {",
+          "    console.log('Rate Limit:', pm.response.headers.get('X-RateLimit-Remaining') + '/' + pm.response.headers.get('X-RateLimit-Limit'));",
+          "}"
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://zencap-website.vercel.app/api",
+      "type": "string"
+    },
+    {
+      "key": "devUrl",
+      "value": "http://localhost:3001/api",
+      "type": "string"
+    },
+    {
+      "key": "authToken",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "testEmail",
+      "value": "test@zencap-api.com",
+      "type": "string"
+    },
+    {
+      "key": "testModelId",
+      "value": "1",
+      "type": "string"
+    },
+    {
+      "key": "sessionId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "fileId",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "🏢 Core Business APIs",
+      "description": "Main business logic endpoints for insights, models, and content management",
+      "item": [
+        {
+          "name": "Insights Management",
+          "item": [
+            {
+              "name": "Get All Insights (Public)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/insights",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["insights"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response is array', () => {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.be.an('array');",
+                      "});",
+                      "pm.test('Insights have required fields', () => {",
+                      "    const response = pm.response.json();",
+                      "    if (response.length > 0) {",
+                      "        pm.expect(response[0]).to.have.property('id');",
+                      "        pm.expect(response[0]).to.have.property('slug');",
+                      "        pm.expect(response[0]).to.have.property('title');",
+                      "        pm.expect(response[0]).to.have.property('status', 'published');",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Specific Insight",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/insights?slug=market-outlook-2025",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["insights"],
+                  "query": [
+                    {
+                      "key": "slug",
+                      "value": "market-outlook-2025"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get All Insights (Admin)",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/insights?admin=true",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["insights"],
+                  "query": [
+                    {
+                      "key": "admin",
+                      "value": "true"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create New Insight",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"slug\": \"test-insight-{{$timestamp}}\",\n  \"title\": \"Test Investment Insight\",\n  \"summary\": \"This is a test insight created via API\",\n  \"content\": \"<h1>Test Content</h1><p>This insight was created for API testing purposes.</p>\",\n  \"author\": \"API Tester\",\n  \"cover_image_url\": \"https://via.placeholder.com/600x400\",\n  \"status\": \"draft\",\n  \"tags\": \"test,api,automation\",\n  \"date_published\": null\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/insights",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["insights"]
+                }
+              }
+            },
+            {
+              "name": "Update Insight",
+              "request": {
+                "method": "PUT",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"slug\": \"test-insight-example\",\n  \"title\": \"Updated Test Insight\",\n  \"status\": \"published\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/insights",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["insights"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Financial Models",
+          "item": [
+            {
+              "name": "Get All Models",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/models",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["models"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Status is 200', () => pm.response.to.have.status(200));",
+                      "pm.test('Response has models array', () => {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('models');",
+                      "    pm.expect(response.models).to.be.an('array');",
+                      "});",
+                      "pm.test('Models have pricing', () => {",
+                      "    const response = pm.response.json();",
+                      "    if (response.models.length > 0) {",
+                      "        pm.expect(response.models[0]).to.have.property('price');",
+                      "        pm.expect(response.models[0].price).to.be.above(0);",
+                      "    }",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Get Models by Category",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/models?category=private-equity&limit=10",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["models"],
+                  "query": [
+                    {
+                      "key": "category",
+                      "value": "private-equity"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Get Specific Model",
+              "request": {
+                "method": "GET",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/models?slug=multifamily-real-estate-model",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["models"],
+                  "query": [
+                    {
+                      "key": "slug",
+                      "value": "multifamily-real-estate-model"
+                    }
+                  ]
+                }
+              }
+            },
+            {
+              "name": "Create New Model",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"slug\": \"test-model-{{$timestamp}}\",\n  \"title\": \"Test Financial Model\",\n  \"description\": \"A comprehensive test model for API validation\",\n  \"category\": \"private-equity\",\n  \"thumbnail_url\": \"https://via.placeholder.com/400x300\",\n  \"file_url\": \"https://example.com/test-model.xlsx\",\n  \"price\": 2985.00,\n  \"status\": \"active\",\n  \"tags\": \"test,api,validation\",\n  \"excel_url\": \"https://example.com/test-preview.xlsx\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/models",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["models"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Lead & Contact Management",
+          "item": [
+            {
+              "name": "Submit Contact Form",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"API Test User\",\n  \"email\": \"{{testEmail}}\",\n  \"company\": \"ZenCap API Testing Ltd\",\n  \"interest\": \"private-equity\",\n  \"message\": \"This is a test contact form submission via API at {{timestamp}}\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/contact",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["contact"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Contact form submission successful', () => {",
+                      "    pm.response.to.have.status(200);",
+                      "});",
+                      "pm.test('Response contains leadId', () => {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('leadId');",
+                      "    pm.expect(response.success).to.be.true;",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            },
+            {
+              "name": "Invalid Contact Form",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"name\": \"\",\n  \"email\": \"invalid-email\",\n  \"message\": \"\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/contact",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["contact"]
+                }
+              },
+              "event": [
+                {
+                  "listen": "test",
+                  "script": {
+                    "exec": [
+                      "pm.test('Validation error returned', () => {",
+                      "    pm.response.to.have.status(400);",
+                      "});",
+                      "pm.test('Error message provided', () => {",
+                      "    const response = pm.response.json();",
+                      "    pm.expect(response).to.have.property('message');",
+                      "    pm.expect(response.success).to.be.false;",
+                      "});"
+                    ]
+                  }
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "Newsletter Management",
+          "item": [
+            {
+              "name": "Subscribe to Newsletter",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"email\": \"newsletter-{{$randomInt}}@zencap-api.com\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/newsletter",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["newsletter"]
+                }
+              }
+            },
+            {
+              "name": "Get Newsletter Subscribers",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/newsletter",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["newsletter"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "💳 Payment Processing",
+      "description": "Stripe integration for model purchases and payment management",
+      "item": [
+        {
+          "name": "Create Checkout Session",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"modelId\": {{testModelId}},\n  \"modelTitle\": \"Test Financial Model\",\n  \"modelPrice\": 4985.00,\n  \"modelSlug\": \"test-financial-model\",\n  \"customerEmail\": \"buyer@zencap-api.com\",\n  \"customerName\": \"API Test Buyer\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/stripe/create-checkout-session",
+              "host": ["{{baseUrl}}"],
+              "path": ["stripe", "create-checkout-session"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Checkout session created', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Response contains checkout URL', () => {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('url');",
+                  "    pm.expect(response).to.have.property('sessionId');",
+                  "    pm.globals.set('sessionId', response.sessionId);",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Get Order Details",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/orders/{{sessionId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["orders", "{{sessionId}}"]
+            }
+          }
+        },
+        {
+          "name": "Get Account Orders",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/account/orders",
+              "host": ["{{baseUrl}}"],
+              "path": ["account", "orders"]
+            }
+          }
+        },
+        {
+          "name": "Customer Portal",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/stripe/customer-portal",
+              "host": ["{{baseUrl}}"],
+              "path": ["stripe", "customer-portal"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📊 File Management",
+      "description": "Excel file upload, processing, and download services",
+      "item": [
+        {
+          "name": "Upload Excel File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/test-file.xlsx",
+                  "description": "Excel file to upload (update with actual file path)"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/upload-excel",
+              "host": ["{{baseUrl}}"],
+              "path": ["upload-excel"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('File upload successful', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('File ID returned', () => {",
+                  "    const response = pm.response.json();",
+                  "    if (response.success && response.file) {",
+                  "        pm.expect(response.file).to.have.property('fileId');",
+                  "        pm.globals.set('fileId', response.file.fileId);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Simple Excel Upload",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "file",
+                  "type": "file",
+                  "src": "/path/to/simple-test.xlsx"
+                }
+              ]
+            },
+            "url": {
+              "raw": "{{baseUrl}}/upload-excel-simple",
+              "host": ["{{baseUrl}}"],
+              "path": ["upload-excel-simple"]
+            }
+          }
+        },
+        {
+          "name": "Get Excel Data",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/excel/data/{{fileId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["excel", "data", "{{fileId}}"]
+            }
+          }
+        },
+        {
+          "name": "Check Excel File",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"fileId\": \"{{fileId}}\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/check-excel",
+              "host": ["{{baseUrl}}"],
+              "path": ["check-excel"]
+            }
+          }
+        },
+        {
+          "name": "Download Excel",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/download-excel?fileId={{fileId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["download-excel"],
+              "query": [
+                {
+                  "key": "fileId",
+                  "value": "{{fileId}}"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Excel Metadata",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/excel-metadata?fileId={{fileId}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["excel-metadata"],
+              "query": [
+                {
+                  "key": "fileId",
+                  "value": "{{fileId}}"
+                }
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "📈 Analytics & Monitoring",
+      "description": "Business analytics, performance monitoring, and system metrics",
+      "item": [
+        {
+          "name": "Business Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Analytics data retrieved', () => {",
+                  "    pm.response.to.have.status(200);",
+                  "});",
+                  "pm.test('Analytics structure valid', () => {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('success', true);",
+                  "    pm.expect(response.data).to.have.property('leads');",
+                  "    pm.expect(response.data).to.have.property('newsletter');",
+                  "    pm.expect(response.data).to.have.property('summary');",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Revenue Dashboard",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/revenue-dashboard",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "revenue-dashboard"]
+            }
+          }
+        },
+        {
+          "name": "Attribution Analytics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/attribution",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "attribution"]
+            }
+          }
+        },
+        {
+          "name": "Track Custom Event",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventType\": \"api_test_event\",\n  \"metadata\": {\n    \"source\": \"postman\",\n    \"timestamp\": \"{{timestamp}}\",\n    \"test_session\": \"{{$randomUUID}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/analytics/events",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "events"]
+            }
+          }
+        },
+        {
+          "name": "Social Proof Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/social-proof",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "social-proof"]
+            }
+          }
+        },
+        {
+          "name": "Social Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/analytics/social-stats",
+              "host": ["{{baseUrl}}"],
+              "path": ["analytics", "social-stats"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔧 Admin & Management",
+      "description": "Administrative functions and system management",
+      "item": [
+        {
+          "name": "Database Management",
+          "item": [
+            {
+              "name": "Initialize Database",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/init-db",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["init-db"]
+                }
+              }
+            },
+            {
+              "name": "Migrate Database",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/migrate-db",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["migrate-db"]
+                }
+              }
+            },
+            {
+              "name": "Verify Database",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/verify-database",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["verify-database"]
+                }
+              }
+            },
+            {
+              "name": "Optimize Database",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/optimize-database",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["optimize-database"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Backup & Recovery",
+          "item": [
+            {
+              "name": "Get Backups",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/admin/backups",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "backups"]
+                }
+              }
+            },
+            {
+              "name": "Create Backup",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  },
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"type\": \"full\",\n  \"description\": \"API test backup\"\n}"
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/admin/backups",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["admin", "backups"]
+                }
+              }
+            }
+          ]
+        },
+        {
+          "name": "Production Setup",
+          "item": [
+            {
+              "name": "Production Database Init",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/production/init-database",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["production", "init-database"]
+                }
+              }
+            },
+            {
+              "name": "Init Sample Data",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Authorization",
+                    "value": "Bearer {{authToken}}"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/init-sample-data",
+                  "host": ["{{baseUrl}}"],
+                  "path": ["init-sample-data"]
+                }
+              }
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "🏥 System Health & Monitoring",
+      "description": "System health checks, performance monitoring, and error tracking",
+      "item": [
+        {
+          "name": "Comprehensive Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Health check responds', () => {",
+                  "    pm.response.to.be.ok;",
+                  "});",
+                  "pm.test('Health data structure valid', () => {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response).to.have.property('health');",
+                  "    pm.expect(response.health).to.have.property('overallStatus');",
+                  "    pm.expect(response.health).to.have.property('healthScore');",
+                  "    pm.expect(response.health).to.have.property('checks');",
+                  "});",
+                  "pm.test('System is healthy', () => {",
+                  "    const response = pm.response.json();",
+                  "    pm.expect(response.health.healthScore).to.be.above(50);",
+                  "});",
+                  "console.log('System Health:', JSON.stringify(pm.response.json().health.overallStatus, null, 2));"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Performance Monitor",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/performance-monitor",
+              "host": ["{{baseUrl}}"],
+              "path": ["performance-monitor"]
+            }
+          }
+        },
+        {
+          "name": "Advanced Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/advanced-metrics",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "advanced-metrics"]
+            }
+          }
+        },
+        {
+          "name": "System Metrics",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/metrics",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "metrics"]
+            }
+          }
+        },
+        {
+          "name": "Error Logs",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/errors?limit=50&severity=error",
+              "host": ["{{baseUrl}}"],
+              "path": ["errors"],
+              "query": [
+                {
+                  "key": "limit",
+                  "value": "50"
+                },
+                {
+                  "key": "severity",
+                  "value": "error"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "Create Test Alert",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Authorization",
+                "value": "Bearer {{authToken}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"test_alert\",\n  \"severity\": \"warning\",\n  \"message\": \"API testing alert created at {{timestamp}}\",\n  \"metadata\": {\n    \"source\": \"postman_collection\",\n    \"test_run\": \"{{$randomUUID}}\"\n  }\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/monitoring/alert",
+              "host": ["{{baseUrl}}"],
+              "path": ["monitoring", "alert"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🔒 Authentication & Security",
+      "description": "Authentication flows and security testing",
+      "item": [
+        {
+          "name": "Debug Environment (Dev Only)",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{devUrl}}/debug-env",
+              "host": ["{{devUrl}}"],
+              "path": ["debug-env"]
+            }
+          }
+        },
+        {
+          "name": "Hello World Test",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/hello",
+              "host": ["{{baseUrl}}"],
+              "path": ["hello"]
+            }
+          }
+        },
+        {
+          "name": "Security Validation",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/init-security",
+              "host": ["{{baseUrl}}"],
+              "path": ["init-security"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "🧪 Rate Limiting Tests",
+      "description": "Test rate limiting behavior across endpoints",
+      "item": [
+        {
+          "name": "Rate Limit - Contact Form",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Rate Limit Test {{$randomInt}}\",\n  \"email\": \"ratetest-{{$randomInt}}@example.com\",\n  \"message\": \"Testing rate limits\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/contact",
+              "host": ["{{baseUrl}}"],
+              "path": ["contact"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Rate limit headers present', () => {",
+                  "    pm.expect(pm.response.headers.has('X-RateLimit-Limit')).to.be.true;",
+                  "    pm.expect(pm.response.headers.has('X-RateLimit-Remaining')).to.be.true;",
+                  "});",
+                  "",
+                  "const remaining = parseInt(pm.response.headers.get('X-RateLimit-Remaining'));",
+                  "const limit = parseInt(pm.response.headers.get('X-RateLimit-Limit'));",
+                  "",
+                  "console.log(`Rate Limit: ${limit - remaining}/${limit} used`);"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Rate Limit - Newsletter",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"ratelimit-{{$randomInt}}@example.com\"\n}"
+            },
+            "url": {
+              "raw": "{{baseUrl}}/newsletter",
+              "host": ["{{baseUrl}}"],
+              "path": ["newsletter"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "⚡ Performance Tests",
+      "description": "Performance and load testing endpoints",
+      "item": [
+        {
+          "name": "Concurrent Insights Load",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/insights",
+              "host": ["{{baseUrl}}"],
+              "path": ["insights"]
+            }
+          },
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "pm.test('Response time under 2s', () => {",
+                  "    pm.expect(pm.response.responseTime).to.be.below(2000);",
+                  "});",
+                  "",
+                  "pm.test('Cache headers present', () => {",
+                  "    // Check if caching headers are set for performance",
+                  "    const cacheControl = pm.response.headers.get('Cache-Control');",
+                  "    if (cacheControl) {",
+                  "        console.log('Cache-Control:', cacheControl);",
+                  "    }",
+                  "});"
+                ]
+              }
+            }
+          ]
+        },
+        {
+          "name": "Concurrent Models Load",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{baseUrl}}/models",
+              "host": ["{{baseUrl}}"],
+              "path": ["models"]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}

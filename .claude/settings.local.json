@@ -71,7 +71,8 @@
       "Bash(timeout 30 npm run dev)",
       "Bash(npx playwright test:*)",
       "Bash(npx playwright:*)",
-      "Bash(npx vercel:*)"
+      "Bash(npx vercel:*)",
+      "WebFetch(domain:zencap-website-qxv75e78d-mjschmitts-projects.vercel.app)"
     ],
     "deny": []
   }

@@ -114,8 +114,9 @@ export default function PublicEquityModels() {
   return (
     <Layout>
       <SEO
-        title="Public Equity Models"
-        description="Professional financial models for public equity analysis. 3-statement models, DCF valuations, and portfolio attribution tools for investment professionals."
+        title="Public Equity Models | DCF Valuation & Analysis Tools"
+        description="Professional Excel financial models for public equity analysis. DCF valuation, 3-statement models & portfolio tools $2,985-$4,985. Company-specific investment analysis models."
+        keywords="public equity models, DCF valuation, 3-statement financial models, equity analysis tools, investment valuation models, Excel financial models, portfolio attribution"
         structuredData={structuredData}
       />
       

@@ -33,9 +33,9 @@ export default function About() {
   return (
     <Layout>
       <SEO
-        title="About Zenith Capital Advisors - Expert Financial Modeling Team"
-        description="Learn about Zenith Capital Advisors' mission, values, and expert team. Founded by Max Schmitt with 10+ years in private and public equity. Institutional-grade financial modeling services."
-        keywords="Zenith Capital Advisors, Max Schmitt, financial modeling team, investment advisory, private equity experience, Evercore ISI, Macquarie Capital, financial services team"
+        title="About Zenith Capital | Expert Financial Modeling Team"
+        description="Expert financial modeling team led by Max Schmitt (10+ years private/public equity). Professional investment advisory services. Institutional-grade financial models & analysis."
+        keywords="Zenith Capital Advisors, Max Schmitt, financial modeling team, investment advisory, private equity experience, financial services team, institutional finance"
         ogImage="/images/og/about-zenith-capital.jpg"
         breadcrumbs={[
           { name: "Home", path: "/" },

@@ -16,11 +16,11 @@ export default function SEO({
   const router = useRouter();
   const baseUrl = 'https://zencap-website.vercel.app';
   
-  const siteTitle = title ? `${title} | Zenith Capital Advisors` : 'Zenith Capital Advisors - Financial Modeling & Investment Advisory';
-  const siteDescription = description || 'Professional financial models and investment advisory services for private equity, real estate, and public equity. Excel-based models $2,985-$4,985.';
+  const siteTitle = title ? (title.length > 60 ? `${title.substring(0, 57)}...` : `${title} | Zenith Capital`) : 'Financial Models & Investment Advisory | Zenith Capital';
+  const siteDescription = description || 'Professional Excel financial models for private equity, real estate & public equity investments. Premium DCF valuation tools $2,985-$4,985. Expert investment advisory services.';
   const siteImage = ogImage ? (ogImage.startsWith('http') ? ogImage : `${baseUrl}${ogImage}`) : `${baseUrl}/images/og/zenith-capital-og.jpg`;
   const siteUrl = canonical || `${baseUrl}${router.asPath}`;
-  const siteKeywords = keywords || 'financial modeling, investment analysis, private equity models, real estate financial models, DCF valuation, Excel financial models, investment advisory';
+  const siteKeywords = keywords || 'financial models, investment models, Excel financial models, DCF valuation, private equity models, real estate financial models, investment advisory, financial modeling services';
 
   // Generate breadcrumb structured data
   const breadcrumbStructuredData = breadcrumbs.length > 0 ? {
@@ -107,6 +107,55 @@ export default function SEO({
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+        />
+      )}
+      
+      {/* Default Financial Services Organization Schema */}
+      {!structuredData && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FinancialService",
+              "name": "Zenith Capital Advisors",
+              "description": "Professional financial modeling and investment advisory services for private equity, real estate, and public equity investments.",
+              "url": baseUrl,
+              "logo": `${baseUrl}/images/logo.png`,
+              "address": {
+                "@type": "PostalAddress",
+                "addressCountry": "US"
+              },
+              "sameAs": [
+                "https://linkedin.com/company/zenith-capital-advisors",
+                "https://twitter.com/ZenithCapital"
+              ],
+              "serviceType": "Financial Advisory Services",
+              "areaServed": "Worldwide",
+              "hasOfferCatalog": {
+                "@type": "OfferCatalog",
+                "name": "Financial Models",
+                "itemListElement": [
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Private Equity Financial Models",
+                      "description": "Excel-based financial models for real estate and private equity investments"
+                    }
+                  },
+                  {
+                    "@type": "Offer",
+                    "itemOffered": {
+                      "@type": "Service",
+                      "name": "Public Equity Analysis Models",
+                      "description": "DCF valuation and company-specific financial analysis models"
+                    }
+                  }
+                ]
+              }
+            })
+          }}
         />
       )}
       

@@ -92,9 +92,9 @@ export default function Contact() {
   return (
     <Layout>
       <SEO
-        title="Contact Zenith Capital Advisors - Financial Modeling Consultants"
-        description="Get in touch with our financial modeling experts. Custom models, investment advisory, and financial analysis services. Professional consultation for private equity and investment firms."
-        keywords="contact Zenith Capital, financial modeling consultants, investment advisory consultation, custom financial models, private equity modeling services, financial analysis experts"
+        title="Contact Us | Financial Modeling Experts | Zenith Capital"
+        description="Contact financial modeling experts for custom Excel models & investment advisory services. Professional consultation for private equity & real estate investments. Get expert help today."
+        keywords="contact financial modeling experts, investment advisory consultation, custom financial models, private equity modeling, financial analysis consultation"
         ogImage="/images/og/contact-zenith-capital.jpg"
         breadcrumbs={[
           { name: "Home", path: "/" },
