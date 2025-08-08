@@ -98,7 +98,7 @@ export default function OptimizedPricing({ model, showComparePrice = true, urgen
           <span className="text-sm text-gray-600 dark:text-gray-400 ml-2">(127 reviews)</span>
         </div>
         <div className="text-xs text-gray-500">
-          "Saved our team weeks of work" - Goldman Sachs Asset Management
+          "Professional-grade modeling tools that deliver results"
         </div>
       </div>
 

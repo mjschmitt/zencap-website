@@ -31,7 +31,7 @@ const PRIVATE_EQUITY_MODELS = [
     id: 'multifamily-acquisition-model',
     slug: 'multifamily-acquisition-model',
     title: 'Multifamily Acquisition Model',
-    excerpt: 'Institutional-grade acquisition analysis trusted by Goldman Sachs and Blackstone. Features unit-by-unit analysis, value-add scenarios, and sophisticated financing options. Saves 40+ hours of modeling work per deal.',
+    excerpt: 'Institutional-grade acquisition analysis for professional investors. Features unit-by-unit analysis, value-add scenarios, and sophisticated financing options. Saves 40+ hours of modeling work per deal.',
     price: 9875,
     imagePlaceholder: 'Multifamily Acquisition Preview',
     features: [

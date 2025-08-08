@@ -11,7 +11,7 @@ import LaunchUrgencyBanner from '@/components/ui/LaunchUrgencyBanner';
 import FounderCredibility from '@/components/ui/FounderCredibility';
 import MoneyBackGuarantee from '@/components/ui/MoneyBackGuarantee';
 import BundleOffers from '@/components/ui/BundleOffers';
-import SocialProofTestimonials from '@/components/ui/SocialProofTestimonials';
+// import SocialProofTestimonials from '@/components/ui/SocialProofTestimonials'; // Temporarily removed
 
 // Dynamically import non-critical components for better performance
 const EnhancedTestimonials = dynamic(() => import('@/components/ui/EnhancedTestimonials'), {
@@ -433,8 +433,8 @@ export default function Home() {
         </div>
       </section>
       
-      {/* Enhanced Social Proof Testimonials */}
-      <SocialProofTestimonials />
+      {/* Enhanced Social Proof Testimonials - TEMPORARILY REMOVED UNTIL WE HAVE REAL TESTIMONIALS */}
+      {/* <SocialProofTestimonials /> */}
       
       {/* Founder Credibility Section */}
       <FounderCredibility />

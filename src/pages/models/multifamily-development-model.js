@@ -31,22 +31,7 @@ export default function MultifamilyDevelopmentModel() {
       'Detailed instruction manual (45 pages)',
       'Sample project with realistic assumptions'
     ],
-    testimonials: [
-      {
-        name: 'Jennifer Park',
-        title: 'Director of Investments',
-        company: 'Goldman Sachs Asset Management',
-        text: 'This model helped us underwrite a $125M multifamily development 3 weeks ahead of schedule. The construction budget tracking alone saved us countless hours.',
-        deal: '$125M Development Project'
-      },
-      {
-        name: 'Robert Martinez',
-        title: 'Managing Director',
-        company: 'Brookfield Asset Management',
-        text: 'We use this model as our standard for all multifamily developments. The sophistication rivals what we build internally at a fraction of the cost.',
-        deal: '$89M Mixed-Use Development'
-      }
-    ],
+    testimonials: [],  // Will add real testimonials after launch
     faqs: [
       {
         question: 'How quickly can I start using this model?',
@@ -74,7 +59,7 @@ export default function MultifamilyDevelopmentModel() {
       
       <SEO
         title="Multifamily Development Model - Professional Excel Financial Model"
-        description="Institutional-grade Excel model for multifamily development projects. Used by Goldman Sachs, Blackstone, and top PE firms. Save 40+ hours of modeling work."
+        description="Institutional-grade Excel model for multifamily development projects. Professional-grade financial modeling solution. Save 40+ hours of modeling work."
         keywords="multifamily development model, real estate financial model, Excel model, apartment development, private equity"
       />
 
@@ -277,7 +262,7 @@ export default function MultifamilyDevelopmentModel() {
                     <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>Created by former Goldman Sachs VP</span>
+                    <span>Created by Wall Street professional</span>
                   </div>
                   <div className="flex items-center space-x-3">
                     <svg className="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
