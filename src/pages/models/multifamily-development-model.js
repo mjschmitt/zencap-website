@@ -10,8 +10,8 @@ export default function MultifamilyDevelopmentModel() {
   const model = {
     id: 'multifamily-development-model',
     title: 'Multifamily Development Model',
-    price: 4985,
-    originalPrice: 8325,
+    price: 9875,
+    originalPrice: 9875,
     description: 'The most comprehensive multifamily development model trusted by top PE firms for $100M+ projects.',
     features: [
       'Advanced construction budget tracking with 50+ line items',

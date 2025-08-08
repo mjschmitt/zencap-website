@@ -16,7 +16,7 @@ const PRIVATE_EQUITY_MODELS = [
     slug: 'multifamily-development-model',
     title: 'Multifamily Development Model',
     excerpt: 'The most comprehensive multifamily development model on the market. Used by top PE firms to analyze $100M+ projects. Includes advanced construction budgeting, unit mix optimization, and investor waterfall modeling that typically costs $25,000+ from consultants.',
-    price: 4985,
+    price: 9875,
     imagePlaceholder: 'Multifamily Development Preview',
     features: [
       'Detailed construction budget tracking',
@@ -32,7 +32,7 @@ const PRIVATE_EQUITY_MODELS = [
     slug: 'multifamily-acquisition-model',
     title: 'Multifamily Acquisition Model',
     excerpt: 'Institutional-grade acquisition analysis trusted by Goldman Sachs and Blackstone. Features unit-by-unit analysis, value-add scenarios, and sophisticated financing options. Saves 40+ hours of modeling work per deal.',
-    price: 4985,
+    price: 9875,
     imagePlaceholder: 'Multifamily Acquisition Preview',
     features: [
       'Unit-by-unit rental analysis',
@@ -48,7 +48,7 @@ const PRIVATE_EQUITY_MODELS = [
     slug: 'mixed-use-development-model',
     title: 'Mixed-Use Development Model',
     excerpt: 'Ground-up development analysis for mixed-use projects combining retail, office, residential, and other property types.',
-    price: 4985,
+    price: 9875,
     imagePlaceholder: 'Mixed-Use Development Preview',
     features: [
       'Multi-component property type modeling',
@@ -64,7 +64,7 @@ const PRIVATE_EQUITY_MODELS = [
     slug: 'mixed-use-acquisition-model',
     title: 'Mixed-Use Acquisition Model',
     excerpt: 'Acquisition analysis for properties with multiple components including retail, office, residential, and other property types.',
-    price: 4985,
+    price: 9875,
     imagePlaceholder: 'Mixed-Use Acquisition Preview',
     features: [
       'Component-level cash flow analysis',
@@ -80,7 +80,7 @@ const PRIVATE_EQUITY_MODELS = [
     slug: 'commercial-development-model',
     title: 'Commercial Development Model',
     excerpt: 'Development underwriting for office, retail, industrial and other commercial property types with detailed construction tracking.',
-    price: 4985,
+    price: 9875,
     imagePlaceholder: 'Commercial Development Preview',
     features: [
       'Customizable for different commercial property types',
@@ -96,7 +96,7 @@ const PRIVATE_EQUITY_MODELS = [
     slug: 'commercial-acquisition-model',
     title: 'Commercial Acquisition Model',
     excerpt: 'Detailed tenant rollover analysis, leasing assumptions, and capital expenditure planning for commercial property investments.',
-    price: 4985,
+    price: 9875,
     imagePlaceholder: 'Commercial Acquisition Preview',
     features: [
       'Tenant-by-tenant lease analysis',
@@ -112,7 +112,7 @@ const PRIVATE_EQUITY_MODELS = [
     slug: 'hospitality-development-model',
     title: 'Hospitality Development Model',
     excerpt: 'Ground-up development modeling for hotel and resort properties with ADR, occupancy, and departmental revenue/expense projections.',
-    price: 4985,
+    price: 9875,
     imagePlaceholder: 'Hospitality Development Preview',
     features: [
       'Hotel flag/brand assumptions',
@@ -128,7 +128,7 @@ const PRIVATE_EQUITY_MODELS = [
     slug: 'hospitality-acquisition-model',
     title: 'Hospitality Acquisition Model',
     excerpt: 'Acquisition analysis for hotel and resort properties with RevPAR modeling, brand conversion scenarios, and renovation budgeting.',
-    price: 4985,
+    price: 9875,
     imagePlaceholder: 'Hospitality Acquisition Preview',
     features: [
       'Historical and projected RevPAR analysis',

@@ -36,7 +36,7 @@ export default function LaunchUrgencyBanner() {
       initial={{ opacity: 0, y: -50 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
-      className="bg-gradient-to-r from-red-600 to-orange-600 text-white"
+      className="bg-gradient-to-r from-green-700 to-green-600 text-white"
     >
       <div className="max-w-7xl mx-auto px-4 py-4 text-center">
         <div className="flex flex-col md:flex-row items-center justify-center space-y-2 md:space-y-0 md:space-x-6">
@@ -59,7 +59,7 @@ export default function LaunchUrgencyBanner() {
               Save 40% on All Models - Limited Time Only!
             </p>
             <p className="text-sm opacity-90">
-              Original price $4,985 → <span className="font-bold text-yellow-300">Launch price $2,985</span>
+              Private Equity: $9,875 → <span className="font-bold text-yellow-300">$5,925</span> | Public Equity: $14,750 → <span className="font-bold text-yellow-300">$8,850</span>
             </p>
           </div>
           

@@ -1,10 +1,11 @@
 import { motion } from 'framer-motion';
 
 export default function OptimizedPricing({ model, showComparePrice = true, urgency = true }) {
-  // Calculate savings and percentages
-  const originalPrice = model.price * 1.67; // Show 67% markup as "original"
-  const savings = originalPrice - model.price;
-  const savingsPercent = Math.round((savings / originalPrice) * 100);
+  // Calculate 40% discount from the original price
+  const originalPrice = model.price; // Model price IS the original price
+  const discountedPrice = Math.round(originalPrice * 0.6); // 40% off = pay 60%
+  const savings = originalPrice - discountedPrice;
+  const savingsPercent = 40;
 
   const todayOnly = urgency && Math.random() > 0.5; // Random urgency for different models
 
@@ -37,7 +38,7 @@ export default function OptimizedPricing({ model, showComparePrice = true, urgen
         
         <div className="flex items-center justify-center space-x-2 mb-2">
           <span className="text-4xl font-bold text-navy-700 dark:text-white">
-            ${model.price.toLocaleString()}
+            ${discountedPrice.toLocaleString()}
           </span>
           <div className="text-left">
             <div className="text-xs text-gray-500 uppercase tracking-wide">Launch Price</div>
@@ -121,7 +122,7 @@ export default function OptimizedPricing({ model, showComparePrice = true, urgen
       {/* CTA Buttons */}
       <div className="space-y-3">
         <button className="w-full bg-gradient-to-r from-teal-500 to-blue-600 hover:from-teal-600 hover:to-blue-700 text-white font-bold py-4 px-6 rounded-lg transform hover:-translate-y-1 transition-all duration-300 shadow-lg hover:shadow-xl">
-          🚀 Get Instant Access - ${model.price.toLocaleString()}
+          🚀 Get Instant Access - ${discountedPrice.toLocaleString()}
         </button>
         
         <div className="text-center">

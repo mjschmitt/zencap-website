@@ -140,8 +140,8 @@ export default function Home() {
       "offers": {
         "@type": "AggregateOffer",
         "priceCurrency": "USD",
-        "lowPrice": "2985",
-        "highPrice": "4985",
+        "lowPrice": "5925",
+        "highPrice": "8850",
         "offerCount": "13"
       }
     }
@@ -154,7 +154,7 @@ export default function Home() {
       
       <SEO
         title="Financial Models & Investment Advisory | Zenith Capital"
-        description="Professional Excel financial models for private equity & real estate. DCF valuation tools $2,985-$4,985. Institutional-grade investment analysis models. Get premium financial modeling services."
+        description="Professional Excel financial models for private equity & real estate. Premium DCF valuation tools with 40% launch discount. Institutional-grade investment analysis models. Get premium financial modeling services."
         keywords="financial models, investment models, Excel financial models, DCF valuation, private equity models, real estate financial models, investment advisory, financial modeling services"
         ogImage="/images/og/zenith-capital-homepage.jpg"
         structuredData={structuredData}

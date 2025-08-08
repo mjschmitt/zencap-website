@@ -13,7 +13,7 @@ const PUBLIC_EQUITY_MODELS = [
     slug: 'applovin-3-statement-model',
     title: 'AppLovin (APP) 3-Statement Model',
     excerpt: 'Comprehensive financial model for AppLovin Corporation with integrated income statement, balance sheet, and cash flow projections.',
-    price: 4985,
+    price: 14750,
     imagePlaceholder: 'AppLovin Model Preview',
     features: [
       'Detailed revenue breakdown by segment',
@@ -29,7 +29,7 @@ const PUBLIC_EQUITY_MODELS = [
     slug: 'nvidia-3-statement-model',
     title: 'NVIDIA (NVDA) 3-Statement Model',
     excerpt: 'Integrated financial model for NVIDIA Corporation with segment analysis, growth projections, and valuation framework.',
-    price: 4985,
+    price: 14750,
     imagePlaceholder: 'NVIDIA Model Preview',
     features: [
       'Revenue modeling by business segment',
@@ -45,7 +45,7 @@ const PUBLIC_EQUITY_MODELS = [
     slug: 'tesla-3-statement-model',
     title: 'Tesla (TSLA) 3-Statement Model',
     excerpt: 'Detailed financial model for Tesla, Inc. with vehicle delivery forecasts, energy business projections, and manufacturing expansion analysis.',
-    price: 4985,
+    price: 14750,
     imagePlaceholder: 'Tesla Model Preview',
     features: [
       'Vehicle production and delivery forecasts',
@@ -61,7 +61,7 @@ const PUBLIC_EQUITY_MODELS = [
     slug: 'dcf-valuation-suite',
     title: 'DCF Valuation Suite',
     excerpt: 'Comprehensive discounted cash flow analysis for public companies with integrated financial statement projections.',
-    price: 2985,
+    price: 14750,
     imagePlaceholder: 'DCF Model Preview',
     features: [
       'Integrated 3-statement model with projections',
@@ -77,7 +77,7 @@ const PUBLIC_EQUITY_MODELS = [
     slug: 'portfolio-attribution-model',
     title: 'Portfolio Attribution Model',
     excerpt: 'Analyze performance drivers and attribution factors across investment positions.',
-    price: 2985,
+    price: 14750,
     imagePlaceholder: 'Portfolio Model Preview',
     features: [
       'Multi-factor attribution analysis',

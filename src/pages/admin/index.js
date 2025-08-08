@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import Head from 'next/head';
+import dynamic from 'next/dynamic';
 import Layout from '../../components/layout/Layout';
 
 // ZenCap brand colors
@@ -25,8 +26,6 @@ const DashboardCharts = dynamic(
     )
   }
 );
-
-import dynamic from 'next/dynamic';
 
 const RichTextEditor = dynamic(
   () => import('@/components/ui/RichTextEditor'),
