@@ -63,7 +63,8 @@
       "Bash(start https://zencap-website.vercel.app/models)",
       "WebFetch(domain:zencap-website.vercel.app)",
       "Bash(nslookup:*)",
-      "Bash(start https://zencap.co)"
+      "Bash(start https://zencap.co)",
+      "Bash(echo $HOME)"
     ],
     "deny": []
   }
