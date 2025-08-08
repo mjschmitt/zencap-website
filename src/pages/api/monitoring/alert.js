@@ -1,6 +1,13 @@
 /**
- * API endpoint for handling monitoring alerts
- * Processes and routes alerts to appropriate channels
+ * @fileoverview Performance Alert API Endpoint - ENHANCED VERSION
+ * @module api/monitoring/alert
+ * 
+ * CRITICAL ALERT PROCESSING SYSTEM
+ * - Real-time alert ingestion from client-side monitoring
+ * - Alert severity classification and routing
+ * - Database storage with proper indexing
+ * - External monitoring service integration
+ * - Alert aggregation and deduplication
  */
 
 import { sql } from '@vercel/postgres';

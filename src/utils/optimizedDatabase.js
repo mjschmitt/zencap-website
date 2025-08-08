@@ -1,469 +1,454 @@
-// High-Performance Database Layer for ZenCap Financial Models
-// Optimized for $2,985-$4,985 product queries with sub-100ms response times
+// Optimized Database Utilities for High-Performance Transactions
+// Implements connection pooling, query caching, and performance monitoring
 
 import { sql } from '@vercel/postgres';
-import { Redis } from 'ioredis';
 
 class OptimizedDatabase {
   constructor() {
     this.queryCache = new Map();
-    this.connectionPool = null;
-    this.redis = null;
-    this.queryMetrics = {
-      totalQueries: 0,
-      cacheHits: 0,
-      slowQueries: 0,
-      avgResponseTime: 0
+    this.performanceMetrics = new Map();
+    this.connectionPool = {
+      active: 0,
+      max: 20,
+      queue: []
     };
-    
-    // Initialize Redis for caching (if available)
-    this.initializeRedis();
-    
-    // Query performance thresholds
-    this.SLOW_QUERY_THRESHOLD = 100; // ms
-    this.CACHE_TTL = 300; // 5 minutes for financial data
-    this.MAX_CACHE_SIZE = 1000;
   }
 
-  // Initialize Redis connection
-  async initializeRedis() {
-    if (process.env.REDIS_URL) {
-      try {
-        this.redis = new Redis(process.env.REDIS_URL, {
-          retryDelayOnFailover: 100,
-          maxRetriesPerRequest: 3,
-          lazyConnect: true
-        });
-        
-        console.log('[OptimizedDB] Redis cache initialized');
-      } catch (error) {
-        console.warn('[OptimizedDB] Redis initialization failed, using memory cache:', error);
+  /**
+   * Execute query with performance monitoring and caching
+   */
+  async executeQuery(queryKey, queryFn, cacheOptions = {}) {
+    const { ttl = 300000, useCache = true } = cacheOptions; // 5 min default TTL
+    
+    // Check cache first for read queries
+    if (useCache && this.queryCache.has(queryKey)) {
+      const cached = this.queryCache.get(queryKey);
+      if (Date.now() < cached.expires) {
+        this.recordMetric(queryKey, 0, 'cache_hit');
+        return cached.data;
       }
+      this.queryCache.delete(queryKey);
     }
-  }
 
-  // Execute query with caching and performance monitoring
-  async executeQuery(query, params = [], options = {}) {
     const startTime = performance.now();
-    const cacheKey = this.generateCacheKey(query, params);
-    const { cache = true, ttl = this.CACHE_TTL } = options;
-
+    
     try {
-      // Check cache first
-      if (cache) {
-        const cachedResult = await this.getFromCache(cacheKey);
-        if (cachedResult) {
-          this.queryMetrics.cacheHits++;
-          this.queryMetrics.totalQueries++;
-          return cachedResult;
-        }
+      const result = await queryFn();
+      const duration = performance.now() - startTime;
+      
+      // Record performance metrics
+      this.recordMetric(queryKey, duration, 'database');
+      
+      // Cache successful read results
+      if (useCache && queryKey.startsWith('SELECT')) {
+        this.queryCache.set(queryKey, {
+          data: result,
+          expires: Date.now() + ttl,
+          createdAt: Date.now()
+        });
       }
 
-      // Execute query
-      const result = await sql.query(query, params);
-      const responseTime = performance.now() - startTime;
-
-      // Update metrics
-      this.updateQueryMetrics(responseTime);
-
-      // Cache result
-      if (cache && result.rows) {
-        await this.setCache(cacheKey, result.rows, ttl);
+      // Log slow queries (>100ms)
+      if (duration > 100) {
+        console.warn(`Slow query detected: ${queryKey} took ${Math.round(duration)}ms`);
+        await this.logSlowQuery(queryKey, duration);
       }
-
-      return result.rows;
-
+      
+      return result;
     } catch (error) {
-      const responseTime = performance.now() - startTime;
-      console.error('[OptimizedDB] Query failed:', {
-        query: query.substring(0, 100) + '...',
-        params,
-        responseTime,
-        error: error.message
-      });
+      const duration = performance.now() - startTime;
+      this.recordMetric(queryKey, duration, 'error');
+      
+      // Log database errors
+      await this.logDatabaseError(queryKey, error, duration);
       throw error;
     }
   }
 
-  // Optimized financial models query
-  async getFinancialModels(options = {}) {
-    const {
-      category = null,
-      featured = null,
-      limit = 20,
-      offset = 0,
-      sortBy = 'created_at',
-      sortOrder = 'DESC'
-    } = options;
-
-    let query = `
-      SELECT 
-        id,
-        title,
-        slug,
-        description,
-        price,
-        category,
-        featured,
-        preview_image,
-        excel_file,
-        created_at,
-        updated_at
-      FROM models
-      WHERE 1=1
-    `;
-
-    const params = [];
-    let paramIndex = 1;
-
-    if (category) {
-      query += ` AND category = $${paramIndex}`;
-      params.push(category);
-      paramIndex++;
-    }
-
-    if (featured !== null) {
-      query += ` AND featured = $${paramIndex}`;
-      params.push(featured);
-      paramIndex++;
-    }
-
-    query += ` ORDER BY ${sortBy} ${sortOrder}`;
-    query += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-    params.push(limit, offset);
-
-    return this.executeQuery(query, params, { cache: true, ttl: 600 });
-  }
-
-  // High-performance model by slug query
+  /**
+   * Optimized model lookup with caching
+   */
   async getModelBySlug(slug) {
-    const query = `
-      SELECT 
-        m.*,
-        COUNT(r.id) as review_count,
-        AVG(r.rating) as avg_rating
-      FROM models m
-      LEFT JOIN reviews r ON m.id = r.model_id
-      WHERE m.slug = $1
-      GROUP BY m.id
-    `;
-
-    const results = await this.executeQuery(query, [slug], { cache: true, ttl: 900 });
-    return results[0] || null;
-  }
-
-  // Optimized insights query with full-text search
-  async getInsights(options = {}) {
-    const {
-      search = null,
-      limit = 10,
-      offset = 0,
-      category = null,
-      featured = null
-    } = options;
-
-    let query = `
-      SELECT 
-        id,
-        title,
-        slug,
-        excerpt,
-        featured_image,
-        category,
-        featured,
-        published_at,
-        read_time,
-        ts_rank(search_vector, to_tsquery($1)) as rank
-      FROM insights
-      WHERE published_at IS NOT NULL
-    `;
-
-    const params = [];
-    let paramIndex = 1;
-
-    if (search) {
-      query += ` AND search_vector @@ to_tsquery($${paramIndex})`;
-      params.push(search.split(' ').join(' & '));
-      paramIndex++;
-    } else {
-      params.push('');
-    }
-
-    if (category) {
-      query += ` AND category = $${paramIndex}`;
-      params.push(category);
-      paramIndex++;
-    }
-
-    if (featured !== null) {
-      query += ` AND featured = $${paramIndex}`;
-      params.push(featured);
-      paramIndex++;
-    }
-
-    if (search) {
-      query += ` ORDER BY rank DESC, published_at DESC`;
-    } else {
-      query += ` ORDER BY published_at DESC`;
-    }
-
-    query += ` LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-    params.push(limit, offset);
-
-    return this.executeQuery(query, params, { cache: true, ttl: 300 });
-  }
-
-  // Batch operations for better performance
-  async batchGetModels(ids) {
-    if (!ids || ids.length === 0) return [];
-
-    const placeholders = ids.map((_, index) => `$${index + 1}`).join(',');
-    const query = `
-      SELECT * FROM models 
-      WHERE id IN (${placeholders})
-      ORDER BY CASE id ${ids.map((id, index) => `WHEN $${index + 1} THEN ${index}`).join(' ')} END
-    `;
-
-    return this.executeQuery(query, ids, { cache: true, ttl: 600 });
-  }
-
-  // Newsletter optimization with deduplication
-  async addNewsletterSubscriber(email) {
-    const query = `
-      INSERT INTO newsletter_subscribers (email, subscribed_at)
-      VALUES ($1, NOW())
-      ON CONFLICT (email) 
-      DO UPDATE SET 
-        subscribed_at = NOW(),
-        unsubscribed_at = NULL
-      RETURNING id, email, subscribed_at
-    `;
-
-    return this.executeQuery(query, [email], { cache: false });
-  }
-
-  // Contact form with spam detection
-  async createContactSubmission(data) {
-    const { name, email, message, source = 'website' } = data;
+    const queryKey = `SELECT_MODEL_BY_SLUG_${slug}`;
     
-    // Basic spam detection
-    const spamScore = this.calculateSpamScore(data);
+    return this.executeQuery(
+      queryKey,
+      () => sql`
+        SELECT m.*, 
+               COALESCE(s.total_orders, 0) as popularity_score,
+               COALESCE(s.total_revenue, 0) as revenue_generated
+        FROM models m
+        LEFT JOIN mv_model_performance s ON m.id = s.id
+        WHERE m.slug = ${slug} AND m.status = 'active'
+      `,
+      { ttl: 600000, useCache: true } // 10 min cache for models
+    );
+  }
+
+  /**
+   * Optimized models listing with performance data
+   */
+  async getActiveModels(category = null, limit = 50) {
+    const queryKey = `SELECT_ACTIVE_MODELS_${category}_${limit}`;
     
-    const query = `
-      INSERT INTO form_submissions (
-        name, email, message, source, spam_score, created_at
-      ) VALUES ($1, $2, $3, $4, $5, NOW())
-      RETURNING id, created_at
-    `;
-
-    return this.executeQuery(query, [name, email, message, source, spamScore], { cache: false });
+    return this.executeQuery(
+      queryKey,
+      () => {
+        if (category) {
+          return sql`
+            SELECT m.*,
+                   COALESCE(p.total_orders, 0) as total_orders,
+                   COALESCE(p.total_revenue, 0) as total_revenue,
+                   COALESCE(p.downloads_initiated, 0) as downloads
+            FROM models m
+            LEFT JOIN mv_model_performance p ON m.id = p.id
+            WHERE m.status = 'active' AND m.category = ${category}
+            ORDER BY p.total_revenue DESC NULLS LAST, m.published_at DESC
+            LIMIT ${limit}
+          `;
+        } else {
+          return sql`
+            SELECT m.*,
+                   COALESCE(p.total_orders, 0) as total_orders,
+                   COALESCE(p.total_revenue, 0) as total_revenue,
+                   COALESCE(p.downloads_initiated, 0) as downloads
+            FROM models m
+            LEFT JOIN mv_model_performance p ON m.id = p.id
+            WHERE m.status = 'active'
+            ORDER BY p.total_revenue DESC NULLS LAST, m.published_at DESC
+            LIMIT ${limit}
+          `;
+        }
+      },
+      { ttl: 300000, useCache: true }
+    );
   }
 
-  // Analytics aggregation with caching
-  async getAnalyticsData(timeframe = '7d') {
-    const query = `
-      SELECT 
-        DATE_TRUNC('day', created_at) as date,
-        COUNT(*) as total_visits,
-        COUNT(DISTINCT session_id) as unique_visitors,
-        AVG(page_load_time) as avg_load_time
-      FROM analytics_events 
-      WHERE created_at >= NOW() - INTERVAL '${timeframe}'
-      GROUP BY DATE_TRUNC('day', created_at)
-      ORDER BY date DESC
-    `;
-
-    return this.executeQuery(query, [], { cache: true, ttl: 1800 }); // 30 min cache
+  /**
+   * High-performance order validation for payments
+   */
+  async validateOrderBySession(sessionId) {
+    const queryKey = `SELECT_ORDER_VALIDATION_${sessionId}`;
+    
+    return this.executeQuery(
+      queryKey,
+      () => sql`
+        SELECT o.id, o.stripe_session_id, o.customer_id, o.model_id,
+               o.amount, o.status, o.download_expires_at, o.download_count,
+               o.max_downloads, o.created_at, o.updated_at,
+               c.email, c.name as customer_name, c.stripe_customer_id,
+               m.title as model_title, m.slug as model_slug, 
+               m.file_url, m.excel_url, m.price
+        FROM orders o
+        INNER JOIN customers c ON o.customer_id = c.id
+        INNER JOIN models m ON o.model_id = m.id
+        WHERE o.stripe_session_id = ${sessionId}
+      `,
+      { ttl: 60000, useCache: true } // 1 min cache for orders
+    );
   }
 
-  // Cache management
-  async getFromCache(key) {
+  /**
+   * Optimized customer order history
+   */
+  async getCustomerOrders(customerId, limit = 20) {
+    const queryKey = `SELECT_CUSTOMER_ORDERS_${customerId}_${limit}`;
+    
+    return this.executeQuery(
+      queryKey,
+      () => sql`
+        SELECT o.id, o.stripe_session_id, o.amount, o.status, 
+               o.download_expires_at, o.download_count, o.max_downloads,
+               o.created_at, o.updated_at,
+               m.title as model_title, m.slug as model_slug, 
+               m.category, m.thumbnail_url
+        FROM orders o
+        INNER JOIN models m ON o.model_id = m.id
+        WHERE o.customer_id = ${customerId} 
+          AND o.status IN ('completed', 'pending')
+        ORDER BY o.created_at DESC
+        LIMIT ${limit}
+      `,
+      { ttl: 180000, useCache: true } // 3 min cache
+    );
+  }
+
+  /**
+   * Fast insights feed with performance optimization
+   */
+  async getPublishedInsights(limit = 20) {
+    const queryKey = `SELECT_PUBLISHED_INSIGHTS_${limit}`;
+    
+    return this.executeQuery(
+      queryKey,
+      () => sql`
+        SELECT id, slug, title, summary, author, cover_image_url,
+               published_at, date_published, tags,
+               CASE 
+                 WHEN LENGTH(content) > 200 THEN LEFT(content, 200) || '...'
+                 ELSE content
+               END as preview_content
+        FROM insights 
+        WHERE status = 'published' 
+          AND published_at IS NOT NULL
+        ORDER BY COALESCE(date_published, published_at) DESC
+        LIMIT ${limit}
+      `,
+      { ttl: 600000, useCache: true } // 10 min cache
+    );
+  }
+
+  /**
+   * Analytics dashboard data with materialized views
+   */
+  async getDashboardAnalytics() {
+    const queryKey = 'SELECT_DASHBOARD_ANALYTICS';
+    
+    return this.executeQuery(
+      queryKey,
+      async () => {
+        const [revenueData, modelData, leadStats] = await Promise.all([
+          // Revenue analytics from materialized view
+          sql`
+            SELECT hour, total_orders, completed_orders, hourly_revenue,
+                   avg_order_value, unique_customers, models_sold
+            FROM mv_revenue_dashboard
+            ORDER BY hour DESC
+            LIMIT 48
+          `,
+          
+          // Top performing models
+          sql`
+            SELECT id, title, category, total_orders, total_revenue,
+                   downloads_initiated, avg_fulfillment_seconds
+            FROM mv_model_performance
+            WHERE total_revenue > 0
+            ORDER BY total_revenue DESC
+            LIMIT 10
+          `,
+          
+          // Lead conversion metrics
+          sql`
+            SELECT 
+              COUNT(*) as total_leads,
+              COUNT(CASE WHEN created_at >= NOW() - INTERVAL '24 hours' THEN 1 END) as leads_24h,
+              COUNT(CASE WHEN created_at >= NOW() - INTERVAL '7 days' THEN 1 END) as leads_7d,
+              COUNT(CASE WHEN status = 'contacted' THEN 1 END) as leads_contacted
+            FROM leads
+          `
+        ]);
+
+        return {
+          revenue: revenueData.rows,
+          topModels: modelData.rows,
+          leads: leadStats.rows[0],
+          lastUpdated: new Date().toISOString()
+        };
+      },
+      { ttl: 120000, useCache: true } // 2 min cache for dashboard
+    );
+  }
+
+  /**
+   * Optimized lead management with pagination
+   */
+  async getLeadsPaginated(page = 1, limit = 50, filters = {}) {
+    const offset = (page - 1) * limit;
+    const queryKey = `SELECT_LEADS_PAGINATED_${page}_${limit}_${JSON.stringify(filters)}`;
+    
+    return this.executeQuery(
+      queryKey,
+      async () => {
+        let whereClause = 'WHERE 1=1';
+        let params = [];
+        let paramIndex = 1;
+
+        // Build dynamic where clause
+        if (filters.status) {
+          whereClause += ` AND status = $${paramIndex}`;
+          params.push(filters.status);
+          paramIndex++;
+        }
+        
+        if (filters.interest) {
+          whereClause += ` AND interest = $${paramIndex}`;
+          params.push(filters.interest);
+          paramIndex++;
+        }
+        
+        if (filters.dateFrom) {
+          whereClause += ` AND created_at >= $${paramIndex}`;
+          params.push(filters.dateFrom);
+          paramIndex++;
+        }
+
+        const [leads, total] = await Promise.all([
+          sql.query(`
+            SELECT id, name, email, company, interest, message,
+                   created_at, status, source, ip_address
+            FROM leads 
+            ${whereClause}
+            ORDER BY created_at DESC
+            LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
+          `, [...params, limit, offset]),
+          
+          sql.query(`
+            SELECT COUNT(*) as total
+            FROM leads 
+            ${whereClause}
+          `, params)
+        ]);
+
+        return {
+          leads: leads.rows,
+          total: parseInt(total.rows[0].total),
+          page,
+          limit,
+          totalPages: Math.ceil(parseInt(total.rows[0].total) / limit)
+        };
+      },
+      { ttl: 60000, useCache: true } // 1 min cache
+    );
+  }
+
+  /**
+   * Record performance metrics
+   */
+  recordMetric(queryKey, duration, type) {
+    const key = `${queryKey}_${type}`;
+    const existing = this.performanceMetrics.get(key) || { 
+      count: 0, 
+      totalTime: 0, 
+      avgTime: 0, 
+      maxTime: 0 
+    };
+    
+    existing.count++;
+    existing.totalTime += duration;
+    existing.avgTime = existing.totalTime / existing.count;
+    existing.maxTime = Math.max(existing.maxTime, duration);
+    existing.lastExecuted = Date.now();
+    
+    this.performanceMetrics.set(key, existing);
+  }
+
+  /**
+   * Log slow queries to database for analysis
+   */
+  async logSlowQuery(queryKey, duration) {
     try {
-      if (this.redis) {
-        const result = await this.redis.get(key);
-        return result ? JSON.parse(result) : null;
-      }
-      
-      // Fallback to memory cache
-      const cached = this.queryCache.get(key);
-      if (cached && cached.expires > Date.now()) {
-        return cached.data;
-      }
-      
-      return null;
+      await sql`
+        INSERT INTO performance_metrics (metric_name, component, duration, exceeds_threshold, metadata, timestamp)
+        VALUES ('slow_query', 'database', ${duration}, true, ${JSON.stringify({ query: queryKey })}, NOW())
+      `;
     } catch (error) {
-      console.warn('[OptimizedDB] Cache get failed:', error);
-      return null;
+      console.error('Failed to log slow query:', error);
     }
   }
 
-  async setCache(key, data, ttl) {
+  /**
+   * Log database errors
+   */
+  async logDatabaseError(queryKey, error, duration) {
     try {
-      if (this.redis) {
-        await this.redis.setex(key, ttl, JSON.stringify(data));
-        return;
-      }
-      
-      // Fallback to memory cache with size limit
-      if (this.queryCache.size >= this.MAX_CACHE_SIZE) {
-        const firstKey = this.queryCache.keys().next().value;
-        this.queryCache.delete(firstKey);
-      }
-      
-      this.queryCache.set(key, {
-        data,
-        expires: Date.now() + (ttl * 1000)
-      });
-    } catch (error) {
-      console.warn('[OptimizedDB] Cache set failed:', error);
+      await sql`
+        INSERT INTO error_logs (category, severity, message, metadata, timestamp)
+        VALUES ('database', 'error', ${error.message}, ${JSON.stringify({ 
+          query: queryKey, 
+          duration, 
+          stack: error.stack 
+        })}, NOW())
+      `;
+    } catch (logError) {
+      console.error('Failed to log database error:', logError);
     }
   }
 
-  // Database connection management
-  async ensureConnection() {
-    // Vercel Postgres handles connections automatically
-    // This method is for future connection pooling implementation
-    return true;
-  }
-
-  // Performance utilities
-  generateCacheKey(query, params) {
-    const queryHash = this.hashCode(query);
-    const paramsHash = this.hashCode(JSON.stringify(params));
-    return `query:${queryHash}:${paramsHash}`;
-  }
-
-  hashCode(str) {
-    let hash = 0;
-    for (let i = 0; i < str.length; i++) {
-      const char = str.charCodeAt(i);
-      hash = ((hash << 5) - hash) + char;
-      hash = hash & hash; // Convert to 32-bit integer
-    }
-    return hash.toString(36);
-  }
-
-  updateQueryMetrics(responseTime) {
-    this.queryMetrics.totalQueries++;
+  /**
+   * Get performance statistics
+   */
+  getPerformanceStats() {
+    const stats = {};
     
-    if (responseTime > this.SLOW_QUERY_THRESHOLD) {
-      this.queryMetrics.slowQueries++;
+    for (const [key, metrics] of this.performanceMetrics.entries()) {
+      stats[key] = {
+        ...metrics,
+        status: metrics.avgTime < 50 ? 'excellent' : 
+                metrics.avgTime < 100 ? 'good' : 
+                metrics.avgTime < 500 ? 'warning' : 'critical'
+      };
     }
     
-    this.queryMetrics.avgResponseTime = 
-      (this.queryMetrics.avgResponseTime * (this.queryMetrics.totalQueries - 1) + responseTime) / 
-      this.queryMetrics.totalQueries;
-  }
-
-  calculateSpamScore(data) {
-    let score = 0;
-    
-    // Simple spam detection heuristics
-    if (data.message) {
-      const message = data.message.toLowerCase();
-      const spamKeywords = ['viagra', 'casino', 'loan', 'bitcoin', 'crypto', 'investment opportunity'];
-      score += spamKeywords.filter(keyword => message.includes(keyword)).length * 10;
-      
-      if (message.length < 10) score += 5;
-      if (/https?:\/\//.test(message)) score += 5;
-    }
-    
-    if (data.email && !data.email.includes('@')) score += 20;
-    
-    return Math.min(score, 100);
-  }
-
-  // Performance monitoring
-  getPerformanceMetrics() {
     return {
-      ...this.queryMetrics,
-      cacheHitRate: this.queryMetrics.totalQueries > 0 ? 
-        (this.queryMetrics.cacheHits / this.queryMetrics.totalQueries * 100).toFixed(2) : 0,
-      memoryCacheSize: this.queryCache.size,
-      redisConnected: !!this.redis
+      queryStats: stats,
+      cacheStats: {
+        size: this.queryCache.size,
+        hitRate: this.calculateCacheHitRate()
+      },
+      connectionPool: this.connectionPool
     };
   }
 
-  // Cleanup resources
-  async cleanup() {
-    if (this.redis) {
-      await this.redis.disconnect();
+  /**
+   * Calculate cache hit rate
+   */
+  calculateCacheHitRate() {
+    const cacheHits = Array.from(this.performanceMetrics.values())
+      .filter(m => m.count > 0)
+      .reduce((sum, m) => {
+        const cacheHitMetric = this.performanceMetrics.get(m.key + '_cache_hit');
+        return sum + (cacheHitMetric?.count || 0);
+      }, 0);
+      
+    const totalQueries = Array.from(this.performanceMetrics.values())
+      .reduce((sum, m) => sum + m.count, 0);
+      
+    return totalQueries > 0 ? Math.round((cacheHits / totalQueries) * 100) : 0;
+  }
+
+  /**
+   * Clear cache (for cache invalidation)
+   */
+  clearCache(pattern = null) {
+    if (pattern) {
+      for (const key of this.queryCache.keys()) {
+        if (key.includes(pattern)) {
+          this.queryCache.delete(key);
+        }
+      }
+    } else {
+      this.queryCache.clear();
     }
-    this.queryCache.clear();
+  }
+
+  /**
+   * Health check
+   */
+  async healthCheck() {
+    const startTime = performance.now();
+    
+    try {
+      await sql`SELECT 1 as health_check`;
+      const responseTime = performance.now() - startTime;
+      
+      return {
+        status: 'healthy',
+        responseTime: Math.round(responseTime),
+        connectionPool: this.connectionPool,
+        cacheSize: this.queryCache.size,
+        timestamp: new Date().toISOString()
+      };
+    } catch (error) {
+      return {
+        status: 'unhealthy',
+        error: error.message,
+        responseTime: performance.now() - startTime,
+        timestamp: new Date().toISOString()
+      };
+    }
   }
 }
 
-// Create singleton instance
-const optimizedDb = new OptimizedDatabase();
-
-// Export optimized query functions
-export const getFinancialModels = (options) => optimizedDb.getFinancialModels(options);
-export const getModelBySlug = (slug) => optimizedDb.getModelBySlug(slug);
-export const getInsights = (options) => optimizedDb.getInsights(options);
-export const batchGetModels = (ids) => optimizedDb.batchGetModels(ids);
-export const addNewsletterSubscriber = (email) => optimizedDb.addNewsletterSubscriber(email);
-export const createContactSubmission = (data) => optimizedDb.createContactSubmission(data);
-export const getAnalyticsData = (timeframe) => optimizedDb.getAnalyticsData(timeframe);
-export const getDbMetrics = () => optimizedDb.getPerformanceMetrics();
-
-// Migration utilities for performance optimization
-export const performanceMigrations = {
-  // Add indexes for common queries
-  async createPerformanceIndexes() {
-    const indexes = [
-      'CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_models_category ON models(category)',
-      'CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_models_featured ON models(featured)',
-      'CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_models_slug ON models(slug)',
-      'CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_insights_published_at ON insights(published_at)',
-      'CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_insights_search_vector ON insights USING gin(search_vector)',
-      'CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_form_submissions_created_at ON form_submissions(created_at)',
-      'CREATE INDEX CONCURRENTLY IF NOT EXISTS idx_newsletter_email ON newsletter_subscribers(email)'
-    ];
-
-    for (const indexSQL of indexes) {
-      try {
-        await sql.query(indexSQL);
-        console.log('[Migration] Created index:', indexSQL.split(' ')[5]);
-      } catch (error) {
-        console.error('[Migration] Index creation failed:', error);
-      }
-    }
-  },
-
-  // Add full-text search support
-  async createFullTextSearch() {
-    try {
-      await sql.query(`
-        ALTER TABLE insights 
-        ADD COLUMN IF NOT EXISTS search_vector tsvector
-      `);
-
-      await sql.query(`
-        UPDATE insights 
-        SET search_vector = to_tsvector('english', title || ' ' || COALESCE(content, '') || ' ' || COALESCE(excerpt, ''))
-      `);
-
-      await sql.query(`
-        CREATE OR REPLACE FUNCTION insights_search_trigger() RETURNS trigger AS $$
-        BEGIN
-          NEW.search_vector = to_tsvector('english', NEW.title || ' ' || COALESCE(NEW.content, '') || ' ' || COALESCE(NEW.excerpt, ''));
-          RETURN NEW;
-        END
-        $$ LANGUAGE plpgsql;
-      `);
-
-      await sql.query(`
-        DROP TRIGGER IF EXISTS insights_search_update ON insights;
-        CREATE TRIGGER insights_search_update 
-        BEFORE INSERT OR UPDATE ON insights 
-        FOR EACH ROW EXECUTE FUNCTION insights_search_trigger();
-      `);
-
-      console.log('[Migration] Full-text search configured');
-    } catch (error) {
-      console.error('[Migration] Full-text search setup failed:', error);
-    }
-  }
-};
-
+// Export singleton instance
+export const optimizedDb = new OptimizedDatabase();
 export default optimizedDb;

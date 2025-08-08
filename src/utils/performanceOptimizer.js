@@ -381,7 +381,6 @@ export const usePerformanceOptimization = () => {
 
 // Export all utilities
 export {
-  BundleOptimizer,
   ImageOptimizer,
   ReactOptimizer,
   PerformanceMeasurer

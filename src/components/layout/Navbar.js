@@ -18,11 +18,11 @@ export default function Navbar() {
   
   return (
     <nav className="flex space-x-8 items-center">
-      <Link href="/" className={`cursor-pointer px-3 py-2 rounded-md text-sm flex items-center ${isActive('/')}`}>
+      <Link href="/" className={`cursor-pointer px-4 py-3 rounded-md text-sm flex items-center min-h-[44px] transition-colors ${isActive('/')}`}>
         Home
       </Link>
       
-      <Link href="/about" className={`cursor-pointer px-3 py-2 rounded-md text-sm flex items-center ${isActive('/about')}`}>
+      <Link href="/about" className={`cursor-pointer px-4 py-3 rounded-md text-sm flex items-center min-h-[44px] transition-colors ${isActive('/about')}`}>
         About
       </Link>
       
@@ -34,7 +34,7 @@ export default function Navbar() {
       >
         <Link 
           href="/models" 
-          className={`cursor-pointer px-3 py-2 rounded-md text-sm flex items-center ${router.pathname === '/models' || router.pathname.startsWith('/models/') ? 'text-teal-500 font-medium' : 'text-navy-700 dark:text-white hover:text-navy-900 dark:hover:text-teal-300'}`}
+          className={`cursor-pointer px-4 py-3 rounded-md text-sm flex items-center min-h-[44px] transition-colors ${router.pathname === '/models' || router.pathname.startsWith('/models/') ? 'text-teal-500 font-medium' : 'text-navy-700 dark:text-white hover:text-navy-900 dark:hover:text-teal-300'}`}
         >
           Models
           <svg className="w-4 h-4 ml-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -49,7 +49,7 @@ export default function Navbar() {
             <div className="py-1" role="menu" aria-orientation="vertical">
               <Link 
                 href="/models/private-equity" 
-                className={`block px-4 py-3 text-sm cursor-pointer transition-colors duration-150 ${
+                className={`block px-4 py-3 text-sm cursor-pointer transition-colors duration-150 min-h-[44px] flex items-center ${
                   router.pathname === '/models/private-equity' 
                     ? 'text-teal-500 font-medium bg-gray-50 dark:bg-navy-700' 
                     : 'text-navy-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gray-100 dark:hover:bg-navy-700'
@@ -60,7 +60,7 @@ export default function Navbar() {
               </Link>
               <Link 
                 href="/models/public-equity" 
-                className={`block px-4 py-3 text-sm cursor-pointer transition-colors duration-150 ${
+                className={`block px-4 py-3 text-sm cursor-pointer transition-colors duration-150 min-h-[44px] flex items-center ${
                   router.pathname === '/models/public-equity' 
                     ? 'text-teal-500 font-medium bg-gray-50 dark:bg-navy-700' 
                     : 'text-navy-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gray-100 dark:hover:bg-navy-700'
@@ -82,7 +82,7 @@ export default function Navbar() {
       >
         <Link 
           href="/solutions" 
-          className={`cursor-pointer px-3 py-2 rounded-md text-sm flex items-center ${router.pathname === '/solutions' || router.pathname.startsWith('/solutions/') ? 'text-teal-500 font-medium' : 'text-navy-700 dark:text-white hover:text-navy-900 dark:hover:text-teal-300'}`}
+          className={`cursor-pointer px-4 py-3 rounded-md text-sm flex items-center min-h-[44px] transition-colors ${router.pathname === '/solutions' || router.pathname.startsWith('/solutions/') ? 'text-teal-500 font-medium' : 'text-navy-700 dark:text-white hover:text-navy-900 dark:hover:text-teal-300'}`}
         >
           Solutions
           <svg className="w-4 h-4 ml-1 inline-block" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
@@ -97,7 +97,7 @@ export default function Navbar() {
             <div className="py-1" role="menu" aria-orientation="vertical">
               <Link 
                 href="/solutions/financial-modeling" 
-                className={`block px-4 py-3 text-sm cursor-pointer transition-colors duration-150 ${
+                className={`block px-4 py-3 text-sm cursor-pointer transition-colors duration-150 min-h-[44px] flex items-center ${
                   router.pathname === '/solutions/financial-modeling' 
                     ? 'text-teal-500 font-medium bg-gray-50 dark:bg-navy-700' 
                     : 'text-navy-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gray-100 dark:hover:bg-navy-700'
@@ -108,7 +108,7 @@ export default function Navbar() {
               </Link>
               <Link 
                 href="/solutions/infrastructure" 
-                className={`block px-4 py-3 text-sm cursor-pointer transition-colors duration-150 ${
+                className={`block px-4 py-3 text-sm cursor-pointer transition-colors duration-150 min-h-[44px] flex items-center ${
                   router.pathname === '/solutions/infrastructure' 
                     ? 'text-teal-500 font-medium bg-gray-50 dark:bg-navy-700' 
                     : 'text-navy-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gray-100 dark:hover:bg-navy-700'
@@ -119,7 +119,7 @@ export default function Navbar() {
               </Link>
               <Link 
                 href="/solutions/research" 
-                className={`block px-4 py-3 text-sm cursor-pointer transition-colors duration-150 ${
+                className={`block px-4 py-3 text-sm cursor-pointer transition-colors duration-150 min-h-[44px] flex items-center ${
                   router.pathname === '/solutions/research' 
                     ? 'text-teal-500 font-medium bg-gray-50 dark:bg-navy-700' 
                     : 'text-navy-700 dark:text-gray-300 hover:text-teal-600 dark:hover:text-teal-400 hover:bg-gray-100 dark:hover:bg-navy-700'
@@ -134,11 +134,11 @@ export default function Navbar() {
       </div>
       
       {/* Insights Link */}
-      <Link href="/insights" className={`cursor-pointer px-3 py-2 rounded-md text-sm flex items-center ${isActive('/insights')}`}>
+      <Link href="/insights" className={`cursor-pointer px-4 py-3 rounded-md text-sm flex items-center min-h-[44px] transition-colors ${isActive('/insights')}`}>
         Insights
       </Link>
       
-      <Link href="/contact" className={`cursor-pointer px-3 py-2 rounded-md text-sm flex items-center ${isActive('/contact')}`}>
+      <Link href="/contact" className={`cursor-pointer px-4 py-3 rounded-md text-sm flex items-center min-h-[44px] transition-colors ${isActive('/contact')}`}>
         Contact
       </Link>
     </nav>

@@ -1,0 +1,163 @@
+{
+  "timestamp": "2025-08-08T13:38:52.856Z",
+  "overall_status": "not_ready",
+  "summary": {
+    "critical_issues": 7,
+    "important_issues": 2,
+    "security_issues": 4,
+    "performance_issues": 3,
+    "total_issues": 16
+  },
+  "categories": {
+    "critical": [
+      {
+        "key": "POSTGRES_URL",
+        "status": "invalid",
+        "message": "Must be a valid production PostgreSQL connection string",
+        "value": "missing"
+      },
+      {
+        "key": "POSTGRES_URL_NON_POOLING",
+        "status": "invalid",
+        "message": "Must be a valid non-pooling PostgreSQL connection string",
+        "value": "missing"
+      },
+      {
+        "key": "SENDGRID_API_KEY",
+        "status": "invalid",
+        "message": "Must be a valid SendGrid API key (starts with SG.)",
+        "value": "missing"
+      },
+      {
+        "key": "STRIPE_SECRET_KEY",
+        "status": "invalid",
+        "message": "Must be a LIVE Stripe secret key (starts with sk_live_)",
+        "value": "missing"
+      },
+      {
+        "key": "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY",
+        "status": "invalid",
+        "message": "Must be a LIVE Stripe publishable key (starts with pk_live_)",
+        "value": "missing"
+      },
+      {
+        "key": "STRIPE_WEBHOOK_SECRET",
+        "status": "invalid",
+        "message": "Must be a valid Stripe webhook secret (starts with whsec_)",
+        "value": "missing"
+      },
+      {
+        "key": "NEXTAUTH_SECRET",
+        "status": "invalid",
+        "message": "Must be at least 32 characters long",
+        "value": "missing"
+      }
+    ],
+    "important": [
+      {
+        "key": "NEXT_PUBLIC_GA_ID",
+        "status": "valid",
+        "value": "empty"
+      },
+      {
+        "key": "SENDGRID_FROM_EMAIL",
+        "status": "invalid",
+        "message": "Must be a valid email address using zencap.co domain",
+        "value": "missing"
+      },
+      {
+        "key": "NEXT_PUBLIC_SITE_URL",
+        "status": "invalid",
+        "message": "Must be the production HTTPS URL",
+        "value": "missing"
+      }
+    ],
+    "security": [
+      {
+        "key": "ENCRYPTION_KEY",
+        "status": "invalid",
+        "message": "Must be a 64-character hexadecimal string",
+        "value": "missing"
+      },
+      {
+        "key": "JWT_SECRET",
+        "status": "invalid",
+        "message": "Must be at least 32 characters long",
+        "value": "missing"
+      },
+      {
+        "key": "SESSION_SECRET",
+        "status": "invalid",
+        "message": "Must be a strong session secret (not default value)",
+        "value": "missing"
+      },
+      {
+        "key": "NODE_ENV",
+        "status": "invalid",
+        "message": "Must be set to \"production\"",
+        "value": "missing"
+      }
+    ],
+    "performance": [
+      {
+        "key": "ENABLE_COMPRESSION",
+        "status": "invalid",
+        "message": "Should be enabled for production performance",
+        "value": "missing"
+      },
+      {
+        "key": "CACHE_STATIC_ASSETS",
+        "status": "invalid",
+        "message": "Should be enabled for production performance",
+        "value": "missing"
+      },
+      {
+        "key": "IMAGE_OPTIMIZATION",
+        "status": "invalid",
+        "message": "Should be enabled for production performance",
+        "value": "missing"
+      }
+    ]
+  },
+  "recommendations": [
+    "CRITICAL: Fix all critical configuration issues before deployment",
+    "SECURITY: Address security configuration issues immediately",
+    "DATABASE: Fix database connection configuration",
+    "STRIPE: Configure LIVE Stripe keys for production payments",
+    "PERFORMANCE: Enable production performance optimizations"
+  ],
+  "database_connection": false,
+  "stripe_configuration": [
+    {
+      "component": "secret_key",
+      "status": "missing"
+    },
+    {
+      "component": "publishable_key",
+      "status": "missing"
+    },
+    {
+      "component": "webhook_secret",
+      "status": "missing"
+    }
+  ],
+  "security_checks": [
+    {
+      "check": "Environment File Security",
+      "status": "passed"
+    },
+    {
+      "check": "HTTPS Configuration",
+      "status": "failed",
+      "message": "Site URL should use HTTPS"
+    },
+    {
+      "check": "Secure Headers",
+      "status": "passed"
+    },
+    {
+      "check": "Production Build Optimization",
+      "status": "passed"
+    }
+  ]
+}

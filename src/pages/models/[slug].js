@@ -510,18 +510,34 @@ export default function ModelDetail({ model, relatedModels }) {
 
 // This function gets called at build time
 export async function getStaticPaths() {
+  // For production build, use fallback-only approach to avoid conflicts
+  if (process.env.NODE_ENV === 'production' || process.env.BUILD_MODE === 'static') {
+    return { paths: [], fallback: 'blocking' };
+  }
+
   try {
     const models = await fetchModels();
     
-    // Generate paths for all models
-    const paths = models.map((model) => ({
-      params: { slug: model.slug },
-    }));
+    // Generate paths for all models, ensuring uniqueness
+    const uniqueSlugs = new Set();
+    const paths = models
+      .filter(model => {
+        if (uniqueSlugs.has(model.slug)) {
+          console.warn(`Duplicate slug found: ${model.slug}, skipping...`);
+          return false;
+        }
+        uniqueSlugs.add(model.slug);
+        return true;
+      })
+      .map((model) => ({
+        params: { slug: model.slug },
+      }));
 
+    console.log(`Generated ${paths.length} unique paths for models`);
     return { paths, fallback: true };
   } catch (error) {
     console.error('Error fetching models for static paths:', error);
-    return { paths: [], fallback: true };
+    return { paths: [], fallback: 'blocking' };
   }
 }
 

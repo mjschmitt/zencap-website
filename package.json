@@ -29,7 +29,15 @@
     "prod:deploy": "npm run security:check && npm run build",
     "security:monitor": "node scripts/security-monitor.js start",
     "security:health": "node scripts/security-monitor.js health-check",
-    "security:report": "node scripts/security-monitor.js report"
+    "security:report": "node scripts/security-monitor.js report",
+    "setup:prod-env": "node scripts/setup-production-env.js",
+    "validate:prod-env": "node scripts/validate-production-env.js",
+    "deploy:vercel": "node scripts/deploy-to-vercel.js",
+    "monitor:production": "node scripts/production-health-monitor.js",
+    "prod:setup": "npm run setup:prod-env && npm run validate:prod-env",
+    "prod:deploy": "npm run validate:prod-env && npm run deploy:vercel",
+    "prod:monitor": "npm run monitor:production",
+    "prod:full-deploy": "npm run prod:setup && npm run prod:deploy && npm run prod:monitor"
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
@@ -113,5 +121,8 @@
     "postcss": "^8.5.3",
     "tailwindcss": "^3.3.0",
     "typescript": "^5.9.2"
+  },
+  "overrides": {
+    "jquery": "^3.7.1"
   }
 }

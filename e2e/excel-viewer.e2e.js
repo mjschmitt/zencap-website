@@ -1,9 +1,5 @@
-import { test, expect } from '@playwright/test';
-import path from 'path';
-import { fileURLToPath } from 'url';
-
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = path.dirname(__filename);
+const { test, expect } = require('@playwright/test');
+const path = require('path');
 
 // Test data files
 const TEST_FILES = {

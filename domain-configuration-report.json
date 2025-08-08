@@ -1,0 +1,97 @@
+{
+  "timestamp": "2025-08-08T13:36:50.741Z",
+  "domain": "zencap.co",
+  "status": "unknown",
+  "checks": {
+    "primaryDomain": {
+      "status": "operational",
+      "statusCode": 307,
+      "responseTime": 211
+    },
+    "wwwDomain": {
+      "status": "operational",
+      "statusCode": 200,
+      "responseTime": 119
+    },
+    "deployment": {
+      "status": "active",
+      "projectFound": false,
+      "domainAssigned": false,
+      "edgeNetworkEnabled": false,
+      "recentDeployments": 0
+    },
+    "cdn": {
+      "status": "configured",
+      "provider": "Vercel",
+      "cacheStatus": "unknown",
+      "cacheControl": "public, max-age=0, must-revalidate"
+    }
+  },
+  "performance": {
+    "averageResponseTime": 117,
+    "tests": [
+      {
+        "name": "Homepage",
+        "path": "/",
+        "responseTime": 120,
+        "statusCode": 307,
+        "performance": "excellent"
+      },
+      {
+        "name": "Private Equity Models",
+        "path": "/models/private-equity",
+        "responseTime": 108,
+        "statusCode": 307,
+        "performance": "excellent"
+      },
+      {
+        "name": "Research Solutions",
+        "path": "/solutions/research",
+        "responseTime": 120,
+        "statusCode": 307,
+        "performance": "excellent"
+      },
+      {
+        "name": "API Health",
+        "path": "/api/health",
+        "responseTime": 118,
+        "statusCode": 307,
+        "performance": "excellent"
+      }
+    ],
+    "rating": "excellent",
+    "coreWebVitals": {
+      "lcp": "good",
+      "fid": "good",
+      "cls": "good"
+    }
+  },
+  "security": {
+    "score": 17,
+    "rating": "poor",
+    "headers": {
+      "strict-transport-security": "max-age=63072000"
+    },
+    "presentHeaders": [
+      "strict-transport-security"
+    ],
+    "ssl": {
+      "status": "valid",
+      "protocol": "TLS"
+    }
+  },
+  "recommendations": [
+    {
+      "category": "Security",
+      "priority": "High",
+      "issue": "Missing critical security headers",
+      "solution": "Review and implement all security headers in next.config.mjs"
+    },
+    {
+      "category": "Monitoring",
+      "priority": "Medium",
+      "issue": "Need continuous monitoring setup",
+      "solution": "Implement Vercel Analytics and error tracking"
+    }
+  ]
+}

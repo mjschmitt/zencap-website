@@ -7,6 +7,11 @@ import Image from 'next/image';
 import Link from 'next/link';
 import dynamic from 'next/dynamic';
 import { getImageWithVersion } from '@/utils/imageUtils';
+import LaunchUrgencyBanner from '@/components/ui/LaunchUrgencyBanner';
+import FounderCredibility from '@/components/ui/FounderCredibility';
+import MoneyBackGuarantee from '@/components/ui/MoneyBackGuarantee';
+import BundleOffers from '@/components/ui/BundleOffers';
+import SocialProofTestimonials from '@/components/ui/SocialProofTestimonials';
 
 // Dynamically import non-critical components for better performance
 const EnhancedTestimonials = dynamic(() => import('@/components/ui/EnhancedTestimonials'), {
@@ -144,6 +149,9 @@ export default function Home() {
 
   return (
     <Layout>
+      {/* Launch Urgency Banner */}
+      <LaunchUrgencyBanner />
+      
       <SEO
         title="Financial Modeling & Investment Advisory Services"
         description="Professional financial models and investment advisory services for private equity, real estate, and public equity. Excel-based models $2,985-$4,985. Institutional-grade tools for sophisticated investors."
@@ -425,8 +433,21 @@ export default function Home() {
         </div>
       </section>
       
-      {/* Enhanced Testimonials */}
-      <EnhancedTestimonials />
+      {/* Enhanced Social Proof Testimonials */}
+      <SocialProofTestimonials />
+      
+      {/* Founder Credibility Section */}
+      <FounderCredibility />
+      
+      {/* Bundle Offers Section */}
+      <BundleOffers />
+      
+      {/* Money Back Guarantee */}
+      <section className="py-8">
+        <div className="max-w-4xl mx-auto px-4">
+          <MoneyBackGuarantee />
+        </div>
+      </section>
       
       {/* Modern CTA Section */}
       <ModernCTA />

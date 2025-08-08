@@ -16,7 +16,6 @@ const nextConfig = {
   // Optimizations
   experimental: {
     optimizeCss: true,
-    webpackBuildWorker: true,
   },
   
   // Performance optimizations
@@ -26,8 +25,8 @@ const nextConfig = {
     styledComponents: true,
   },
   
-  // Enable SWC minification for better performance
-  swcMinify: true,
+  // SWC minification is enabled by default in Next.js 15
+  // swcMinify: true, // Removed as this is deprecated
 
   images: {
     domains: ['localhost'],
@@ -252,10 +251,6 @@ const nextConfig = {
       
       // Minimize configuration
       minimize: !dev,
-      minimizer: dev ? [] : [
-        // Add Terser options for better compression
-        '...',
-      ],
       
       // Remove empty chunks
       removeEmptyChunks: true,

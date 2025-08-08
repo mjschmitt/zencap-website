@@ -1057,7 +1057,7 @@ const ExcelSheet = memo(forwardRef(({
 
   // Create custom inner element that includes spillover overlays and images
   const innerElementType = useMemo(() => {
-    return forwardRef(({ children, style, ...rest }, ref) => {
+    const InnerElement = forwardRef(({ children, style, ...rest }, ref) => {
       // Render images inside the scrollable area
       const imagesInGrid = data.images?.map((image, index) => {
         // Image positions from ExcelJS
@@ -1309,6 +1309,9 @@ const ExcelSheet = memo(forwardRef(({
         </div>
       );
     });
+    
+    InnerElement.displayName = 'ExcelSheetInnerElement';
+    return InnerElement;
   }, [data.spilloverRanges, data.images, getColumnWidth, getRowHeight, darkMode, isPrintMode, zoomFactor, columnGroups, collapsedGroups]);
 
   // Don't render Grid until dimensions are ready to prevent misalignment
