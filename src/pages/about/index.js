@@ -270,12 +270,12 @@ export default function About() {
                   <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-1">
                     Gediminas Bulota
                   </h3>
-                  <p className="text-teal-500 font-medium mb-4">Senior Advisor, Quantitative Finance</p>
+                  <p className="text-teal-500 font-medium mb-4">Senior Advisor</p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    Gediminas brings over 15 years of experience in quantitative finance and derivatives modeling. Previously, he served as Head of Quantitative Strategy at a major global investment bank and led the development of proprietary pricing models for complex structured products.
+                    Gediminas brings extensive experience in real estate development and construction management, currently serving as Managing Partner at North Park Ventures Florida. His career spans complex project oversight and strategic development initiatives, where he has managed project teams, navigated municipal approvals, and delivered successful project turnovers. He has consulted on high-profile developments throughout Florida with a combined value exceeding $200 million, including the first Class A office building in Miami Beach, branded as the Starwood Headquarters.
                   </p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
-                    He holds a Ph.D. in Financial Mathematics from MIT and has published numerous papers on derivatives pricing and risk management. His expertise in mathematical finance provides an invaluable perspective to Zenith&apos;s modeling approach.
+                    Prior to his real estate career, Gediminas spearheaded international technology-based expansions, advising Fortune 500 clients including Bosch on strategic growth initiatives. This unique combination of technology sector experience and real estate development expertise provides Zenith with valuable perspectives on both operational excellence and strategic project execution. Gediminas holds a Bachelor of Science in Mechanical Engineering from the University of Florida.
                   </p>
                   <div className="flex space-x-3 mt-auto">
                     <a href="#" className="text-gray-400 hover:text-navy-700 dark:hover:text-white">
@@ -303,7 +303,7 @@ export default function About() {
                   <h3 className="text-2xl font-bold text-navy-700 dark:text-white mb-1">
                     Matthew Yance
                   </h3>
-                  <p className="text-teal-500 font-medium mb-4">Senior Advisor, Private Equity</p>
+                  <p className="text-teal-500 font-medium mb-4">Senior Advisor</p>
                   <p className="text-gray-600 dark:text-gray-300 mb-4">
                     Matthew has over two decades of experience in private equity investing, having most recently served as Managing Director at a leading global private equity firm where he led investments in the technology and healthcare sectors with deal sizes ranging from $500M to $5B.
                   </p>

@@ -72,7 +72,8 @@
       "Bash(npx playwright test:*)",
       "Bash(npx playwright:*)",
       "Bash(npx vercel:*)",
-      "WebFetch(domain:zencap-website-qxv75e78d-mjschmitts-projects.vercel.app)"
+      "WebFetch(domain:zencap-website-qxv75e78d-mjschmitts-projects.vercel.app)",
+      "WebFetch(domain:www.linkedin.com)"
     ],
     "deny": []
   }
