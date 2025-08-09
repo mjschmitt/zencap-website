@@ -510,18 +510,33 @@ function ModelsAdmin() {
   const [uploading, setUploading] = useState(false);
   const [showExcelPreview, setShowExcelPreview] = useState(false);
   const [newlyUploadedFile, setNewlyUploadedFile] = useState(false);
+  const [statusFilter, setStatusFilter] = useState('active'); // New state for status filtering
+  const [statusCounts, setStatusCounts] = useState({ active: 0, inactive: 0, archived: 0 }); // Track counts for each status
 
-  useEffect(() => { fetchModels(); }, []);
+  useEffect(() => { fetchModels(); }, [statusFilter]);
 
   const fetchModels = async () => {
     setLoading(true);
-    const res = await fetch('/api/models');
-    const data = await res.json();
-    if (Array.isArray(data)) {
-      setModels(data);
-    } else if (data && Array.isArray(data.models)) {
-      setModels(data.models);
-    } else {
+    try {
+      // Fetch models based on status filter
+      const res = await fetch(`/api/models?status=${statusFilter}&includeAll=true`);
+      const data = await res.json();
+      if (Array.isArray(data)) {
+        setModels(data);
+      } else if (data && Array.isArray(data.models)) {
+        setModels(data.models);
+      } else {
+        setModels([]);
+      }
+      
+      // Fetch status counts for all models
+      const countsRes = await fetch('/api/models/counts');
+      const countsData = await countsRes.json();
+      if (countsData.success) {
+        setStatusCounts(countsData.counts);
+      }
+    } catch (error) {
+      console.error('Error fetching models:', error);
       setModels([]);
     }
     setLoading(false);
@@ -617,6 +632,49 @@ function ModelsAdmin() {
     fetchModels();
   };
 
+  const handleArchive = async (slug, currentStatus) => {
+    const newStatus = currentStatus === 'archived' ? 'active' : 'archived';
+    const action = newStatus === 'archived' ? 'archive' : 'unarchive';
+    
+    if (!window.confirm(`Are you sure you want to ${action} this model?`)) return;
+    
+    try {
+      const res = await fetch('/api/models', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, status: newStatus })
+      });
+      
+      if (res.ok) {
+        fetchModels();
+      } else {
+        const errorData = await res.json();
+        setError(`Failed to ${action} model: ${errorData.error}`);
+      }
+    } catch (error) {
+      setError(`Failed to ${action} model: ${error.message}`);
+    }
+  };
+
+  const handleStatusChange = async (slug, newStatus) => {
+    try {
+      const res = await fetch('/api/models', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ slug, status: newStatus })
+      });
+      
+      if (res.ok) {
+        fetchModels();
+      } else {
+        const errorData = await res.json();
+        setError(`Failed to update status: ${errorData.error}`);
+      }
+    } catch (error) {
+      setError(`Failed to update status: ${error.message}`);
+    }
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     setSaving(true);
@@ -640,12 +698,82 @@ function ModelsAdmin() {
 
   return (
     <div>
-      <div className="flex justify-between items-center mb-4">
+      <div className="flex justify-between items-center mb-6">
         <h3 className="text-lg font-semibold text-gray-900 dark:text-white">Manage Models</h3>
         <button onClick={handleAdd} className="bg-teal-600 dark:bg-teal-500 text-white px-4 py-2 rounded hover:bg-teal-700 dark:hover:bg-teal-600">Add Model</button>
       </div>
+
+      {/* Status Filter Tabs */}
+      <div className="mb-6">
+        <div className="border-b border-gray-200 dark:border-navy-700">
+          <nav className="-mb-px flex space-x-8">
+            {[
+              { key: 'active', label: 'Active', count: statusCounts.active },
+              { key: 'inactive', label: 'Inactive', count: statusCounts.inactive },
+              { key: 'archived', label: 'Archived', count: statusCounts.archived }
+            ].map((tab) => (
+              <button
+                key={tab.key}
+                onClick={() => setStatusFilter(tab.key)}
+                className={`whitespace-nowrap py-2 px-1 border-b-2 font-medium text-sm transition-colors duration-200 ${
+                  statusFilter === tab.key
+                    ? 'border-teal-500 text-teal-600 dark:text-teal-400'
+                    : 'border-transparent text-gray-500 hover:text-gray-700 hover:border-gray-300 dark:text-gray-400 dark:hover:text-gray-300'
+                }`}
+              >
+                {tab.label}
+                <span className={`ml-2 inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  statusFilter === tab.key
+                    ? 'bg-teal-100 text-teal-800 dark:bg-teal-900 dark:text-teal-200'
+                    : 'bg-gray-100 text-gray-800 dark:bg-navy-700 dark:text-gray-300'
+                }`}>
+                  {tab.count || 0}
+                </span>
+              </button>
+            ))}
+          </nav>
+        </div>
+      </div>
+
+      {error && (
+        <div className="mb-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 text-red-700 dark:text-red-400 px-4 py-3 rounded relative">
+          <button
+            onClick={() => setError('')}
+            className="absolute top-0 bottom-0 right-0 px-4 py-3"
+          >
+            <svg className="fill-current h-6 w-6" role="button" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20">
+              <path d="M14.348 14.849a1.2 1.2 0 0 1-1.697 0L10 11.819l-2.651 3.029a1.2 1.2 0 1 1-1.697-1.697l2.758-3.15-2.759-3.152a1.2 1.2 0 1 1 1.697-1.697L10 8.183l2.651-3.031a1.2 1.2 0 1 1 1.697 1.697l-2.758 3.152 2.758 3.15a1.2 1.2 0 0 1 0 1.698z"/>
+            </svg>
+          </button>
+          {error}
+        </div>
+      )}
       {loading ? (
         <div className="text-gray-500">Loading...</div>
+      ) : models.length === 0 ? (
+        <div className="bg-white dark:bg-navy-800 rounded-lg border border-gray-200 dark:border-navy-700 p-8 text-center">
+          <div className="text-gray-400 dark:text-gray-500 mb-2">
+            <svg className="mx-auto h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+            </svg>
+          </div>
+          <h3 className="text-lg font-medium text-gray-900 dark:text-white mb-1">
+            No {statusFilter} models found
+          </h3>
+          <p className="text-gray-500 dark:text-gray-400">
+            {statusFilter === 'active' ? 'There are no active models yet.' :
+             statusFilter === 'archived' ? 'No models have been archived.' :
+             'There are no inactive models.'}
+          </p>
+          {statusFilter !== 'active' && (
+            <button
+              onClick={() => setStatusFilter('active')}
+              className="mt-4 text-teal-600 hover:text-teal-700 dark:text-teal-400 dark:hover:text-teal-300 text-sm font-medium"
+            >
+              View active models instead
+            </button>
+          )}
+        </div>
       ) : (
         <div className="space-y-4">
           {/* Table header */}
@@ -664,15 +792,36 @@ function ModelsAdmin() {
             {models.map((model, index) => (
               <div key={model.id}>
                 {/* Model row */}
-                <div className={`grid gap-4 px-4 py-3 hover:bg-gray-50 dark:hover:bg-navy-700 ${index !== models.length - 1 ? 'border-b border-gray-200 dark:border-navy-700' : ''}`} style={{gridTemplateColumns: '3fr 1.5fr 1fr 1fr 1fr'}}>
-                  <div className="text-gray-900 dark:text-white truncate">{model.title}</div>
+                <div className={`grid gap-4 px-4 py-3 transition-colors ${
+                  model.status === 'archived' 
+                    ? 'bg-gray-50 dark:bg-navy-900 hover:bg-gray-100 dark:hover:bg-navy-800 opacity-75' 
+                    : 'hover:bg-gray-50 dark:hover:bg-navy-700'
+                } ${index !== models.length - 1 ? 'border-b border-gray-200 dark:border-navy-700' : ''}`} style={{gridTemplateColumns: '3fr 1.5fr 1fr 1fr 1fr'}}>
+                  <div className={`truncate ${
+                    model.status === 'archived' 
+                      ? 'text-gray-600 dark:text-gray-300' 
+                      : 'text-gray-900 dark:text-white'
+                  }`}>
+                    {model.title}
+                    {model.status === 'archived' && (
+                      <span className="ml-2 text-xs text-gray-500 dark:text-gray-400">(Archived)</span>
+                    )}
+                  </div>
                   <div className="text-gray-500 dark:text-gray-400 truncate">{model.slug}</div>
                   <div className="text-gray-500 dark:text-gray-400">{model.category}</div>
-                  <div className="text-gray-500 dark:text-gray-400">{model.status}</div>
-                  <div className="flex justify-end gap-2">
+                  <div className="flex items-center gap-2">
+                    <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                      model.status === 'active' ? 'bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-200' :
+                      model.status === 'archived' ? 'bg-gray-100 text-gray-800 dark:bg-gray-700 dark:text-gray-200' :
+                      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200'
+                    }`}>
+                      {model.status}
+                    </span>
+                  </div>
+                  <div className="flex justify-end gap-1">
                      <button 
                        onClick={() => handleEdit(model)} 
-                       className={`px-3 py-1 rounded text-sm transition ${
+                       className={`px-2 py-1 rounded text-xs transition ${
                          editingModelId === model.id && showForm 
                            ? 'bg-gray-600 hover:bg-gray-700 text-white' 
                            : 'bg-blue-600 hover:bg-blue-700 text-white'
@@ -680,7 +829,32 @@ function ModelsAdmin() {
                      >
                        {editingModelId === model.id && showForm ? 'Close' : 'Edit'}
                      </button>
-                     <button onClick={() => handleDelete(model.slug)} className="bg-red-600 hover:bg-red-700 text-white px-3 py-1 rounded text-sm transition">Delete</button>
+                     
+                     {model.status === 'archived' ? (
+                       <button 
+                         onClick={() => handleArchive(model.slug, model.status)} 
+                         className="bg-green-600 hover:bg-green-700 text-white px-2 py-1 rounded text-xs transition"
+                         title="Unarchive model"
+                       >
+                         Restore
+                       </button>
+                     ) : (
+                       <button 
+                         onClick={() => handleArchive(model.slug, model.status)} 
+                         className="bg-orange-600 hover:bg-orange-700 text-white px-2 py-1 rounded text-xs transition"
+                         title="Archive model"
+                       >
+                         Archive
+                       </button>
+                     )}
+                     
+                     <button 
+                       onClick={() => handleDelete(model.slug)} 
+                       className="bg-red-600 hover:bg-red-700 text-white px-2 py-1 rounded text-xs transition"
+                       title="Permanently delete model"
+                     >
+                       Delete
+                     </button>
                    </div>
                 </div>
                 

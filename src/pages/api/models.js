@@ -5,13 +5,50 @@ export default async function handler(req, res) {
   const { method } = req;
 
   if (method === 'GET') {
-    // Fetch all active models or by slug with performance optimization
-    const { slug, category, limit = 50 } = req.query;
+    // Handle special requests
+    if (req.url.includes('/counts')) {
+      try {
+        const result = await sql`
+          SELECT 
+            status,
+            COUNT(*) as count
+          FROM models
+          GROUP BY status
+        `;
+        
+        const counts = { active: 0, inactive: 0, archived: 0 };
+        result.rows.forEach(row => {
+          counts[row.status] = parseInt(row.count);
+        });
+        
+        return res.status(200).json({ success: true, counts });
+      } catch (error) {
+        console.error('Model counts API Error:', error);
+        return res.status(500).json({ error: 'Failed to fetch model counts' });
+      }
+    }
+    
+    // Fetch all models or by slug with performance optimization
+    const { slug, category, limit = 50, status, includeAll } = req.query;
     
     try {
       if (slug) {
         // Use optimized single model lookup with performance metrics
-        const result = await optimizedDb.getModelBySlug(slug);
+        let result;
+        if (includeAll) {
+          // For admin, get model regardless of status
+          result = await sql`
+            SELECT m.*, 
+                   COALESCE(s.total_orders, 0) as popularity_score,
+                   COALESCE(s.total_revenue, 0) as revenue_generated
+            FROM models m
+            LEFT JOIN mv_model_performance s ON m.id = s.id
+            WHERE m.slug = ${slug}
+          `;
+        } else {
+          result = await optimizedDb.getModelBySlug(slug);
+        }
+        
         if (!result || result.rows.length === 0) {
           return res.status(404).json({ error: 'Model not found' });
         }
@@ -20,8 +57,27 @@ export default async function handler(req, res) {
         res.setHeader('Cache-Control', 'public, s-maxage=600, stale-while-revalidate=1800');
         return res.status(200).json(result.rows[0]);
       } else {
-        // Use optimized models listing with performance data
-        const result = await optimizedDb.getActiveModels(category, parseInt(limit));
+        let result;
+        
+        if (includeAll) {
+          // Admin view - fetch models by status
+          const statusFilter = status || 'active';
+          result = await sql`
+            SELECT m.*,
+                   COALESCE(p.total_orders, 0) as total_orders,
+                   COALESCE(p.total_revenue, 0) as total_revenue,
+                   COALESCE(p.downloads_initiated, 0) as downloads
+            FROM models m
+            LEFT JOIN mv_model_performance p ON m.id = p.id
+            WHERE m.status = ${statusFilter}
+            ${category ? sql`AND m.category = ${category}` : sql``}
+            ORDER BY m.updated_at DESC
+            LIMIT ${parseInt(limit)}
+          `;
+        } else {
+          // Use optimized models listing with performance data (public view)
+          result = await optimizedDb.getActiveModels(category, parseInt(limit));
+        }
         
         // Set cache headers for model listings
         res.setHeader('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=900');
@@ -29,6 +85,7 @@ export default async function handler(req, res) {
           models: result.rows,
           total: result.rows.length,
           category: category || 'all',
+          status: status || 'active',
           cached: result._cached || false
         });
       }
