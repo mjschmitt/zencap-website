@@ -39,10 +39,9 @@ export default async function handler(req, res) {
           // For admin, get model regardless of status
           result = await sql`
             SELECT m.*, 
-                   COALESCE(s.total_orders, 0) as popularity_score,
-                   COALESCE(s.total_revenue, 0) as revenue_generated
+                   0 as popularity_score,
+                   0 as revenue_generated
             FROM models m
-            LEFT JOIN mv_model_performance s ON m.id = s.id
             WHERE m.slug = ${slug}
           `;
         } else {
@@ -66,11 +65,10 @@ export default async function handler(req, res) {
           if (category) {
             result = await sql`
               SELECT m.*,
-                     COALESCE(p.total_orders, 0) as total_orders,
-                     COALESCE(p.total_revenue, 0) as total_revenue,
-                     COALESCE(p.downloads_initiated, 0) as downloads
+                     0 as total_orders,
+                     0 as total_revenue,
+                     0 as downloads
               FROM models m
-              LEFT JOIN mv_model_performance p ON m.id = p.id
               WHERE m.status = ${statusFilter} AND m.category = ${category}
               ORDER BY m.updated_at DESC
               LIMIT ${parseInt(limit)}
@@ -78,11 +76,10 @@ export default async function handler(req, res) {
           } else {
             result = await sql`
               SELECT m.*,
-                     COALESCE(p.total_orders, 0) as total_orders,
-                     COALESCE(p.total_revenue, 0) as total_revenue,
-                     COALESCE(p.downloads_initiated, 0) as downloads
+                     0 as total_orders,
+                     0 as total_revenue,
+                     0 as downloads
               FROM models m
-              LEFT JOIN mv_model_performance p ON m.id = p.id
               WHERE m.status = ${statusFilter}
               ORDER BY m.updated_at DESC
               LIMIT ${parseInt(limit)}
