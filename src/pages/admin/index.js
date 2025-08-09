@@ -8,27 +8,86 @@ import { ResponsiveContainer, LineChart, Line, XAxis, YAxis, CartesianGrid, Tool
 // ZenCap brand colors
 const COLORS = ['#046B4E', '#3e6792', '#6187ad', '#8ba8c2', '#bccddc'];
 
-// Simple placeholder components to fix white screen issue
-const DashboardCharts = () => (
-  <div className="p-8 bg-gray-100 rounded-lg">
-    <p className="text-gray-600">Dashboard charts loading...</p>
-  </div>
+// Dynamically import heavy components with proper error handling
+const RichTextEditor = dynamic(
+  () => import('@/components/ui/RichTextEditor').catch(err => {
+    console.error('Failed to load RichTextEditor:', err);
+    // Return a fallback component
+    return {
+      default: ({ value, onChange, placeholder }) => (
+        <textarea
+          value={value || ''}
+          onChange={(e) => onChange && onChange(e.target.value)}
+          placeholder={placeholder || 'Enter content...'}
+          className="w-full h-64 p-4 border border-gray-300 rounded-lg"
+        />
+      )
+    };
+  }),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="w-full h-64 p-4 border border-gray-300 rounded-lg bg-gray-50 animate-pulse">
+        <div className="h-4 bg-gray-200 rounded w-3/4 mb-2"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2"></div>
+      </div>
+    )
+  }
 );
 
-const RichTextEditor = ({ value, onChange, placeholder }) => (
-  <textarea
-    value={value || ''}
-    onChange={(e) => onChange && onChange(e.target.value)}
-    placeholder={placeholder || 'Enter content...'}
-    className="w-full h-64 p-4 border border-gray-300 rounded-lg"
-  />
+const ExcelPreview = dynamic(
+  () => import('@/components/ui/ExcelPreview').catch(err => {
+    console.error('Failed to load ExcelPreview:', err);
+    // Return a fallback component
+    return {
+      default: ({ file, title }) => (
+        <div className="p-8 bg-gray-100 rounded-lg">
+          <p className="text-gray-600">Excel preview: {title || file}</p>
+          <p className="text-sm text-gray-500 mt-2">Preview functionality temporarily unavailable</p>
+        </div>
+      )
+    };
+  }),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="p-8 bg-gray-100 rounded-lg animate-pulse">
+        <div className="h-4 bg-gray-200 rounded w-1/3 mb-2"></div>
+        <div className="h-32 bg-gray-200 rounded"></div>
+      </div>
+    )
+  }
 );
 
-const ExcelPreview = ({ file, title }) => (
-  <div className="p-8 bg-gray-100 rounded-lg">
-    <p className="text-gray-600">Excel preview: {title || file}</p>
-    <p className="text-sm text-gray-500 mt-2">Preview functionality temporarily disabled</p>
-  </div>
+// DashboardCharts with error handling
+const DashboardCharts = dynamic(
+  () => import('@/components/admin/DashboardCharts').catch(err => {
+    console.error('Failed to load DashboardCharts:', err);
+    // Return a fallback component
+    return {
+      default: () => (
+        <div className="p-8 bg-gray-100 rounded-lg">
+          <p className="text-gray-600">Analytics charts temporarily unavailable</p>
+          <p className="text-xs text-gray-500 mt-2">Recharts components failed to load</p>
+        </div>
+      )
+    };
+  }),
+  { 
+    ssr: false,
+    loading: () => (
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
+        {[...Array(3)].map((_, i) => (
+          <div key={i} className="bg-white rounded-lg shadow p-6">
+            <div className="animate-pulse">
+              <div className="h-4 bg-gray-300 rounded w-3/4 mb-4"></div>
+              <div className="h-32 bg-gray-200 rounded"></div>
+            </div>
+          </div>
+        ))}
+      </div>
+    )
+  }
 );
 
 // AdminTabs component removed for now - can be added later if needed
