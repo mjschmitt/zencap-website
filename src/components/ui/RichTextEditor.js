@@ -3033,6 +3033,4 @@ export default function RichTextEditor({ initialContent = '', onChange }) {
       `}</style>
     </div>
   );
-}
-
-export default RichTextEditor; 
+} 
