@@ -78,7 +78,8 @@
       "Bash(timeout:*)",
       "Bash(cat:*)",
       "Bash(set PORT=3011)",
-      "Bash(del nul)"
+      "Bash(del nul)",
+      "Bash(npx next lint:*)"
     ],
     "deny": []
   }
