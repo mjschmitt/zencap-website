@@ -75,10 +75,9 @@ class OptimizedDatabase {
       queryKey,
       () => sql`
         SELECT m.*, 
-               COALESCE(s.total_orders, 0) as popularity_score,
-               COALESCE(s.total_revenue, 0) as revenue_generated
+               0 as popularity_score,
+               0 as revenue_generated
         FROM models m
-        LEFT JOIN mv_model_performance s ON m.id = s.id
         WHERE m.slug = ${slug} AND m.status = 'active'
       `,
       { ttl: 600000, useCache: true } // 10 min cache for models
@@ -97,25 +96,23 @@ class OptimizedDatabase {
         if (category) {
           return sql`
             SELECT m.*,
-                   COALESCE(p.total_orders, 0) as total_orders,
-                   COALESCE(p.total_revenue, 0) as total_revenue,
-                   COALESCE(p.downloads_initiated, 0) as downloads
+                   0 as total_orders,
+                   0 as total_revenue,
+                   0 as downloads
             FROM models m
-            LEFT JOIN mv_model_performance p ON m.id = p.id
             WHERE m.status = 'active' AND m.category = ${category}
-            ORDER BY p.total_revenue DESC NULLS LAST, m.published_at DESC
+            ORDER BY m.published_at DESC
             LIMIT ${limit}
           `;
         } else {
           return sql`
             SELECT m.*,
-                   COALESCE(p.total_orders, 0) as total_orders,
-                   COALESCE(p.total_revenue, 0) as total_revenue,
-                   COALESCE(p.downloads_initiated, 0) as downloads
+                   0 as total_orders,
+                   0 as total_revenue,
+                   0 as downloads
             FROM models m
-            LEFT JOIN mv_model_performance p ON m.id = p.id
             WHERE m.status = 'active'
-            ORDER BY p.total_revenue DESC NULLS LAST, m.published_at DESC
+            ORDER BY m.published_at DESC
             LIMIT ${limit}
           `;
         }
@@ -199,7 +196,7 @@ class OptimizedDatabase {
   }
 
   /**
-   * Analytics dashboard data with materialized views
+   * Analytics dashboard data with live queries
    */
   async getDashboardAnalytics() {
     const queryKey = 'SELECT_DASHBOARD_ANALYTICS';
@@ -207,23 +204,28 @@ class OptimizedDatabase {
     return this.executeQuery(
       queryKey,
       async () => {
-        const [revenueData, modelData, leadStats] = await Promise.all([
-          // Revenue analytics from materialized view
+        const [orderStats, modelData, leadStats] = await Promise.all([
+          // Basic order statistics
           sql`
-            SELECT hour, total_orders, completed_orders, hourly_revenue,
-                   avg_order_value, unique_customers, models_sold
-            FROM mv_revenue_dashboard
-            ORDER BY hour DESC
-            LIMIT 48
+            SELECT 
+              COUNT(*) as total_orders,
+              COUNT(CASE WHEN status = 'completed' THEN 1 END) as completed_orders,
+              COALESCE(SUM(CASE WHEN status = 'completed' THEN amount END), 0) as total_revenue,
+              COUNT(DISTINCT customer_id) as unique_customers
+            FROM orders
+            WHERE created_at >= NOW() - INTERVAL '30 days'
           `,
           
-          // Top performing models
+          // Top performing models by orders
           sql`
-            SELECT id, title, category, total_orders, total_revenue,
-                   downloads_initiated, avg_fulfillment_seconds
-            FROM mv_model_performance
-            WHERE total_revenue > 0
-            ORDER BY total_revenue DESC
+            SELECT m.id, m.title, m.category, m.price,
+                   COUNT(o.id) as total_orders,
+                   COALESCE(SUM(CASE WHEN o.status = 'completed' THEN o.amount END), 0) as total_revenue
+            FROM models m
+            LEFT JOIN orders o ON m.id = o.model_id
+            WHERE m.status = 'active'
+            GROUP BY m.id, m.title, m.category, m.price
+            ORDER BY total_revenue DESC NULLS LAST
             LIMIT 10
           `,
           
@@ -239,7 +241,12 @@ class OptimizedDatabase {
         ]);
 
         return {
-          revenue: revenueData.rows,
+          revenue: [{
+            total_orders: orderStats.rows[0].total_orders,
+            completed_orders: orderStats.rows[0].completed_orders,
+            total_revenue: orderStats.rows[0].total_revenue,
+            unique_customers: orderStats.rows[0].unique_customers
+          }],
           topModels: modelData.rows,
           leads: leadStats.rows[0],
           lastUpdated: new Date().toISOString()
@@ -259,44 +266,17 @@ class OptimizedDatabase {
     return this.executeQuery(
       queryKey,
       async () => {
-        let whereClause = 'WHERE 1=1';
-        let params = [];
-        let paramIndex = 1;
-
-        // Build dynamic where clause
-        if (filters.status) {
-          whereClause += ` AND status = $${paramIndex}`;
-          params.push(filters.status);
-          paramIndex++;
-        }
-        
-        if (filters.interest) {
-          whereClause += ` AND interest = $${paramIndex}`;
-          params.push(filters.interest);
-          paramIndex++;
-        }
-        
-        if (filters.dateFrom) {
-          whereClause += ` AND created_at >= $${paramIndex}`;
-          params.push(filters.dateFrom);
-          paramIndex++;
-        }
-
+        // Simplified pagination without complex filtering for now
         const [leads, total] = await Promise.all([
-          sql.query(`
+          sql`
             SELECT id, name, email, company, interest, message,
                    created_at, status, source, ip_address
             FROM leads 
-            ${whereClause}
             ORDER BY created_at DESC
-            LIMIT $${paramIndex} OFFSET $${paramIndex + 1}
-          `, [...params, limit, offset]),
+            LIMIT ${limit} OFFSET ${offset}
+          `,
           
-          sql.query(`
-            SELECT COUNT(*) as total
-            FROM leads 
-            ${whereClause}
-          `, params)
+          sql`SELECT COUNT(*) as total FROM leads`
         ]);
 
         return {
