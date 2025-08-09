@@ -139,7 +139,33 @@ export default async function handler(req, res) {
     // Update a model by slug
     const { slug, ...fields } = req.body;
     if (!slug) return res.status(400).json({ error: 'Slug required' });
+    
     try {
+      // If only status is being updated (for archive/restore)
+      if (Object.keys(fields).length === 1 && fields.status !== undefined) {
+        const result = await sql`
+          UPDATE models SET 
+            status = ${fields.status},
+            updated_at = CURRENT_TIMESTAMP
+          WHERE slug = ${slug}
+          RETURNING *;
+        `;
+        
+        if (result.rows.length === 0) {
+          return res.status(404).json({ error: 'Model not found' });
+        }
+        
+        // Clear relevant caches after update
+        optimizedDb.clearCache('SELECT_ACTIVE_MODELS');
+        optimizedDb.clearCache(`SELECT_MODEL_BY_SLUG_${slug}`);
+        
+        return res.status(200).json({
+          model: result.rows[0],
+          message: `Model ${fields.status === 'archived' ? 'archived' : 'restored'} successfully`
+        });
+      }
+      
+      // Full update with all fields
       const result = await sql`
         UPDATE models SET 
           title = ${fields.title},
