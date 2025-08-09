@@ -34,8 +34,7 @@ export default function Footer() {
             </p>
             <p className="text-gray-400 text-sm mb-4 leading-relaxed">
               We provide institutional-grade financial models and investment analysis tools 
-              to help sophisticated investors make data-driven decisions. Our Excel-based models 
-              range from $2,985 to $4,985 and cover private equity real estate and public equity analysis.
+              to help sophisticated investors make data-driven decisions.
             </p>
             
             {/* Professional credentials */}
