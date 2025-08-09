@@ -16,6 +16,7 @@ import OptimizedMotion from '@/components/spa/OptimizedMotion';
 import SpaFeatureFlags from '@/components/spa/SpaFeatureFlags';
 import SpaMonitoring from '@/components/spa/SpaMonitoring';
 import { CriticalResourcePrefetch, PrefetchDebugger } from '@/components/spa/PrefetchUtils';
+import { KeyboardNavigationProvider } from '@/components/KeyboardNavigation';
 
 // Load fonts
 const inter = Inter({
@@ -132,6 +133,7 @@ export default function App({ Component, pageProps, router }) {
   // 3. SpaRouter - Hybrid SPA routing
   // 4. LazyLoadManager - Component lazy loading
   // 5. OptimizedMotion - Performance-aware animations
+  // 6. KeyboardNavigationProvider - Power-user keyboard shortcuts (innermost)
   return (
     <SessionProvider session={pageProps.session}>
       <SpaMonitoring>
@@ -139,7 +141,9 @@ export default function App({ Component, pageProps, router }) {
           <SpaRouter>
             <LazyLoadManager>
               <OptimizedMotion>
-                {AppContent}
+                <KeyboardNavigationProvider>
+                  {AppContent}
+                </KeyboardNavigationProvider>
               </OptimizedMotion>
             </LazyLoadManager>
           </SpaRouter>
