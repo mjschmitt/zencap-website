@@ -1,4 +1,4 @@
-// src/pages/_app.js - With route-based transition customization
+// src/pages/_app.js - Enhanced Hybrid SPA Implementation
 import "@/styles/globals.css";
 import { SessionProvider } from 'next-auth/react';
 import { AnimatePresence } from 'framer-motion';
@@ -8,6 +8,13 @@ import { useEffect } from 'react';
 import { initializeProduction, cleanupProduction } from '@/utils/initProduction';
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ProductionPerformanceMonitor from '@/components/utility/ProductionPerformanceMonitor';
+
+// SPA Components - Temporarily disabled due to import issues
+// import SpaRouter from '@/components/spa/SpaRouter';
+// import LazyLoadManager from '@/components/spa/LazyLoadManager';
+// import OptimizedMotion from '@/components/spa/OptimizedMotion';
+// import SpaFeatureFlags from '@/components/spa/SpaFeatureFlags';
+// import SpaMonitoring from '@/components/spa/SpaMonitoring';
 
 // Load fonts
 const inter = Inter({

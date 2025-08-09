@@ -10,6 +10,9 @@ import SEO from '@/components/SEO';
 import LoadingSkeleton, { ModelCardSkeleton } from '@/components/ui/LoadingSkeleton';
 import { useToast } from '@/components/ui/Toast';
 import ModelCard from '@/components/ui/ModelCard';
+import OptimizedModelCard from '@/components/ui/OptimizedModelCard';
+import { useSpa } from '@/components/spa/SpaRouter';
+import { useOptimizedMotion } from '@/components/spa/OptimizedMotion';
 
 
 // Categories for filtering
@@ -24,6 +27,8 @@ export default function Models() {
   const [models, setModels] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
+  const { isSpaMode, prefetchPage } = useSpa();
+  const { isMotionEnabled } = useOptimizedMotion();
 
   useEffect(() => {
     fetch('/api/models')
@@ -240,10 +245,18 @@ export default function Models() {
                   delay={200 + (index * 100)} 
                   className="h-full"
                 >
-                  <ModelCard 
-                    model={model} 
-                    featured={true}
-                  />
+                  {isSpaMode ? (
+                    <OptimizedModelCard 
+                      model={model} 
+                      featured={true}
+                      priority="high"
+                    />
+                  ) : (
+                    <ModelCard 
+                      model={model} 
+                      featured={true}
+                    />
+                  )}
                 </Motion>
               ))}
             </div>
@@ -270,10 +283,18 @@ export default function Models() {
                   delay={100 + (index * 50)} 
                   className="h-full"
                 >
-                  <ModelCard 
-                    model={model} 
-                    featured={false}
-                  />
+                  {isSpaMode ? (
+                    <OptimizedModelCard 
+                      model={model} 
+                      featured={false}
+                      priority="medium"
+                    />
+                  ) : (
+                    <ModelCard 
+                      model={model} 
+                      featured={false}
+                    />
+                  )}
                 </Motion>
               ))
             ) : (
