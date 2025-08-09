@@ -128,6 +128,12 @@ const ExcelJSViewer = ({
   const enterFullScreen = useCallback(async () => {
     if (!containerRef.current || processingRef.current) return;
     
+    // CRITICAL MEMORY CHECK: Prevent fullscreen if memory usage is critical
+    if (isCritical) {
+      showToast('Cannot enter fullscreen - critical memory usage detected. Please refresh the page.', 'error');
+      return;
+    }
+    
     // Prevent re-entry while processing
     processingRef.current = true;
     setIsTransitioningFullscreen(true);
@@ -136,6 +142,14 @@ const ExcelJSViewer = ({
     try {
       // Show loading state during transition
       showToast('Entering fullscreen mode...', 'info');
+      
+      // Memory check before proceeding
+      if (performance.memory) {
+        const usage = performance.memory.usedJSHeapSize / performance.memory.jsHeapSizeLimit;
+        if (usage > 0.8) {
+          showToast('High memory usage detected - fullscreen may affect performance', 'warning');
+        }
+      }
       
       // Small delay to allow UI to update
       await new Promise(resolve => setTimeout(resolve, 100));
@@ -156,8 +170,9 @@ const ExcelJSViewer = ({
       
     } catch (error) {
       console.error('Failed to enter fullscreen:', error);
-      // Fallback to CSS fullscreen
-      setIsFullScreen(true);
+      captureError('Fullscreen enter failed', error, { memoryInfo, fileSize: file?.size });
+      showToast('Failed to enter fullscreen mode', 'error');
+      // Don't fallback to CSS fullscreen if there's an error - it might make crashes worse
     } finally {
       // Delay clearing transition state to allow render to stabilize
       setTimeout(() => {
@@ -165,7 +180,7 @@ const ExcelJSViewer = ({
         processingRef.current = false;
       }, 300);
     }
-  }, [showToast]);
+  }, [showToast, isCritical, memoryInfo, file]);
 
   const exitFullScreenMode = useCallback(() => {
     if (document.fullscreenElement || document.webkitFullscreenElement) {

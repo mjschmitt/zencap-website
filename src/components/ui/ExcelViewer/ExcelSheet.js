@@ -741,9 +741,18 @@ const ExcelSheet = memo(forwardRef(({
     // Grid col 0 is row numbers, so grid col 1 = Excel col 1
     // CRITICAL FIX: The indices are already 1-based for data cells (after headers/row numbers)
     // This directly maps to Excel's internal 1-based indexing system
+    
+    // ADDITIONAL SAFETY CHECK: Ensure we're mapping correctly
+    // react-window rowIndex/columnIndex are 0-based, but our data cells start at 1,1
+    // rowIndex=1,columnIndex=1 should map to Excel A1 which is stored as row:1,col:1
     const cellKey = `${rowIndex}-${columnIndex}`;
     const cellData = cellDataMap.current.get(cellKey);
     const spilloverData = spilloverMap.current.get(cellKey);
+    
+    // Debug logging to verify correct mapping (only for development)
+    if (process.env.NODE_ENV === 'development' && debugMode && cellData) {
+      console.log(`[Cell Mapping] Grid(${rowIndex},${columnIndex}) → Excel(${cellData.row || rowIndex},${cellData.col || columnIndex}) = ${getColumnName(columnIndex)}${rowIndex}`);
+    }
     
     // Calculate selection and highlight state early
     const isSelected = selectedCell?.row === rowIndex && selectedCell?.col === columnIndex;
