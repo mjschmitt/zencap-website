@@ -1,10 +1,11 @@
-// src/components/ui/OptimizedModelCard.js - SPA-Optimized Model Card
+// src/components/ui/OptimizedModelCard.js - SPA-Optimized Model Card with Intelligent Prefetching
 import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useSpa, SpaLink } from '../spa/SpaRouter';
 import { OptimizedMotionCard } from '../spa/OptimizedMotion';
 import { useComponentLoader } from '../spa/LazyLoadManager';
+import { usePrefetchOnHover } from '../spa/PrefetchUtils';
 
 export default function OptimizedModelCard({ model, featured = false, priority = 'medium' }) {
   const { isSpaMode } = useSpa();
@@ -12,6 +13,10 @@ export default function OptimizedModelCard({ model, featured = false, priority =
   const [isVisible, setIsVisible] = useState(false);
   const [imageLoaded, setImageLoaded] = useState(false);
   const { triggerLoad, isLoaded } = useComponentLoader('ModelCard', 'HIGH');
+  
+  // Intelligent prefetching based on card priority
+  const prefetchDelay = featured ? 100 : (priority === 'high' ? 150 : 200);
+  const prefetchOnHover = usePrefetchOnHover(prefetchDelay);
 
   // Intersection Observer for lazy loading
   useEffect(() => {
@@ -50,6 +55,9 @@ export default function OptimizedModelCard({ model, featured = false, priority =
     isNew = false,
     isBestseller = false
   } = model || {};
+
+  // Generate model URL for prefetching
+  const modelUrl = `/models/${slug}`;
 
   // Price formatting
   const formatPrice = (price) => {
@@ -175,14 +183,16 @@ export default function OptimizedModelCard({ model, featured = false, priority =
           <div className="space-y-2">
             {isSpaMode ? (
               <SpaLink
-                href={`/models/${slug}`}
+                href={modelUrl}
                 className="block w-full bg-teal-500 hover:bg-teal-600 text-white text-center py-2 px-4 rounded-md font-medium transition-colors duration-200"
+                priority={featured ? 1 : 2} // CRITICAL for featured, HIGH for regular
+                prefetch={true}
               >
                 View Details
               </SpaLink>
             ) : (
               <Link
-                href={`/models/${slug}`}
+                href={modelUrl}
                 className="block w-full bg-teal-500 hover:bg-teal-600 text-white text-center py-2 px-4 rounded-md font-medium transition-colors duration-200"
               >
                 View Details
@@ -198,6 +208,9 @@ export default function OptimizedModelCard({ model, featured = false, priority =
     </>
   );
 
+  // Get prefetch handlers
+  const { onMouseEnter, onMouseLeave } = prefetchOnHover(modelUrl);
+
   // Render optimized card
   return (
     <div ref={cardRef} className="h-full">
@@ -206,6 +219,8 @@ export default function OptimizedModelCard({ model, featured = false, priority =
           className={`bg-white dark:bg-navy-800 rounded-lg shadow-lg overflow-hidden hover:shadow-xl transition-all duration-300 cursor-pointer h-full flex flex-col ${
             featured ? 'ring-2 ring-teal-500' : ''
           }`}
+          onMouseEnter={onMouseEnter}
+          onMouseLeave={onMouseLeave}
         >
           <CardContent />
         </OptimizedMotionCard>

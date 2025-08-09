@@ -9,12 +9,13 @@ import { initializeProduction, cleanupProduction } from '@/utils/initProduction'
 import ErrorBoundary from '@/components/ErrorBoundary';
 import ProductionPerformanceMonitor from '@/components/utility/ProductionPerformanceMonitor';
 
-// SPA Components - Temporarily disabled due to import issues
-// import SpaRouter from '@/components/spa/SpaRouter';
-// import LazyLoadManager from '@/components/spa/LazyLoadManager';
-// import OptimizedMotion from '@/components/spa/OptimizedMotion';
-// import SpaFeatureFlags from '@/components/spa/SpaFeatureFlags';
-// import SpaMonitoring from '@/components/spa/SpaMonitoring';
+// SPA Components - Progressive rollout with Predictive Prefetching
+import SpaRouter from '@/components/spa/SpaRouter';
+import LazyLoadManager from '@/components/spa/LazyLoadManager';
+import OptimizedMotion from '@/components/spa/OptimizedMotion';
+import SpaFeatureFlags from '@/components/spa/SpaFeatureFlags';
+import SpaMonitoring from '@/components/spa/SpaMonitoring';
+import { CriticalResourcePrefetch, PrefetchDebugger } from '@/components/spa/PrefetchUtils';
 
 // Load fonts
 const inter = Inter({
@@ -43,13 +44,25 @@ export default function App({ Component, pageProps, router }) {
       });
     }
     
+    // Log SPA components initialization in development
+    if (process.env.NODE_ENV === 'development') {
+      console.log('🚀 SPA Components Initialized:', {
+        SpaRouter: '✅ Active',
+        SpaFeatureFlags: '✅ Active',
+        LazyLoadManager: '✅ Active',
+        OptimizedMotion: '✅ Active',
+        SpaMonitoring: '✅ Active',
+        currentRoute: router.pathname
+      });
+    }
+    
     // Cleanup on unmount
     return () => {
       if (process.env.NODE_ENV === 'production') {
         cleanupProduction();
       }
     };
-  }, []);
+  }, [router.pathname]);
 
   // Always use SessionProvider but with different session handling
   const publicPages = [
@@ -93,6 +106,12 @@ export default function App({ Component, pageProps, router }) {
         <ErrorBoundary
           showDetails={process.env.NODE_ENV === 'development'}
         >
+          {/* Critical Resource Prefetching for Lightning-Fast Navigation */}
+          <CriticalResourcePrefetch />
+          
+          {/* Prefetch Debug Panel (Development Only) */}
+          <PrefetchDebugger enabled={process.env.NODE_ENV === 'development'} />
+          
           <AnimatePresence mode="wait">
             <PageTransition 
               key={router.route} 
@@ -107,10 +126,25 @@ export default function App({ Component, pageProps, router }) {
     </ProductionPerformanceMonitor>
   );
 
-  // Always wrap with SessionProvider for consistent authentication state
+  // SPA Provider Stack - Order is important for proper functionality:
+  // 1. SpaMonitoring - Performance monitoring (outermost) - TEMPORARILY DISABLED
+  // 2. SpaFeatureFlags - Feature flag system
+  // 3. SpaRouter - Hybrid SPA routing
+  // 4. LazyLoadManager - Component lazy loading
+  // 5. OptimizedMotion - Performance-aware animations
   return (
     <SessionProvider session={pageProps.session}>
-      {AppContent}
+      <SpaMonitoring>
+        <SpaFeatureFlags>
+          <SpaRouter>
+            <LazyLoadManager>
+              <OptimizedMotion>
+                {AppContent}
+              </OptimizedMotion>
+            </LazyLoadManager>
+          </SpaRouter>
+        </SpaFeatureFlags>
+      </SpaMonitoring>
     </SessionProvider>
   );
 }

@@ -1,6 +1,7 @@
-// src/components/spa/LazyLoadManager.js - Intelligent Lazy Loading for SPA
+// src/components/spa/LazyLoadManager.js - Intelligent Lazy Loading with Prefetch Integration
 import { Suspense, lazy, useState, useEffect, createContext, useContext } from 'react';
 import { useSpa } from './SpaRouter';
+import { useRelatedPagesPrefetch, PREFETCH_STRATEGIES } from './PrefetchUtils';
 
 const LazyLoadContext = createContext({
   loadedComponents: new Set(),
@@ -141,9 +142,12 @@ export const LazyComponents = {
 };
 
 export default function LazyLoadManager({ children }) {
-  const { isSpaMode } = useSpa();
+  const { isSpaMode, prefetchPage, getRoutePriority } = useSpa();
   const [loadedComponents, setLoadedComponents] = useState(new Set());
   const [loadingComponents, setLoadingComponents] = useState(new Set());
+  
+  // Enable related pages prefetching
+  useRelatedPagesPrefetch();
 
   // Preload critical components when entering SPA mode
   useEffect(() => {
@@ -156,12 +160,26 @@ export default function LazyLoadManager({ children }) {
             loadComponent(componentName);
           }
         }
+        
+        // Also prefetch critical pages based on current context
+        const criticalPages = [
+          '/models',
+          '/admin',
+          '/insights'
+        ];
+        
+        criticalPages.forEach(href => {
+          const priority = getRoutePriority(href);
+          if (priority <= 2) { // CRITICAL or HIGH priority
+            prefetchPage(href, priority, 'component-load');
+          }
+        });
       };
 
       // Small delay to avoid blocking initial render
       setTimeout(preloadCritical, 100);
     }
-  }, [isSpaMode]);
+  }, [isSpaMode, loadedComponents, getRoutePriority, prefetchPage]);
 
   // Intelligent component loading based on user interaction
   useEffect(() => {
