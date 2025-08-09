@@ -62,18 +62,32 @@ export default async function handler(req, res) {
         if (includeAll) {
           // Admin view - fetch models by status
           const statusFilter = status || 'active';
-          result = await sql`
-            SELECT m.*,
-                   COALESCE(p.total_orders, 0) as total_orders,
-                   COALESCE(p.total_revenue, 0) as total_revenue,
-                   COALESCE(p.downloads_initiated, 0) as downloads
-            FROM models m
-            LEFT JOIN mv_model_performance p ON m.id = p.id
-            WHERE m.status = ${statusFilter}
-            ${category ? sql`AND m.category = ${category}` : sql``}
-            ORDER BY m.updated_at DESC
-            LIMIT ${parseInt(limit)}
-          `;
+          
+          if (category) {
+            result = await sql`
+              SELECT m.*,
+                     COALESCE(p.total_orders, 0) as total_orders,
+                     COALESCE(p.total_revenue, 0) as total_revenue,
+                     COALESCE(p.downloads_initiated, 0) as downloads
+              FROM models m
+              LEFT JOIN mv_model_performance p ON m.id = p.id
+              WHERE m.status = ${statusFilter} AND m.category = ${category}
+              ORDER BY m.updated_at DESC
+              LIMIT ${parseInt(limit)}
+            `;
+          } else {
+            result = await sql`
+              SELECT m.*,
+                     COALESCE(p.total_orders, 0) as total_orders,
+                     COALESCE(p.total_revenue, 0) as total_revenue,
+                     COALESCE(p.downloads_initiated, 0) as downloads
+              FROM models m
+              LEFT JOIN mv_model_performance p ON m.id = p.id
+              WHERE m.status = ${statusFilter}
+              ORDER BY m.updated_at DESC
+              LIMIT ${parseInt(limit)}
+            `;
+          }
         } else {
           // Use optimized models listing with performance data (public view)
           result = await optimizedDb.getActiveModels(category, parseInt(limit));
